@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/JIG/lib/jarsplice-0.40.jar!/" />
+      <root url="jar://$PROJECT_DIR$/JIG/lib/jogg-0.0.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/JIG/lib/jorbis-0.0.15.jar!/" />
+      <root url="jar://$PROJECT_DIR$/JIG/lib/slick.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/JIG/lib/slick-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
