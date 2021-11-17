@@ -57,6 +57,12 @@ public class Player extends Entity {
     velocity = new Vector(0, 0);
   }
 
+  public Coordinate getLocation() {
+    int x = Math.round((this.getX() - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
+    int y = Math.round((this.getY() - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
+    return new Coordinate(x,y);
+  }
+
   /***
    * This function is to be called when the player fire a projectile.
    * @param angle

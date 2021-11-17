@@ -1,5 +1,6 @@
 package Project2;
 
+import jig.ResourceManager;
 import jig.Vector;
 
 import org.newdawn.slick.GameContainer;
@@ -21,6 +22,9 @@ import java.util.LinkedList;
 public class TestState extends BasicGameState {
   Player player;
   LinkedList<Projectile> projectileList;
+  Tile tileMap[][];
+  Vertex [][] path;
+  int levelWidth, levelHeight;
 
   @Override
   public int getID() {
@@ -34,6 +38,8 @@ public class TestState extends BasicGameState {
 
   @Override
   public void enter(GameContainer container, StateBasedGame game) {
+    // See below method for details on construction.
+    initializeLevel(1);
     projectileList = new LinkedList<Projectile>();
     player = new Player(250,250);
     container.setSoundOn(true);
@@ -42,6 +48,43 @@ public class TestState extends BasicGameState {
   @Override
   public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
     DungeonGame rg = (DungeonGame)game;
+
+    // Render tiles
+    for(int y = 0;  y < levelHeight; y++) {
+      for(int x = 0; x < levelWidth; x++) {
+        Tile temp = tileMap[x][y];
+        // Floor tile
+        if(temp.getID() == 0) {
+          g.drawImage(ResourceManager.getImage(DungeonGame.MAP_FLOOR_RSC).getScaledCopy(DungeonGame.SCALE),
+              x * DungeonGame.TILESIZE, y * DungeonGame.TILESIZE);
+        }
+        // Wall tile
+        else if(temp.getID() == 1) {
+          g.drawImage(ResourceManager.getImage(DungeonGame.MAP_WALL_RSC).getScaledCopy(DungeonGame.SCALE),
+              x * DungeonGame.TILESIZE, y * DungeonGame.TILESIZE);
+        }
+      }
+    }
+
+    // Render Dijkstras Overlay if needed
+    /***
+     * Directions are listed by a integer in the overlay corresponding to the direction on the numpad
+     * 2: down, 4: left, 6: right, 8: up
+     * 1: down left, 3: down right, 7: up left, 9: up right
+      */
+    if(true) {
+      if(path != null) {
+        for(int x = 0; x < levelWidth; x++) {
+          for(int y = 0; y < levelHeight; y++) {
+            if(path[x][y].getDistance() < 1000) {
+              //g.drawString("" + path[x][y].getDistance(), (x * DungeonGame.TILESIZE) + 5, (y * DungeonGame.TILESIZE) + 20);
+              g.drawString("" + path[x][y].getDirection(), (x * DungeonGame.TILESIZE) + 5, (y * DungeonGame.TILESIZE) + 8);
+            }
+          }
+        }
+      }
+    }
+    // Render projectiles on the screen
     for(Projectile p : projectileList) {
       p.render(g);
     }
@@ -53,6 +96,9 @@ public class TestState extends BasicGameState {
     Input input = container.getInput();
     DungeonGame dg = (DungeonGame)game;
 
+    // Methods called at the start of every update for usage in the loop
+    Coordinate playerloc = player.getLocation();
+    path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, levelWidth, levelHeight);
 
     /*** CONTROLS SECTION ***/
     if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
@@ -64,19 +110,15 @@ public class TestState extends BasicGameState {
     }
 
     if(input.isKeyDown(Input.KEY_W)) {
-      System.out.println("w pressed");
       player.moveUp();
     }
     else if(input.isKeyDown(Input.KEY_A)) {
-      System.out.println("a pressed");
       player.moveLeft();
     }
     else if(input.isKeyDown(Input.KEY_S)) {
-      System.out.println("s pressed");
       player.moveDown();
     }
     else if(input.isKeyDown(Input.KEY_D)) {
-      System.out.println("d pressed");
       player.moveRight();
     }
     else {
@@ -104,5 +146,37 @@ public class TestState extends BasicGameState {
     float playery = player.getY();
     Vector angleVector = new Vector(mousex - playerx, mousey - playery);
     return angleVector.getRotation();
+  }
+
+  /***
+   * Internal function for construction of levels based on id.
+   * @param level
+   *  level number for which to construct.
+   */
+  private void initializeLevel(int level) {
+    levelWidth = 20;
+    levelHeight = 20;
+    tileMap = DungeonGame.getTileMap(
+        "11111111111111111111" +
+            "10000000110000000001" +
+            "10000000110000000001" +
+            "10000000110000000001" +
+            "10000000110000000001" +
+            "10000000110000000001" +
+            "10000000110000000001" +
+            "10000011111100000001" +
+            "10000011111100000001" +
+            "10000000000000000001" +
+            "10000000000000000001" +
+            "10000011111100000001" +
+            "10000011111100000001" +
+            "10000000110000000001" +
+            "10000000110000000001" +
+            "10000011111100000001" +
+            "10000011111100000001" +
+            "10000000000000000001" +
+            "10000000000000000001" +
+            "11111111111111111111",
+        levelWidth,levelHeight);
   }
 }
