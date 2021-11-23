@@ -102,6 +102,7 @@ public class TestState extends BasicGameState {
     path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, levelWidth, levelHeight);
 
     /*** CONTROLS SECTION ***/
+    // Left click for attacking
     if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
       System.out.println("LClick pressed");
       projectileList.add(player.fire(getPlayerMouseAngle(input)));
@@ -110,15 +111,19 @@ public class TestState extends BasicGameState {
       }
     }
 
+    // W for moving up
     if(input.isKeyDown(Input.KEY_W) && player.isMoveValid(8, tileMap)) {
       player.moveUp();
     }
+    // A for moving left
     else if(input.isKeyDown(Input.KEY_A) && player.isMoveValid(4, tileMap)) {
       player.moveLeft();
     }
+    // S for moving down
     else if(input.isKeyDown(Input.KEY_S) && player.isMoveValid(2, tileMap)) {
       player.moveDown();
     }
+    // D for moving right
     else if(input.isKeyDown(Input.KEY_D) && player.isMoveValid(6, tileMap)) {
       player.moveRight();
     }
@@ -126,15 +131,15 @@ public class TestState extends BasicGameState {
       player.stop();
     }
 
-    if(input.isKeyPressed(Input.KEY_LEFT)) {
-      player.mouseRotate(-45.0);
-    }
-    else if (input.isKeyPressed(Input.KEY_RIGHT)) {
-      player.mouseRotate(45.0);
-    }
 
+    // Update the player model
     player.mouseRotate(getPlayerMouseAngle(input));
     player.update(delta);
+
+    // Now offset if were near a wall so no in the wall happens
+    player.offsetUpdate(tileMap);
+
+    // Update projectiles
     for(Projectile p : projectileList) {
       p.update(delta);
     }

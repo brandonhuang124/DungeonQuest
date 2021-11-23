@@ -19,7 +19,6 @@ import jig.Vector;
 public class Player extends Entity {
   private Vector velocity;
   private float speed;
-  private boolean offsetNeeded;
 
   /***
    * Constructor, prepares default stats and Images/anmiations
@@ -33,7 +32,6 @@ public class Player extends Entity {
     addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_ARROWTEST_RSC));
     velocity = new Vector(0,0);
     speed = 0.25f;
-    offsetNeeded = false;
   }
 
   /**+
@@ -78,8 +76,8 @@ public class Player extends Entity {
   public Vector getTileOffset() {
     Coordinate location = getLocation();
     // The center of the tile location is (Tile * tilewidth) + 1/2 tile width, since the entity's origin is the center.
-    float tilex = (location.x * DungeonGame.TILESIZE) + (0.5f * DungeonGame.TILESIZE);
-    float tiley = (location.y * DungeonGame.TILESIZE) + (0.5f * DungeonGame.TILESIZE);
+    float tilex = (location.x * DungeonGame.TILESIZE) + (DungeonGame.TILESIZE / 2);
+    float tiley = (location.y * DungeonGame.TILESIZE) + (DungeonGame.TILESIZE / 2);
     float x = this.getX();
     float y = this.getY();
     // Return the offset from the center
@@ -153,6 +151,31 @@ public class Player extends Entity {
 
   public void update(final int delta) {
     translate(velocity.scale(delta));
+  }
+
+
+  /**
+   * This function offsets the player's location so they aren't in walls. Call after every update.
+   */
+  public void offsetUpdate(Tile[][] tilemap) {
+    // Check if any adjacent tiles are walls, and if were inside any of them. If so do an offset update.
+    Coordinate location = getLocation();
+    // Tile above
+    if(tilemap[location.x][location.y - 1].getID() == 1 && getTileOffset().getY() >= 0) {
+      translate(0, getTileOffset().getY());
+    }
+    // Tile Below
+    if(tilemap[location.x][location.y + 1].getID() == 1 && getTileOffset().getY() <= 0) {
+      translate(0, getTileOffset().getY());
+    }
+    // Tile Left
+    if(tilemap[location.x - 1][location.y].getID() == 1 && getTileOffset().getX() >= 0) {
+      translate(getTileOffset().getX(), 0 );
+    }
+    // Tile Right
+    if(tilemap[location.x][location.y].getID() == 1 && getTileOffset().getX() <= 0) {
+      translate(getTileOffset().getX(), 0 );
+    }
   }
 
   /***
