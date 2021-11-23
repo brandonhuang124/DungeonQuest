@@ -16,6 +16,7 @@ import org.newdawn.slick.Animation;
 public class Projectile extends Entity {
   private float speed;
   private Vector velocity;
+  private boolean removeMe;
   int id;
 
   /***
@@ -38,11 +39,38 @@ public class Projectile extends Entity {
     velocity = velocity.setRotation(angle);
     addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_PROJECTILE_RSC));
     setRotation(angle);
+    removeMe = false;
+  }
+
+  /**
+   * This function is for collision checking the projectile, should be called every update.
+   * Marks the removeMe field if the projectile needs to be removed.
+   * @param tilemap
+   *  The tilemap representing the layout of the map.
+   */
+  public void collisionCheck(Tile[][] tilemap) {
+    Coordinate location = getLocation();
+    if(tilemap[location.x][location.y].getID() == 1) {
+      removeMe = true;
+    }
+  }
+
+  /**
+   * This function is for getting the coordinate of the player.
+   * @return
+   * A Coordinate object with an x and y field representing the location in the tilemap the player currently exists in.
+   */
+  public Coordinate getLocation() {
+    int x = Math.round((this.getX() - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
+    int y = Math.round((this.getY() - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
+    return new Coordinate(x,y);
   }
 
   public void update(final int delta) {
     translate(velocity.scale(delta));
   }
+
+  public boolean needsRemove() {return removeMe;}
 
   public int getID() { return id;}
 }

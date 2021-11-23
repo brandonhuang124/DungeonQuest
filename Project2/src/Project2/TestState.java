@@ -143,6 +143,12 @@ public class TestState extends BasicGameState {
     for(Projectile p : projectileList) {
       p.update(delta);
     }
+    // Collision check for projectiles
+    for(Projectile projectile : projectileList) {
+      projectile.collisionCheck(tileMap);
+    }
+    // Remove Projetiles that have collided with objects.
+    projectileList.removeIf( (Projectile projectile) -> projectile.needsRemove());
   }
 
   public double getPlayerMouseAngle(Input input) {
