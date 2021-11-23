@@ -41,7 +41,8 @@ public class TestState extends BasicGameState {
     // See below method for details on construction.
     initializeLevel(1);
     projectileList = new LinkedList<Projectile>();
-    player = new Player(250,250);
+    player = new Player((DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE),
+        (DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE));
     container.setSoundOn(true);
   }
 
@@ -109,16 +110,16 @@ public class TestState extends BasicGameState {
       }
     }
 
-    if(input.isKeyDown(Input.KEY_W)) {
+    if(input.isKeyDown(Input.KEY_W) && player.isMoveValid(8, tileMap)) {
       player.moveUp();
     }
-    else if(input.isKeyDown(Input.KEY_A)) {
+    else if(input.isKeyDown(Input.KEY_A) && player.isMoveValid(4, tileMap)) {
       player.moveLeft();
     }
-    else if(input.isKeyDown(Input.KEY_S)) {
+    else if(input.isKeyDown(Input.KEY_S) && player.isMoveValid(2, tileMap)) {
       player.moveDown();
     }
-    else if(input.isKeyDown(Input.KEY_D)) {
+    else if(input.isKeyDown(Input.KEY_D) && player.isMoveValid(6, tileMap)) {
       player.moveRight();
     }
     else {
