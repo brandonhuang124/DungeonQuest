@@ -8,6 +8,7 @@ package Project2;
 public class MapUtil {
     private final String TAG ="Maps class - ";
     private Tile[][] nextMapData;
+    private Tile[][] previousMapData;
 
     /*** Selects the map depending on the level ID: */
     public Tile[][] initializeLevel(int level, int levelWidth, int levelHeight) {
@@ -107,47 +108,28 @@ public class MapUtil {
         }
         return tileMap;
     }
+
     /***
-     * removeColumn removed the column specified for left or right scrolling
-     * tweaking this using rows, we can construct a vertical scroll as well.
+     *
+     * copyCurrentToPreviousMap saves the current state of the map
+     * to a previous 2d array for backtracking.
+     * this should be done upon moving in any direction.
      */
-    private Tile[][] removeColumn(Tile [][] currentMap, int columnToRemove){
-        int row = currentMap.length;
-        int col = currentMap[0].length;
-
-        Tile [][] newMap = new Tile[row][col];
-        for(int i = 0; i < row; i++) {
-            for(int j = 0,currentColumn=0; j < col; j++) {
-                if(j != columnToRemove) {
-                    int nextCol = currentColumn++;
-                    newMap[i][nextCol] = currentMap[i][j];
-                    // set the last column of the new map to a blank tile
-                    Tile blank = new Tile(0);
-                    newMap[i][nextCol++] = blank;
-                }
-            }
+    private void copyCurrentToPreviousMap(Tile [][] currentMap){
+        Tile [][] previousMapData = new Tile[currentMap.length][];
+        // copy the currentMap to previousMapData.
+        for(int i = 0; i < currentMap.length; i++) {
+            Tile[] column = currentMap[i];
+            int colLength = column.length;
+            previousMapData [i] = new Tile[colLength];
+            System.arraycopy(column, 0, previousMapData[i], 0, colLength);
         }
-        return newMap;
-    }
-
-
-    private Tile[][] addColumnFromData(Tile [][] currentMap){
-        Tile [][] newMap = new Tile[currentMap.length][];
-        for(int i = 0; i < currentMap.length; i++)
-        {
-            Tile[] aMatrix = currentMap[i];
-            int   aLength = aMatrix.length;
-            newMap[i] = new Tile[aLength];
-            System.arraycopy(aMatrix, 0, newMap[i], 0, aLength);
-        }
-        return newMap;
     }
 
     /*** scroll right based on the CURRENT state of the map */
-    public Tile[][] ScrollRight(Tile currentMap[][]) {
-        //remove leftmost column. This also shifts all columns and leaves the last column blank
-        // Tile[][] newCurrentMap = removeColumn(currentMap,0);
-        //insert new column in the rightmost position
+    public Tile[][] ScrollRight(Tile[][] currentMap) {
+        // copy the currentMap to previous so player can backtrack:
+        copyCurrentToPreviousMap(currentMap);
         // [row][col]
         Tile [][] shiftedTempMap = new Tile[currentMap.length][];
         // copy the currentMap and shift it over by 1 column:
@@ -170,10 +152,9 @@ public class MapUtil {
     }
 
     /*** scroll left based on the CURRENT state of the map */
-    public void ScrollLeft(Tile tileMap[][]) {
+    public void ScrollLeft(Tile currentMap[][]) {
         //remove rightmost column.
 
         //insert new column in the leftmost position, shifting other columns right one
-
     }
 }
