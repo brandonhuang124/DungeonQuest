@@ -41,7 +41,8 @@ public class TestState extends BasicGameState {
     // See below method for details on construction.
     initializeLevel(1);
     projectileList = new LinkedList<Projectile>();
-    player = new Player(250,250);
+    player = new Player((DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE),
+        (DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE));
     container.setSoundOn(true);
   }
 
@@ -101,6 +102,7 @@ public class TestState extends BasicGameState {
     path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, levelWidth, levelHeight);
 
     /*** CONTROLS SECTION ***/
+    // Left click for attacking
     if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
       System.out.println("LClick pressed");
       projectileList.add(player.fire(getPlayerMouseAngle(input)));
@@ -109,34 +111,61 @@ public class TestState extends BasicGameState {
       }
     }
 
-    if(input.isKeyDown(Input.KEY_W)) {
+    // Check diagonols first
+    // W and A for Up Left
+    if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(7, tileMap)) {
+      player.moveUpLeft();
+    }
+    // W and D for Up Right
+    else if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(9, tileMap)) {
+      player.moveUpRight();
+    }
+    // S and A for Down Left
+    else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(1, tileMap)) {
+      player.moveDownLeft();
+    }
+    // S and D for Down Right
+    else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(3, tileMap)) {
+      player.moveDownRight();
+    }
+    // W for moving up
+    else if(input.isKeyDown(Input.KEY_W) && player.isMoveValid(8, tileMap)) {
       player.moveUp();
     }
-    else if(input.isKeyDown(Input.KEY_A)) {
+    // A for moving left
+    else if(input.isKeyDown(Input.KEY_A) && player.isMoveValid(4, tileMap)) {
       player.moveLeft();
     }
-    else if(input.isKeyDown(Input.KEY_S)) {
+    // S for moving down
+    else if(input.isKeyDown(Input.KEY_S) && player.isMoveValid(2, tileMap)) {
       player.moveDown();
     }
-    else if(input.isKeyDown(Input.KEY_D)) {
+    // D for moving right
+    else if(input.isKeyDown(Input.KEY_D) && player.isMoveValid(6, tileMap)) {
       player.moveRight();
     }
     else {
       player.stop();
     }
 
-    if(input.isKeyPressed(Input.KEY_LEFT)) {
-      player.mouseRotate(-45.0);
-    }
-    else if (input.isKeyPressed(Input.KEY_RIGHT)) {
-      player.mouseRotate(45.0);
-    }
 
+    // Update the player model
     player.mouseRotate(getPlayerMouseAngle(input));
     player.update(delta);
+
+    // Now offset if were near a wall so no in the wall happens
+    player.offsetUpdate(tileMap);
+
+    // Update projectiles
     for(Projectile p : projectileList) {
       p.update(delta);
     }
+    // Collision check for projectiles
+    for(Projectile projectile : projectileList) {
+      projectile.collisionCheck(tileMap);
+    }
+    // Remove Projetiles that have collided with objects.
+    projectileList.removeIf( (Projectile projectile) -> projectile.needsRemove());
   }
 
   public double getPlayerMouseAngle(Input input) {
