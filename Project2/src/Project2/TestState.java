@@ -111,8 +111,25 @@ public class TestState extends BasicGameState {
       }
     }
 
+    // Check diagonols first
+    // W and A for Up Left
+    if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(7, tileMap)) {
+      player.moveUpLeft();
+    }
+    // W and D for Up Right
+    else if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(9, tileMap)) {
+      player.moveUpRight();
+    }
+    // S and A for Down Left
+    else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(1, tileMap)) {
+      player.moveDownLeft();
+    }
+    // S and D for Down Right
+    else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(3, tileMap)) {
+      player.moveDownRight();
+    }
     // W for moving up
-    if(input.isKeyDown(Input.KEY_W) && player.isMoveValid(8, tileMap)) {
+    else if(input.isKeyDown(Input.KEY_W) && player.isMoveValid(8, tileMap)) {
       player.moveUp();
     }
     // A for moving left
