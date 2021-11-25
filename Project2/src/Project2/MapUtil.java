@@ -115,7 +115,7 @@ public class MapUtil {
      * to a previous 2d array for backtracking.
      * this should be done upon moving in any direction.
      */
-    private void copyCurrentToPreviousMap(Tile [][] currentMap){
+    private Tile[][] copyCurrentToPreviousMap(Tile [][] currentMap){
         Tile [][] previousMapData = new Tile[currentMap.length][];
         // copy the currentMap to previousMapData.
         for(int i = 0; i < currentMap.length; i++) {
@@ -124,12 +124,13 @@ public class MapUtil {
             previousMapData [i] = new Tile[colLength];
             System.arraycopy(column, 0, previousMapData[i], 0, colLength);
         }
+        return previousMapData;
     }
 
     /*** scroll right based on the CURRENT state of the map */
     public Tile[][] ScrollRight(Tile[][] currentMap) {
         // copy the currentMap to previous so player can backtrack:
-        copyCurrentToPreviousMap(currentMap);
+        previousMapData = copyCurrentToPreviousMap(currentMap);
         // [row][col]
         Tile [][] shiftedTempMap = new Tile[currentMap.length][];
         // copy the currentMap and shift it over by 1 column:
