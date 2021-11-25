@@ -15,13 +15,21 @@ public class Level1 extends BasicGameState {
     LinkedList<Projectile> projectileList;
     Tile tileMap[][];
     Vertex [][] path;
-    int level2_width = 20;
-    int level1_height = 20;
+    private int level1Width = 20;
+    private int level1Height = 20;
 
 
     @Override
     public int getID() {
         return DungeonGame.LEVEL1;
+    }
+
+    public int getLevelWidth(){
+        return level1Width;
+    }
+
+    public int getLeveleHeight(){
+        return level1Height;
     }
 
     @Override
