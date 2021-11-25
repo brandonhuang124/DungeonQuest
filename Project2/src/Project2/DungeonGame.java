@@ -69,6 +69,7 @@ public class DungeonGame extends StateBasedGame {
     // Load states
     addState(new StartState());
     addState(new TestState());
+    addState(new Level1());
 
     /*** RESOURCE LOADING ***/
     ResourceManager.loadImage(PLAYER_ARROWTEST_RSC);

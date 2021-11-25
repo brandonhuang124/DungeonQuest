@@ -6,36 +6,41 @@ package Project2;
 * DungeonGame class. */
 
 public class MapUtil {
+    // bool for toggling printing maps and logs
+    // set to true to print, additional tag for logs:
+    private boolean debug = true;
     private final String TAG ="Maps class - ";
-    private Tile[][] nextMapData;
-    private Tile[][] previousMapData;
+    public Tile[][] nextMapData;
+    public Tile[][] previousMapData;
+    public Tile[][] currentMap;
 
     /*** Selects the map depending on the level ID: */
     public Tile[][] initializeLevel(int level, int levelWidth, int levelHeight) {
         Tile tileMap[][] = new Tile[levelWidth][levelHeight];
         switch(level) {
             case 1:
-                tileMap = DungeonGame.getTileMap(
-                            "11111111111111111111" +
-                                "10000000110000000000" +
-                                "10000000110000000000" +
-                                "10000000110000000000" +
-                                "10000000110000000000" +
-                                "10000000110000000000" +
-                                "10000000110000000000" +
-                                "10000011111100000000" +
-                                "10000011111100000000" +
-                                "10000000000000000000" +
-                                "10000000000000000000" +
-                                "10000011111100000000" +
-                                "10000011111100000000" +
-                                "10000000110000000000" +
-                                "10000000110000000000" +
-                                "10000011111100000000" +
-                                "10000011111100000000" +
-                                "10000000000000000000" +
-                                "10000000000000000000" +
-                                "11111111111111111111",
+                String map =
+                                "11111111111111111111" +
+                                "10000000110000000001" +
+                                "10000000110000000001" +
+                                "10000000110000000001" +
+                                "10000000110000000001" +
+                                "10000000110000000001" +
+                                "10000000110000000001" +
+                                "10000011111100000001" +
+                                "10000011111100000001" +
+                                "10000000000000000001" +
+                                "10000000000000000001" +
+                                "10000011111100000001" +
+                                "10000011111100000001" +
+                                "10000000110000000001" +
+                                "10000000110000000001" +
+                                "10000011111100000001" +
+                                "10000011111100000001" +
+                                "10000000000000000001" +
+                                "10000000000000000001" +
+                                "11111111111111111111";
+                tileMap = DungeonGame.getTileMap(map,
                                 levelWidth, levelHeight);
                 //initialize the remainder of the map(20 x 20 initially):
                 nextMapData = levelMapNextData(level, levelWidth, levelHeight);
@@ -54,7 +59,15 @@ public class MapUtil {
                 System.out.println(TAG +"please check level ID being passed");
                 break;
         }
+        if(debug){
+            System.out.println(TAG + "Initial level Map:");
+
+        }
     return tileMap;
+    }
+
+    public void printCurrentMap(){
+        printMapTiles(currentMap);
     }
 
     /***
@@ -68,29 +81,32 @@ public class MapUtil {
         Tile tileMap[][] = new Tile[20][20];
         switch(level) {
             case 1:
+                String map =
+                        "11111111111111111111" +
+                        "00000000110000000001" +
+                        "00000000110000000001" +
+                        "11110000110000000001" +
+                        "11110000000000000001" +
+                        "11110000000000000001" +
+                        "00000000110000000001" +
+                        "00000011111100000001" +
+                        "00000011111100000001" +
+                        "11000000000000000001" +
+                        "11000000000000000001" +
+                        "00000011111100000001" +
+                        "00000011111100000001" +
+                        "00000000000000000001" +
+                        "11000000000000000001" +
+                        "11000011111100000001" +
+                        "11000011111100000001" +
+                        "00000000000000000001" +
+                        "00000000000000000001" +
+                        "11111111111111111111";
                 tileMap = DungeonGame.getTileMap(
-                           "11111111111111111111" +
-                                "00000000110000000001" +
-                                "00000000110000000001" +
-                                "00000000110000000001" +
-                                "00000000000000000001" +
-                                "00000000000000000001" +
-                                "00000000110000000001" +
-                                "00000011111100000001" +
-                                "00000011111100000001" +
-                                "00000000000000000001" +
-                                "00000000000000000001" +
-                                "00000011111100000001" +
-                                "00000011111100000001" +
-                                "00000000000000000001" +
-                                "00000000000000000001" +
-                                "00000011111100000001" +
-                                "00000011111100000001" +
-                                "00000000000000000001" +
-                                "00000000000000000001" +
-                                "11111111111111111111",
-                        levelWidth, levelHeight);
-
+                           map, levelWidth, levelHeight);
+                if(debug)
+                    System.out.println(TAG+"NextMapData");
+                    System.out.println(map);
                 break;
             case 2:
                 //TODO add level2 map
@@ -157,5 +173,17 @@ public class MapUtil {
         //remove rightmost column.
 
         //insert new column in the leftmost position, shifting other columns right one
+    }
+
+    /***
+     * simple print method for printing a map for debugging purposes:
+     */
+    private void printMapTiles(Tile[][] map) {
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[i].length; j++) {
+                System.out.print(map[i][j].getID()+ " ");
+            }
+            System.out.println();
+        }
     }
 }

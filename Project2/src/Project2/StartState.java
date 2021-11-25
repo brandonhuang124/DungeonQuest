@@ -11,8 +11,13 @@ import org.newdawn.slick.state.StateBasedGame;
  *
  * Transitions To TestState
  */
+
+
 public class StartState extends BasicGameState {
 
+  // used to toggle between level1 and teststate transition:
+  // set to true to go back to test state.
+  private boolean debug = false;
   private int select, timer;
   private boolean selected, arrowBlink, musicRestart;
   Animation player, melee, melee2, ranged;
@@ -43,8 +48,9 @@ public class StartState extends BasicGameState {
 
     Input input = container.getInput();
     DungeonGame rg = (DungeonGame)game;
-
-    rg.enterState(DungeonGame.TESTSTATE);
-
+    if(debug)
+      rg.enterState(DungeonGame.TESTSTATE);
+    else
+      rg.enterState(DungeonGame.LEVEL1);
   }
 }
