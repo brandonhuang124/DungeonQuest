@@ -58,7 +58,7 @@ public class DungeonGame extends StateBasedGame {
     ScreenHeight = height;
     ScreenWidth = width;
 
-    Client client = new Client("localhost", 4999);
+    //Client client = new Client("localhost", 4999);
 
     Entity.setCoarseGrainedCollisionBoundary(Entity.CIRCLE);
   }
