@@ -131,7 +131,7 @@ public class Level1 extends BasicGameState {
 
         // Methods called at the start of every update for usage in the loop
         Coordinate playerloc = player.getLocation();
-        //path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, levelWidth, levelHeight);
+        path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, offsetX, offsetY);
 
         /*** CONTROLS SECTION ***/
         // Left click for attacking
