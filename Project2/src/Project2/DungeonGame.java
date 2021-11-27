@@ -28,7 +28,9 @@ import java.io.IOException;
  */
 
 public class DungeonGame extends StateBasedGame {
+
   // States
+  private static final String TAG = "DungeonGame -";
   public static final int STARTUPSTATE = 0;
   public static final int TESTSTATE = 1;
   public static final int LEVEL1 = 2;
@@ -106,8 +108,10 @@ public class DungeonGame extends StateBasedGame {
    */
   public static Tile[][] getTileMap(String map, int width, int height) {
     // Check if an invalid string to build was given.
+    System.out.println(map.length());
+    System.out.println(width + " , " + height);
     if(width * height != map.length()) {
-      System.out.println("String length did not match map dimensions");
+      System.out.println(TAG + "String length did not match map dimensions");
       return null;
     }
     Tile tileMap[][] = new Tile[width][height];

@@ -17,6 +17,7 @@ import jig.Vector;
  */
 
 public class Player extends Entity {
+  private static final String TAG =  "Player -" ;
   private Vector velocity;
   private float speed;
 
@@ -222,20 +223,24 @@ public class Player extends Entity {
     // Check if any adjacent tiles are walls, and if were inside any of them. If so do an offset update.
     Coordinate location = getLocation();
     // Tile above
-    if(tilemap[location.x][location.y - 1].getID() == 1 && getTileOffset().getY() >= 0) {
-      translate(0, getTileOffset().getY());
-    }
-    // Tile Below
-    if(tilemap[location.x][location.y + 1].getID() == 1 && getTileOffset().getY() <= 0) {
-      translate(0, getTileOffset().getY());
-    }
-    // Tile Left
-    if(tilemap[location.x - 1][location.y].getID() == 1 && getTileOffset().getX() >= 0) {
-      translate(getTileOffset().getX(), 0 );
-    }
-    // Tile Right
-    if(tilemap[location.x + 1][location.y].getID() == 1 && getTileOffset().getX() <= 0) {
-      translate(getTileOffset().getX(), 0 );
+    if(tilemap != null) {
+      if (tilemap[location.x][location.y - 1].getID() == 1 && getTileOffset().getY() >= 0) {
+        translate(0, getTileOffset().getY());
+      }
+      // Tile Below
+      if (tilemap[location.x][location.y + 1].getID() == 1 && getTileOffset().getY() <= 0) {
+        translate(0, getTileOffset().getY());
+      }
+      // Tile Left
+      if (tilemap[location.x - 1][location.y].getID() == 1 && getTileOffset().getX() >= 0) {
+        translate(getTileOffset().getX(), 0);
+      }
+      // Tile Right
+      if (tilemap[location.x + 1][location.y].getID() == 1 && getTileOffset().getX() <= 0) {
+        translate(getTileOffset().getX(), 0);
+      }
+    }else{
+      System.out.println(TAG + "TileMap is null");
     }
   }
 

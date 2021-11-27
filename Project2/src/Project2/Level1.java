@@ -10,6 +10,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
+import java.io.IOException;
 import java.util.LinkedList;
 
 /***
@@ -24,11 +25,11 @@ public class Level1 extends BasicGameState {
     LinkedList<Projectile> projectileList;
     Tile tileMap[][];
     Vertex [][] path;
+    MapUtil levelMap;
     int levelWidth, levelHeight;
-    private int topOffsetInTiles;
-    private int LeftOffsetInTiles;
-    private int widthInTiles;
-    private int heightInTiles;
+    private int offsetY;
+    private int offsetX;
+
 
 
     @Override
@@ -38,17 +39,25 @@ public class Level1 extends BasicGameState {
 
     @Override
     public void init(GameContainer container, StateBasedGame game) throws SlickException {
-        widthInTiles = container.getWidth() / DungeonGame.TILESIZE;
-        heightInTiles = container.getHeight() / DungeonGame.TILESIZE;
-        topOffsetInTiles = heightInTiles / 2;
-        LeftOffsetInTiles = widthInTiles / 2;
+        levelMap = new MapUtil();
 
     }
 
     @Override
     public void enter(GameContainer container, StateBasedGame game) {
-        // See below method for details on construction.
-        initializeLevel(1);
+        levelWidth = 60;
+        levelHeight = 60;
+        offsetX = 20;
+        offsetY = 20;
+        // parse the CSV map file, throw exception in case of IO error:
+        try {
+            levelMap.loadLevelMap(1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        tileMap = DungeonGame.getTileMap(levelMap.currentMapString,
+                levelWidth,levelHeight);
         projectileList = new LinkedList<Projectile>();
         player = new Player((DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE),
                 (DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE));
@@ -60,9 +69,21 @@ public class Level1 extends BasicGameState {
     public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
         DungeonGame rg = (DungeonGame)game;
 
+        if(levelMap.startY+20 < levelHeight) {
+            offsetY = (levelMap.startY + 20);
+        }else{
+            offsetY = levelHeight;
+        }
+        if(levelMap.startX+20 < levelWidth) {
+            offsetX = (levelMap.startX + 20);
+        }else{
+            offsetX = levelWidth;
+        }
+
+
         // Render tiles
-        for(int y = 0;  y < levelHeight; y++) {
-            for(int x = 0; x < levelWidth; x++) {
+        for(int y = levelMap.startY;  y < offsetY; y++) {
+            for(int x = levelMap.startX; x < offsetX; x++) {
                 Tile temp = tileMap[x][y];
                 // Floor tile
                 if(temp.getID() == 0) {
@@ -85,8 +106,8 @@ public class Level1 extends BasicGameState {
          */
         if(true) {
             if(path != null) {
-                for(int x = 0; x < levelWidth; x++) {
-                    for(int y = 0; y < levelHeight; y++) {
+                for(int x = 0; x < offsetX; x++) {
+                    for(int y = 0; y < offsetY; y++) {
                         if(path[x][y].getDistance() < 1000) {
                             //g.drawString("" + path[x][y].getDistance(), (x * DungeonGame.TILESIZE) + 5, (y * DungeonGame.TILESIZE) + 20);
                             g.drawString("" + path[x][y].getDirection(), (x * DungeonGame.TILESIZE) + 5, (y * DungeonGame.TILESIZE) + 8);
@@ -110,7 +131,7 @@ public class Level1 extends BasicGameState {
 
         // Methods called at the start of every update for usage in the loop
         Coordinate playerloc = player.getLocation();
-        path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, levelWidth, levelHeight);
+        //path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, levelWidth, levelHeight);
 
         /*** CONTROLS SECTION ***/
         // Left click for attacking
@@ -188,35 +209,5 @@ public class Level1 extends BasicGameState {
         return angleVector.getRotation();
     }
 
-    /***
-     * Internal function for construction of levels based on id.
-     * @param level
-     *  level number for which to construct.
-     */
-    private void initializeLevel(int level) {
-        levelWidth = 20;
-        levelHeight = 20;
-        tileMap = DungeonGame.getTileMap(
-                "11111111111111111111" +
-                        "10000000110000000001" +
-                        "10000000110000000001" +
-                        "10000000110000000001" +
-                        "10000000110000000001" +
-                        "10000000110000000001" +
-                        "10000000110000000001" +
-                        "10000011111100000001" +
-                        "10000011111100000001" +
-                        "10000000000000000001" +
-                        "10000000000000000001" +
-                        "10000011111100000001" +
-                        "10000011111100000001" +
-                        "10000000110000000001" +
-                        "10000000110000000001" +
-                        "10000011111100000001" +
-                        "10000011111100000001" +
-                        "10000000000000000001" +
-                        "10000000000000000001" +
-                        "11111111111111111111",
-                levelWidth,levelHeight);
-    }
+
 }
