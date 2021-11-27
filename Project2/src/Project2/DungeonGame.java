@@ -31,6 +31,7 @@ public class DungeonGame extends StateBasedGame {
   // States
   public static final int STARTUPSTATE = 0;
   public static final int TESTSTATE = 1;
+  public static final int LEVEL1 = 2;
 
   // Important parameters
   public static final int TILESIZE = 32;
@@ -68,6 +69,7 @@ public class DungeonGame extends StateBasedGame {
     // Load states
     addState(new StartState());
     addState(new TestState());
+    addState(new Level1());
 
     /*** RESOURCE LOADING ***/
     ResourceManager.loadImage(PLAYER_ARROWTEST_RSC);
