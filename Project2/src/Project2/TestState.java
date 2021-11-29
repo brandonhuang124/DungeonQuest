@@ -22,6 +22,7 @@ import java.util.LinkedList;
 public class TestState extends BasicGameState {
   Player player;
   LinkedList<Projectile> projectileList;
+  LinkedList<Enemy> enemyList;
   Tile tileMap[][];
   Vertex [][] path;
   int levelWidth, levelHeight;
@@ -41,6 +42,8 @@ public class TestState extends BasicGameState {
     // See below method for details on construction.
     initializeLevel(1);
     projectileList = new LinkedList<Projectile>();
+    enemyList = new LinkedList<Enemy>();
+    enemyList.add(new Enemy(DungeonGame.TILESIZE * 18, DungeonGame.TILESIZE * 5, 1));
     player = new Player((DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE),
         (DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE));
     container.setSoundOn(true);
@@ -88,6 +91,11 @@ public class TestState extends BasicGameState {
     // Render projectiles on the screen
     for(Projectile p : projectileList) {
       p.render(g);
+    }
+
+    // Render Entities
+    for(Enemy enemy : enemyList) {
+      enemy.render(g);
     }
     player.render(g);
   }
@@ -148,6 +156,13 @@ public class TestState extends BasicGameState {
       player.stop();
     }
 
+
+    // Update All enemies
+    for(Enemy enemy : enemyList) {
+      enemy.makeMove(tileMap, path, player);
+      enemy.update(delta);
+      enemy.offsetUpdate(tileMap);
+    }
 
     // Update the player model
     player.mouseRotate(getPlayerMouseAngle(input));
