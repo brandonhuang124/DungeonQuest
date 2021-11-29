@@ -25,9 +25,8 @@ public class Enemy extends Entity{
 
   private Vector velocity;
   private float speed;
-  private int id;
-  private int health;
-  private boolean isDead;
+  private int id, health, sleeptimer;
+  private boolean isDead, sleep;
 
   /***
    * Constructor, prepares default stats and Images/anmiations
@@ -42,7 +41,8 @@ public class Enemy extends Entity{
     velocity = new Vector(0,0);
     speed = 0.15f;
     id = newid;
-    isDead = false;
+    isDead = sleep = false;
+    sleeptimer = 0;
     if(id == 1) {
       health = 10;
     }
@@ -61,11 +61,34 @@ public class Enemy extends Entity{
    * @param player1
    *  Player object representing player 1.
    */
-  public void makeMove(Tile[][] tilemap, Vertex[][] path1, Player player1) {
+  public void makeMove(Tile[][] tilemap, Vertex[][] path1, Player player1, int delta) {
+    // First check if were currently asleep due to actions such as attacking.
+    if(sleep) {
+      sleeptimer -= delta;
+      if(sleeptimer <= 0)
+        sleep = false;
+      return;
+    }
+
     // Get location and retrieve direction from the vertex map.
     Coordinate location = getLocation();
     int direction = path1[location.x][location.y].getDirection();
 
+    // Attempt attacks depending on enemy type:
+    //  Melee
+    if(id == 1) {
+      Coordinate playerLocation = player1.getLocation();
+      if(playerLocation.x == location.x && playerLocation.y == location.y) {
+        player1.damage(2);
+        System.out.println("Player Hit! " + player1.getCurrentHealth());
+        sleep = true;
+        sleeptimer = 500;
+        stop();
+        return;
+      }
+    }
+
+    // If attacks are unavailable, the enemy will just move.
     switch (direction) {
       case 1:  moveDownLeft();
                break;

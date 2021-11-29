@@ -159,7 +159,7 @@ public class TestState extends BasicGameState {
 
     // Update All enemies
     for(Enemy enemy : enemyList) {
-      enemy.makeMove(tileMap, path, player);
+      enemy.makeMove(tileMap, path, player, delta);
       enemy.update(delta);
       enemy.offsetUpdate(tileMap);
     }
