@@ -91,51 +91,25 @@ public class MapUtil {
 
     public void updateMap(Coordinate playerLoc){
 
-        if(playerLoc.x > playerPrevLoc.x +3){
+        if(playerLoc.x > playerPrevLoc.x +1){
             // scroll right
-            if(screenTileRender.x+3 < levelWidth) {
-                screenTileRender.x += 3;
-                playerPrevLoc.x = playerLoc.x;
-                // update the end tiles to be rendered:
-                if(screenEndTiles.x+3 < levelWidth)
-                    screenEndTiles.x +=3;
-            }
+            screenTileRender.x = Math.min(screenTileRender.x+1,levelWidth-1);
+            playerPrevLoc.x = playerLoc.x;
         }
-        if(playerLoc.x < playerPrevLoc.x -3){
+        if(playerLoc.x < playerPrevLoc.x -1){
             // scroll left
-            if(screenTileRender.x-3 >= 0) {
-                screenTileRender.x -= 3;
-                playerPrevLoc.x = playerLoc.x;
-                screenEndTiles.x -=3;
-                // update the end tiles to be rendered:
-                if(screenEndTiles.x-3 >= 0)
-                    screenEndTiles.x -=3;
-            }
+            screenTileRender.x = Math.max(screenTileRender.x-1, 0);
+            playerPrevLoc.x = playerLoc.x;
         }
         if(playerLoc.y > playerPrevLoc.y +1){
             // scroll down
-          /*  if(screenTileRender.y+3 < levelWidth) {
-                screenTileRender.y += 3;
-                playerPrevLoc.y = playerLoc.y;
-                // update the end tiles to be rendered:
-                if(screenEndTiles.y+3 < levelHeight)
-                    screenEndTiles.y +=3;
-            }
-            */
-
-            screenTileRender.y +=1;
+            screenTileRender.y = Math.min(screenTileRender.y +1, levelHeight-1);
             playerPrevLoc.y = playerLoc.y;
-
         }
-        if(playerLoc.y < playerPrevLoc.y -3){
+        if(playerLoc.y < playerPrevLoc.y -1){
             // scroll up
-            if(screenTileRender.y-3 >= 0) {
-                screenTileRender.y -= 3;
-                playerPrevLoc.y = playerLoc.y;
-                // update the end tiles to be rendered:
-                if(screenEndTiles.y-3 >= 0)
-                    screenEndTiles.y -=3;
-            }
+            screenTileRender.y = Math.max(screenTileRender.y-1, 0);
+            playerPrevLoc.y = playerLoc.y;
         }
     }
 

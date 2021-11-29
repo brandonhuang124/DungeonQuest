@@ -41,6 +41,7 @@ public class DungeonGame extends StateBasedGame {
 
   /*** ASSET PATHS ***/
   public static final String PLAYER_ARROWTEST_RSC = "Project2/Assets/arrow.png";
+  public static final String PLAYER_ARROWTEST2_RSC = "Project2/Assets/arrow.png";
   public static final String PLAYER_PROJECTILE_RSC = "Project2/Assets/projectile.png";
 
   public static final String MAP_WALL_RSC = "Project2/Assets/wall.png";
@@ -75,6 +76,8 @@ public class DungeonGame extends StateBasedGame {
 
     /*** RESOURCE LOADING ***/
     ResourceManager.loadImage(PLAYER_ARROWTEST_RSC);
+    // used in player tile location:
+    ResourceManager.loadImage(PLAYER_ARROWTEST2_RSC);
     ResourceManager.loadImage(PLAYER_PROJECTILE_RSC);
 
     ResourceManager.loadImage(MAP_FLOOR_RSC);
