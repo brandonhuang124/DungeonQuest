@@ -175,12 +175,17 @@ public class TestState extends BasicGameState {
     for(Projectile p : projectileList) {
       p.update(delta);
     }
+
     // Collision check for projectiles
     for(Projectile projectile : projectileList) {
-      projectile.collisionCheck(tileMap);
+      projectile.collisionCheck(tileMap, enemyList, player);
     }
+
+
     // Remove Projetiles that have collided with objects.
     projectileList.removeIf( (Projectile projectile) -> projectile.needsRemove());
+    // Remove enemies that have died.
+    enemyList.removeIf( (Enemy enemy) -> enemy.isDead());
   }
 
   public double getPlayerMouseAngle(Input input) {
@@ -193,7 +198,7 @@ public class TestState extends BasicGameState {
   }
 
   /***
-   * Internal function for construction of levels based on id.
+   * Internal function for construction of levels based on idd.
    * @param level
    *  level number for which to construct.
    */

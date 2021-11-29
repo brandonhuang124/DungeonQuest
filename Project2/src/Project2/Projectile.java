@@ -5,6 +5,8 @@ import jig.ResourceManager;
 import jig.Vector;
 import org.newdawn.slick.Animation;
 
+import java.util.LinkedList;
+
 /***
  * Enitity class for reprsenting projectiles. Tied to an ID:
  *  ID = 1: Ranged Player projectile
@@ -48,10 +50,29 @@ public class Projectile extends Entity {
    * @param tilemap
    *  The tilemap representing the layout of the map.
    */
-  public void collisionCheck(Tile[][] tilemap) {
+  public void collisionCheck(Tile[][] tilemap, LinkedList<Enemy> enemyList, Player player) {
     Coordinate location = getLocation();
+    // Always do a wall check
     if(tilemap[location.x][location.y].getID() == 1) {
       removeMe = true;
+    }
+    // If were a player projectile, do an enemy check
+    if(id == 1) {
+      for(Enemy enemy : enemyList) {
+        Coordinate enemyLocation = enemy.getLocation();
+        if(enemyLocation.x == location.x && enemyLocation.y == location.y) {
+          removeMe = true;
+          enemy.damage(10);
+        }
+      }
+    }
+    // If were an enemy projectile, do a player check
+    if(id == 2) {
+      Coordinate playerLocation = player.getLocation();
+      if(playerLocation.x == location.x && playerLocation.y == location.y) {
+        // Do things here ***
+
+      }
     }
   }
 
