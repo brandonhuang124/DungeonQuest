@@ -25,6 +25,7 @@ public class TestState extends BasicGameState {
   Tile tileMap[][];
   Vertex [][] path;
   int levelWidth, levelHeight;
+  MapUtil levelMap;
 
   @Override
   public int getID() {
@@ -98,10 +99,11 @@ public class TestState extends BasicGameState {
     DungeonGame dg = (DungeonGame)game;
 
     // Methods called at the start of every update for usage in the loop
-    Coordinate playerloc = player.getLocation();
-    path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, levelWidth, levelHeight);
+    //Coordinate playerloc = player.getLocation();
+   // path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, levelWidth, levelHeight);
 
     /*** CONTROLS SECTION ***/
+    /*
     // Left click for attacking
     if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
       System.out.println("LClick pressed");
@@ -110,6 +112,7 @@ public class TestState extends BasicGameState {
         System.out.println(p);
       }
     }
+
 
     // Check diagonols first
     // W and A for Up Left
@@ -148,13 +151,13 @@ public class TestState extends BasicGameState {
       player.stop();
     }
 
-
+*/
     // Update the player model
     player.mouseRotate(getPlayerMouseAngle(input));
     player.update(delta);
 
     // Now offset if were near a wall so no in the wall happens
-    player.offsetUpdate(tileMap);
+  //assss  player.offsetUpdate(tileMap);
 
     // Update projectiles
     for(Projectile p : projectileList) {

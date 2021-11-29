@@ -27,8 +27,8 @@ public class Level1 extends BasicGameState {
     Vertex [][] path;
     MapUtil levelMap;
     int levelWidth, levelHeight;
-    private int offsetY;
-    private int offsetX;
+
+
 
 
 
@@ -47,8 +47,9 @@ public class Level1 extends BasicGameState {
     public void enter(GameContainer container, StateBasedGame game) {
         levelWidth = 60;
         levelHeight = 60;
-        offsetX = 20;
-        offsetY = 20;
+        levelMap.levelHeight = levelHeight;
+        levelMap.levelWidth = levelWidth;
+
         // parse the CSV map file, throw exception in case of IO error:
         try {
             levelMap.loadLevelMap(1);
@@ -62,6 +63,10 @@ public class Level1 extends BasicGameState {
         player = new Player((DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE),
                 (DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE));
         container.setSoundOn(true);
+        // record initial location of player in our Map:
+        levelMap.playerPrevLoc = player.getLocation(levelMap.screenTileRender);
+        levelMap.currentTileMap = tileMap;
+
 
     }
 
@@ -69,34 +74,8 @@ public class Level1 extends BasicGameState {
     public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
         DungeonGame rg = (DungeonGame)game;
 
-        if(levelMap.startY+20 < levelHeight) {
-            offsetY = (levelMap.startY + 20);
-        }else{
-            offsetY = levelHeight;
-        }
-        if(levelMap.startX+20 < levelWidth) {
-            offsetX = (levelMap.startX + 20);
-        }else{
-            offsetX = levelWidth;
-        }
-
-
         // Render tiles
-        for(int y = levelMap.startY;  y < offsetY; y++) {
-            for(int x = levelMap.startX; x < offsetX; x++) {
-                Tile temp = tileMap[x][y];
-                // Floor tile
-                if(temp.getID() == 0) {
-                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP_FLOOR_RSC).getScaledCopy(DungeonGame.SCALE),
-                            x * DungeonGame.TILESIZE, y * DungeonGame.TILESIZE);
-                }
-                // Wall tile
-                else if(temp.getID() == 1) {
-                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP_WALL_RSC).getScaledCopy(DungeonGame.SCALE),
-                            x * DungeonGame.TILESIZE, y * DungeonGame.TILESIZE);
-                }
-            }
-        }
+        levelMap.renderMap(g);
 
         // Render Dijkstras Overlay if needed
         /***
@@ -104,7 +83,7 @@ public class Level1 extends BasicGameState {
          * 2: down, 4: left, 6: right, 8: up
          * 1: down left, 3: down right, 7: up left, 9: up right
          */
-        if(true) {
+     /*   if(true) {
             if(path != null) {
                 for(int x = 0; x < offsetX; x++) {
                     for(int y = 0; y < offsetY; y++) {
@@ -115,7 +94,7 @@ public class Level1 extends BasicGameState {
                     }
                 }
             }
-        }
+        } */
         // Render projectiles on the screen
         for(Projectile p : projectileList) {
             p.render(g);
@@ -128,10 +107,8 @@ public class Level1 extends BasicGameState {
 
         Input input = container.getInput();
         DungeonGame dg = (DungeonGame)game;
-
-        // Methods called at the start of every update for usage in the loop
-        Coordinate playerloc = player.getLocation();
-        path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, offsetX, offsetY);
+        Coordinate playerloc = player.getLocation(levelMap.screenTileRender);
+       // path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, offsetX, offsetY);
 
         /*** CONTROLS SECTION ***/
         // Left click for attacking
@@ -143,38 +120,47 @@ public class Level1 extends BasicGameState {
             }
         }
 
-        // Check diagonols first
+
+        // Check diagonals first
         // W and A for Up Left
-        if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(7, tileMap)) {
+        if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(7, levelMap)) {
             player.moveUpLeft();
+            levelMap.updateMap(playerloc);
         }
         // W and D for Up Right
-        else if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(9, tileMap)) {
+        else if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(9, levelMap)) {
             player.moveUpRight();
+            levelMap.updateMap(playerloc);
         }
         // S and A for Down Left
-        else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(1, tileMap)) {
+        else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(1, levelMap)) {
             player.moveDownLeft();
+            levelMap.updateMap(playerloc);
         }
         // S and D for Down Right
-        else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(3, tileMap)) {
+        else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(3, levelMap)) {
             player.moveDownRight();
+            levelMap.updateMap(playerloc);
         }
         // W for moving up
-        else if(input.isKeyDown(Input.KEY_W) && player.isMoveValid(8, tileMap)) {
+        else if(input.isKeyDown(Input.KEY_W) && player.isMoveValid(8, levelMap)) {
             player.moveUp();
+            levelMap.updateMap(playerloc);
         }
         // A for moving left
-        else if(input.isKeyDown(Input.KEY_A) && player.isMoveValid(4, tileMap)) {
+        else if(input.isKeyDown(Input.KEY_A) && player.isMoveValid(4, levelMap)) {
             player.moveLeft();
+            levelMap.updateMap(playerloc);
         }
         // S for moving down
-        else if(input.isKeyDown(Input.KEY_S) && player.isMoveValid(2, tileMap)) {
+        else if(input.isKeyDown(Input.KEY_S) && player.isMoveValid(2, levelMap)) {
             player.moveDown();
+            levelMap.updateMap(playerloc);
         }
         // D for moving right
-        else if(input.isKeyDown(Input.KEY_D) && player.isMoveValid(6, tileMap)) {
+        else if(input.isKeyDown(Input.KEY_D) && player.isMoveValid(6, levelMap)) {
             player.moveRight();
+            levelMap.updateMap(playerloc);
         }
         else {
             player.stop();
@@ -186,7 +172,7 @@ public class Level1 extends BasicGameState {
         player.update(delta);
 
         // Now offset if were near a wall so no in the wall happens
-        player.offsetUpdate(tileMap);
+        player.offsetUpdate(levelMap);
 
         // Update projectiles
         for(Projectile p : projectileList) {
@@ -196,9 +182,10 @@ public class Level1 extends BasicGameState {
         for(Projectile projectile : projectileList) {
             projectile.collisionCheck(tileMap);
         }
-        // Remove Projetiles that have collided with objects.
+        // Remove Projectiles that have collided with objects.
         projectileList.removeIf( (Projectile projectile) -> projectile.needsRemove());
     }
+
 
     public double getPlayerMouseAngle(Input input) {
         float mousex = input.getMouseX();

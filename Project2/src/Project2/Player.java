@@ -20,6 +20,8 @@ public class Player extends Entity {
   private static final String TAG =  "Player -" ;
   private Vector velocity;
   private float speed;
+ // MapUtil levelMap;
+
 
   /***
    * Constructor, prepares default stats and Images/anmiations
@@ -34,6 +36,8 @@ public class Player extends Entity {
     velocity = new Vector(0,0);
     speed = 0.25f;
   }
+
+
 
   /**+
    * Below are the 5 movement functions for allowing the player to move around the map
@@ -72,9 +76,11 @@ public class Player extends Entity {
    * @return
    * A Coordinate object with an x and y field representing the location in the tilemap the player currently exists in.
    */
-  public Coordinate getLocation() {
+  public Coordinate getLocation(Coordinate screenTileIndex) {
     int x = Math.round((this.getX() - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
     int y = Math.round((this.getY() - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
+    x += screenTileIndex.x;
+    y += screenTileIndex.y;
     return new Coordinate(x,y);
   }
 
@@ -83,11 +89,12 @@ public class Player extends Entity {
    * @return
    * A Vector containing the x and y difference between the center of the tile and the player
    */
-  public Vector getTileOffset() {
-    Coordinate location = getLocation();
+  public Vector getTileOffset(MapUtil levelMap) {
+    Coordinate location = getLocation(levelMap.screenTileRender);
     // The center of the tile location is (Tile * tilewidth) + 1/2 tile width, since the entity's origin is the center.
-    float tilex = (location.x * DungeonGame.TILESIZE) + (DungeonGame.TILESIZE / 2);
-    float tiley = (location.y * DungeonGame.TILESIZE) + (DungeonGame.TILESIZE / 2);
+    Vector screenPosition = levelMap.convertTileToPos(location);
+    float tilex = screenPosition.getX() + (DungeonGame.TILESIZE / 2);
+    float tiley = screenPosition.getY() + (DungeonGame.TILESIZE / 2);
     float x = this.getX();
     float y = this.getY();
     // Return the offset from the center
@@ -107,21 +114,20 @@ public class Player extends Entity {
    *  7: Up and Left
    *  8: Up
    *  9: Up and Right
-   * @param tilemap
    *  The tilemap representing the level layout.
    * @return
    * A boolean showing if the move is valid or not.
    */
-  public boolean isMoveValid(int direction, Tile[][] tilemap) {
-    Coordinate location = getLocation();
+  public boolean isMoveValid(int direction, MapUtil levelMap) {
+    Coordinate playerloc = getLocation(levelMap.screenTileRender);
     boolean adjacencyCheck = false;
-    // Diagonol directions must check both the directions they are the diagonal of and the diagonal tile.
+    // Diagonal directions must check both the directions they are the diagonal of and the diagonal tile.
     // Down
     if(direction == 2 || direction == 1 || direction == 3) {
       // Check if the tile left is a wall
-      if(tilemap[location.x][location.y+1].getID() == 1) {
+      if(levelMap.currentTileMap[playerloc.x][playerloc.y+1].getID() == 1) {
         // If it is, we need to check were not too far into the tile where we will go into the wall.
-        Vector offset = getTileOffset();
+        Vector offset = getTileOffset(levelMap);
         adjacencyCheck = true;
         if(offset.getY() <= 0)
           return false;
@@ -130,8 +136,8 @@ public class Player extends Entity {
     // Left
     // ** Process for checking is similar to above, but directions and tiles checked are changed.
     if (direction == 4 || direction == 1 || direction == 7) {
-      if(tilemap[location.x-1][location.y].getID() == 1) {
-        Vector offset = getTileOffset();
+      if(levelMap.currentTileMap[playerloc.x-1][playerloc.y].getID() == 1) {
+        Vector offset = getTileOffset(levelMap);
         adjacencyCheck = true;
         if(offset.getX() >= 0)
           return false;
@@ -139,8 +145,8 @@ public class Player extends Entity {
     }
     // Right
     if (direction == 6 || direction == 9 || direction == 3) {
-      if(tilemap[location.x+1][location.y].getID() == 1) {
-        Vector offset = getTileOffset();
+      if(levelMap.currentTileMap[playerloc.x+1][playerloc.y].getID() == 1) {
+        Vector offset = getTileOffset(levelMap);
         adjacencyCheck = true;
         if(offset.getX() <= 0)
           return false;
@@ -148,8 +154,8 @@ public class Player extends Entity {
     }
     // Up
     if (direction == 8 || direction == 7 || direction == 9) {
-      if(tilemap[location.x][location.y-1].getID() == 1) {
-        Vector offset = getTileOffset();
+      if(levelMap.currentTileMap[playerloc.x][playerloc.y-1].getID() == 1) {
+        Vector offset = getTileOffset(levelMap);
         adjacencyCheck = true;
         if(offset.getY() >= 0)
           return false;
@@ -162,32 +168,32 @@ public class Player extends Entity {
     if(!adjacencyCheck) {
       // Up Right
       if (direction == 9) {
-        if(tilemap[location.x+1][location.y-1].getID() == 1) {
-          Vector offset = getTileOffset();
+        if(levelMap.currentTileMap[playerloc.x+1][playerloc.y-1].getID() == 1) {
+          Vector offset = getTileOffset(levelMap);
           if(offset.getY() >= 0 || offset.getX() <= 0)
             return false;
         }
       }
       // Up Left
       else if (direction == 7) {
-        if(tilemap[location.x-1][location.y-1].getID() == 1) {
-          Vector offset = getTileOffset();
+        if(levelMap.currentTileMap[playerloc.x-1][playerloc.y-1].getID() == 1) {
+          Vector offset = getTileOffset(levelMap);
           if(offset.getY() >= 0 || offset.getX() >= 0)
             return false;
         }
       }
       // Down Right
       else if (direction == 3) {
-        if(tilemap[location.x+1][location.y+1].getID() == 1) {
-          Vector offset = getTileOffset();
+        if(levelMap.currentTileMap[playerloc.x+1][playerloc.y+1].getID() == 1) {
+          Vector offset = getTileOffset(levelMap);
           if(offset.getY() <= 0 || offset.getX() <= 0)
             return false;
         }
       }
       // Down Left
       else if (direction == 1) {
-        if(tilemap[location.x-1][location.y+1].getID() == 1) {
-          Vector offset = getTileOffset();
+        if(levelMap.currentTileMap[playerloc.x-1][playerloc.y+1].getID() == 1) {
+          Vector offset = getTileOffset(levelMap);
           if(offset.getY() <= 0 || offset.getX() >= 0) {
             return false;
           }
@@ -219,25 +225,25 @@ public class Player extends Entity {
   /**
    * This function offsets the player's location so they aren't in walls. Call after every update.
    */
-  public void offsetUpdate(Tile[][] tilemap) {
+  public void offsetUpdate(MapUtil levelMap) {
     // Check if any adjacent tiles are walls, and if were inside any of them. If so do an offset update.
-    Coordinate location = getLocation();
+    Coordinate location = getLocation(levelMap.screenTileRender);
     // Tile above
-    if(tilemap != null) {
-      if (tilemap[location.x][location.y - 1].getID() == 1 && getTileOffset().getY() >= 0) {
-        translate(0, getTileOffset().getY());
+    if(levelMap.currentTileMap != null) {
+      if (levelMap.currentTileMap[location.x][location.y - 1].getID() == 1 && getTileOffset(levelMap).getY() >= 0) {
+        translate(0, getTileOffset(levelMap).getY());
       }
       // Tile Below
-      if (tilemap[location.x][location.y + 1].getID() == 1 && getTileOffset().getY() <= 0) {
-        translate(0, getTileOffset().getY());
+      if (levelMap.currentTileMap[location.x][location.y + 1].getID() == 1 && getTileOffset(levelMap).getY() <= 0) {
+        translate(0, getTileOffset(levelMap).getY());
       }
       // Tile Left
-      if (tilemap[location.x - 1][location.y].getID() == 1 && getTileOffset().getX() >= 0) {
-        translate(getTileOffset().getX(), 0);
+      if (levelMap.currentTileMap[location.x - 1][location.y].getID() == 1 && getTileOffset(levelMap).getX() >= 0) {
+        translate(getTileOffset(levelMap).getX(), 0);
       }
       // Tile Right
-      if (tilemap[location.x + 1][location.y].getID() == 1 && getTileOffset().getX() <= 0) {
-        translate(getTileOffset().getX(), 0);
+      if (levelMap.currentTileMap[location.x + 1][location.y].getID() == 1 && getTileOffset(levelMap).getX() <= 0) {
+        translate(getTileOffset(levelMap).getX(), 0);
       }
     }else{
       System.out.println(TAG + "TileMap is null");
