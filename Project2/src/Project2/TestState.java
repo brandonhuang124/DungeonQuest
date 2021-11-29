@@ -22,6 +22,7 @@ import java.util.LinkedList;
 public class TestState extends BasicGameState {
   Player player;
   LinkedList<Projectile> projectileList;
+  LinkedList<Enemy> enemyList;
   Tile tileMap[][];
   Vertex [][] path;
   int levelWidth, levelHeight;
@@ -41,6 +42,9 @@ public class TestState extends BasicGameState {
     // See below method for details on construction.
     initializeLevel(1);
     projectileList = new LinkedList<Projectile>();
+    enemyList = new LinkedList<Enemy>();
+    enemyList.add(new Enemy(DungeonGame.TILESIZE * 18, DungeonGame.TILESIZE * 5, 2));
+    enemyList.add(new Enemy(DungeonGame.TILESIZE * 15, DungeonGame.TILESIZE * 6, 1));
     player = new Player((DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE),
         (DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE));
     container.setSoundOn(true);
@@ -88,6 +92,11 @@ public class TestState extends BasicGameState {
     // Render projectiles on the screen
     for(Projectile p : projectileList) {
       p.render(g);
+    }
+
+    // Render Entities
+    for(Enemy enemy : enemyList) {
+      enemy.render(g);
     }
     player.render(g);
   }
@@ -149,6 +158,13 @@ public class TestState extends BasicGameState {
     }
 
 
+    // Update All enemies
+    for(Enemy enemy : enemyList) {
+      enemy.makeMove(tileMap, path, player, projectileList, delta);
+      enemy.update(delta);
+      enemy.offsetUpdate(tileMap);
+    }
+
     // Update the player model
     player.mouseRotate(getPlayerMouseAngle(input));
     player.update(delta);
@@ -160,12 +176,17 @@ public class TestState extends BasicGameState {
     for(Projectile p : projectileList) {
       p.update(delta);
     }
+
     // Collision check for projectiles
     for(Projectile projectile : projectileList) {
-      projectile.collisionCheck(tileMap);
+      projectile.collisionCheck(tileMap, enemyList, player);
     }
+
+
     // Remove Projetiles that have collided with objects.
     projectileList.removeIf( (Projectile projectile) -> projectile.needsRemove());
+    // Remove enemies that have died.
+    enemyList.removeIf( (Enemy enemy) -> enemy.isDead());
   }
 
   public double getPlayerMouseAngle(Input input) {
@@ -178,7 +199,7 @@ public class TestState extends BasicGameState {
   }
 
   /***
-   * Internal function for construction of levels based on id.
+   * Internal function for construction of levels based on idd.
    * @param level
    *  level number for which to construct.
    */

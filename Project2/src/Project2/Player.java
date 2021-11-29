@@ -19,6 +19,7 @@ import jig.Vector;
 public class Player extends Entity {
   private Vector velocity;
   private float speed;
+  private int damage, maxhealth, health;
 
   /***
    * Constructor, prepares default stats and Images/anmiations
@@ -30,6 +31,9 @@ public class Player extends Entity {
   public Player(final float x, final float y) {
     super(x,y);
     addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_ARROWTEST_RSC));
+    damage = 10;
+    maxhealth = 10;
+    health = maxhealth;
     velocity = new Vector(0,0);
     speed = 0.25f;
   }
@@ -197,6 +201,23 @@ public class Player extends Entity {
     // Return true if all tests were passed.
     return true;
   }
+
+  /***
+   * This function is to be called when the player takes damage from any source.
+   * @param damage
+   *  The amount of damage taken as a positive integer
+   * @return
+   *  true: if the player's health is 0 or less
+   *  false: otherwise
+   */
+  public boolean damage(int damage) {
+    health -= damage;
+    if(health <= 0)
+      return true;
+    return false;
+  }
+
+  public int getCurrentHealth() { return health;}
 
   /***
    * This function is to be called when the player fire a projectile.
