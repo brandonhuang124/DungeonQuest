@@ -63,9 +63,11 @@ public class MapUtil {
         return screenPos;
     }
 
+    // maybe used in correcting choppy-ness movement (x)
     public float getDistanceFromCenterOfTile(float pos){
         return pos % TILESIZE;
     }
+    
 
     public void renderMap(Graphics g){
 
@@ -84,33 +86,38 @@ public class MapUtil {
                     g.drawImage(ResourceManager.getImage(DungeonGame.MAP_WALL_RSC).getScaledCopy(DungeonGame.SCALE),
                             screenX * DungeonGame.TILESIZE, screenY * DungeonGame.TILESIZE);
                 }
-
             }
         }
     }
 
-    public void updateMap(Coordinate playerLoc){
-
-        if(playerLoc.x > playerPrevLoc.x +1){
+    public Boolean updateMap(Coordinate playerLoc){
+        Boolean mapMoved = false;
+        if(playerLoc.x > playerPrevLoc.x + 1){
             // scroll right
             screenTileRender.x = Math.min(screenTileRender.x+1,levelWidth-1);
             playerPrevLoc.x = playerLoc.x;
+            System.out.println(TAG + "player tile previous location: " + playerLoc.x +" , " + playerLoc.y);
+            mapMoved = true;
         }
-        if(playerLoc.x < playerPrevLoc.x -1){
+        if(playerLoc.x < playerPrevLoc.x-1){
             // scroll left
             screenTileRender.x = Math.max(screenTileRender.x-1, 0);
             playerPrevLoc.x = playerLoc.x;
+            mapMoved = true;
         }
-        if(playerLoc.y > playerPrevLoc.y +1){
+        if(playerLoc.y > playerPrevLoc.y+1){
             // scroll down
             screenTileRender.y = Math.min(screenTileRender.y +1, levelHeight-1);
             playerPrevLoc.y = playerLoc.y;
+            mapMoved = true;
         }
-        if(playerLoc.y < playerPrevLoc.y -1){
+        if(playerLoc.y < playerPrevLoc.y-1){
             // scroll up
             screenTileRender.y = Math.max(screenTileRender.y-1, 0);
             playerPrevLoc.y = playerLoc.y;
+            mapMoved = true;
         }
+        return mapMoved;
     }
 
     private String readLevelCSV(String MapData) throws IOException {
@@ -129,6 +136,13 @@ public class MapUtil {
         return map;
     }
 
+    /** the following methods are currently not implemented but maybe
+     * used later.
+     * @param x
+     * @param y
+     * @param levelWidth
+     * @return
+     */
     public Coordinate scrollRight(int x, int y , int levelWidth){
         Coordinate startRenderLoc = new Coordinate(x,y);
         if(x+1 < levelWidth){
@@ -162,6 +176,7 @@ public class MapUtil {
         }
         return startRenderLoc;
     }
+
     public Coordinate scrollUp(int x, int y, int levelHeight){
         Coordinate startRenderLoc = new Coordinate(x,y);
         if(y-1 > 0){
@@ -172,5 +187,4 @@ public class MapUtil {
         }
         return startRenderLoc;
     }
-
 }

@@ -99,15 +99,17 @@ public class Level1 extends BasicGameState {
         for(Projectile p : projectileList) {
             p.render(g);
         }
+
         player.render(g);
     }
 
     @Override
     public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
-
+        Boolean playerMoved = false;
         Input input = container.getInput();
         DungeonGame dg = (DungeonGame)game;
         Coordinate playerloc = player.getLocation(levelMap.screenTileRender);
+
        // path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, offsetX, offsetY);
 
         /*** CONTROLS SECTION ***/
@@ -120,9 +122,9 @@ public class Level1 extends BasicGameState {
             }
         }
 
-
         // Check diagonals first
         // W and A for Up Left
+
         if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(7, levelMap)) {
             player.moveUpLeft();
             levelMap.updateMap(playerloc);
@@ -160,7 +162,9 @@ public class Level1 extends BasicGameState {
         // D for moving right
         else if(input.isKeyDown(Input.KEY_D) && player.isMoveValid(6, levelMap)) {
             player.moveRight();
-            levelMap.updateMap(playerloc);
+            if(levelMap.updateMap(playerloc)) {
+                player.setX(player.getX() - levelMap.TILESIZE);
+            }
         }
         else {
             player.stop();
@@ -174,6 +178,8 @@ public class Level1 extends BasicGameState {
         // Now offset if were near a wall so no in the wall happens
         player.offsetUpdate(levelMap);
 
+
+
         // Update projectiles
         for(Projectile p : projectileList) {
             p.update(delta);
@@ -184,6 +190,10 @@ public class Level1 extends BasicGameState {
         }
         // Remove Projectiles that have collided with objects.
         projectileList.removeIf( (Projectile projectile) -> projectile.needsRemove());
+
+        //TODO: Bugs
+        // - Why does it only move the map every two positions?
+        // - How can we adjust the player position after the map updates?
     }
 
 
