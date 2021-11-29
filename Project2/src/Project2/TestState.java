@@ -43,7 +43,8 @@ public class TestState extends BasicGameState {
     initializeLevel(1);
     projectileList = new LinkedList<Projectile>();
     enemyList = new LinkedList<Enemy>();
-    enemyList.add(new Enemy(DungeonGame.TILESIZE * 18, DungeonGame.TILESIZE * 5, 1));
+    enemyList.add(new Enemy(DungeonGame.TILESIZE * 18, DungeonGame.TILESIZE * 5, 2));
+    enemyList.add(new Enemy(DungeonGame.TILESIZE * 15, DungeonGame.TILESIZE * 6, 1));
     player = new Player((DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE),
         (DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE));
     container.setSoundOn(true);
@@ -159,7 +160,7 @@ public class TestState extends BasicGameState {
 
     // Update All enemies
     for(Enemy enemy : enemyList) {
-      enemy.makeMove(tileMap, path, player, delta);
+      enemy.makeMove(tileMap, path, player, projectileList, delta);
       enemy.update(delta);
       enemy.offsetUpdate(tileMap);
     }

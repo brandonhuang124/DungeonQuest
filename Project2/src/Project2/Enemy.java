@@ -4,6 +4,8 @@ import jig.Entity;
 import jig.ResourceManager;
 import jig.Vector;
 
+import java.util.LinkedList;
+
 /***
  * Enitity class for reprsenting Enemies.
  *
@@ -27,6 +29,7 @@ public class Enemy extends Entity{
   private float speed;
   private int id, health, sleeptimer;
   private boolean isDead, sleep;
+  private double targetAngle;
 
   /***
    * Constructor, prepares default stats and Images/anmiations
@@ -46,6 +49,9 @@ public class Enemy extends Entity{
     if(id == 1) {
       health = 10;
     }
+    else if(id == 2) {
+      health = 10;
+    }
     else {
       isDead = true;
       health = 0;
@@ -61,7 +67,7 @@ public class Enemy extends Entity{
    * @param player1
    *  Player object representing player 1.
    */
-  public void makeMove(Tile[][] tilemap, Vertex[][] path1, Player player1, int delta) {
+  public void makeMove(Tile[][] tilemap, Vertex[][] path1, Player player1, LinkedList<Projectile> projectileList, int delta) {
     // First check if were currently asleep due to actions such as attacking.
     if(sleep) {
       sleeptimer -= delta;
@@ -81,6 +87,21 @@ public class Enemy extends Entity{
       if(playerLocation.x == location.x && playerLocation.y == location.y) {
         player1.damage(2);
         System.out.println("Player Hit! " + player1.getCurrentHealth());
+        sleep = true;
+        sleeptimer = 500;
+        stop();
+        return;
+      }
+    }
+
+    //  Ranged
+    if(id == 2) {
+      Coordinate playerLocation = player1.getLocation();
+      // Check if the enemy has a clear line of sight on the player.
+      if(lineOfSight(player1, tilemap)) {
+        // targetAngle is set when lineOfSight() is called. It's an object property so we just need to access it.
+        projectileList.add(new Projectile(getX(), getY(), 2, targetAngle));
+        System.out.println("Player in sight!");
         sleep = true;
         sleeptimer = 500;
         stop();
@@ -224,5 +245,68 @@ public class Enemy extends Entity{
     if(tilemap[location.x + 1][location.y].getID() == 1 && getTileOffset().getX() <= 0) {
       translate(getTileOffset().getX(), 0 );
     }
+  }
+
+  /***
+   * Function for determining if there is a clear line between a target and the enemy.
+   * @param player
+   * @param tilemap
+   * @return
+   */
+  private boolean lineOfSight(Player player, Tile[][] tilemap) {
+    float enemyx = getX();
+    float enemyy = getY();
+    float playerx = player.getX();
+    float playery = player.getY();
+
+    // Get a Vector between the two objects and scale it to 1.
+    Vector sightLine = new Vector(playerx - enemyx, playery - enemyy);
+    sightLine = sightLine.setLength(1);
+    targetAngle = sightLine.getRotation();
+
+    // Starting at the enemy, and iterating through this unit vector until we reach or pass the player,
+    // Check if there is an obstacle in the way. If there is, we don't have line of sight.
+    // Check which x coordinate is greater to determine which way to do the check.
+    if(enemyx > playerx) {
+      while(enemyx > playerx) {
+        Coordinate currentLocation = getLineLocation(enemyx, enemyy);
+        // Check if were in a wall
+        if(tilemap[currentLocation.x][currentLocation.y].getID() == 1) {
+          return false;
+        }
+        // If no collisions, traverse further down the line.
+        enemyx += sightLine.getX();
+        enemyy += sightLine.getY();
+      }
+    }
+    // POSSIBLY ADD A CHECK IF WERE DIRECTLY VERTICLE OF THE PLAYER. THIS IS AN EDGE CASE ALTHOUGH
+    else {
+      while(enemyx < playerx) {
+        Coordinate currentLocation = getLineLocation(enemyx, enemyy);
+        // Check if were in a wall
+        if(tilemap[currentLocation.x][currentLocation.y].getID() == 1) {
+          return false;
+        }
+        // If no collisions, traverse further down the line.
+        enemyx += sightLine.getX();
+        enemyy += sightLine.getY();
+      }
+    }
+    return true;
+  }
+
+  /***
+   * Internal function of lineOfSight() to determine tilemap location while traversing line.
+   * @param x
+   *  x float position of current location in line
+   * @param y
+   *  y float position of current location in line
+   * @return
+   *  A coordinate containing the tile map location of the current location in the line.
+   */
+  private Coordinate getLineLocation(float x, float y) {
+    int xcoord = Math.round((x - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
+    int ycoord = Math.round((y - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
+    return new Coordinate(xcoord, ycoord);
   }
 }

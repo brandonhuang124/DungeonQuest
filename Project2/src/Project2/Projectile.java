@@ -10,7 +10,7 @@ import java.util.LinkedList;
 /***
  * Enitity class for reprsenting projectiles. Tied to an ID:
  *  ID = 1: Ranged Player projectile
- *
+ *  ID = 2: Ranged Enemy projectile
  * Methods:
  *
  */
@@ -35,11 +35,20 @@ public class Projectile extends Entity {
    */
   public Projectile (final float x, final float y, int type, double angle) {
     super(x,y);
-    speed = 1f;
     id = type;
+    // If player projectile
+    if(id == 1) {
+      speed = 1f;
+      addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_PROJECTILE_RSC));
+    }
+    // If enemy Projectile
+    else if(id == 2) {
+      speed = 0.5f;
+      addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_PROJECTILE_RSC));
+    }
+
     velocity = new Vector(speed,0);
     velocity = velocity.setRotation(angle);
-    addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_PROJECTILE_RSC));
     setRotation(angle);
     removeMe = false;
   }
@@ -70,8 +79,9 @@ public class Projectile extends Entity {
     if(id == 2) {
       Coordinate playerLocation = player.getLocation();
       if(playerLocation.x == location.x && playerLocation.y == location.y) {
-        // Do things here ***
-
+        player.damage(2);
+        System.out.println("Player hit by projectile: " + player.getCurrentHealth());
+        removeMe = true;
       }
     }
   }
