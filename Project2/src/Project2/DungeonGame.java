@@ -37,6 +37,13 @@ public class DungeonGame extends StateBasedGame {
   public static final int SCALE = 1;
 
   /*** ASSET PATHS ***/
+  public static final String PLAYER_RANGEDIDLELEFT_RSC = "Project2/Assets/player/playerRangedIdleLeft.png";
+  public static final String PLAYER_RANGEDIDLERIGHT_RSC = "Project2/Assets/player/playerRangedIdleRight.png";
+  public static final String PLAYER_RANGEDMOVELEFT_RSC = "Project2/Assets/player/playerRangedMoveLeft.png";
+  public static final String PLAYER_RANGEDMOVERIGHT_RSC = "Project2/Assets/player/playerRangedMoveRight.png";
+  public static final String PLAYER_RANGEDBOW1_RSC = "Project2/Assets/player/playerRangedBow1.png";
+  public static final String PLAYER_RANGEDARROW1_RSC = "Project2/Assets/player/playerRangedArrow1.png";
+
   public static final String PLAYER_ARROWTEST_RSC = "Project2/Assets/arrow.png";
   public static final String PLAYER_PROJECTILE_RSC = "Project2/Assets/projectile.png";
 
@@ -70,6 +77,13 @@ public class DungeonGame extends StateBasedGame {
     addState(new TestState());
 
     /*** RESOURCE LOADING ***/
+    ResourceManager.loadImage(PLAYER_RANGEDARROW1_RSC);
+    ResourceManager.loadImage(PLAYER_RANGEDBOW1_RSC);
+    ResourceManager.loadImage(PLAYER_RANGEDIDLELEFT_RSC);
+    ResourceManager.loadImage(PLAYER_RANGEDIDLERIGHT_RSC);
+    ResourceManager.loadImage(PLAYER_RANGEDMOVELEFT_RSC);
+    ResourceManager.loadImage(PLAYER_RANGEDMOVERIGHT_RSC);
+
     ResourceManager.loadImage(PLAYER_ARROWTEST_RSC);
     ResourceManager.loadImage(PLAYER_PROJECTILE_RSC);
 

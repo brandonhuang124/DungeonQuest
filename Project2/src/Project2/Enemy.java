@@ -27,7 +27,7 @@ public class Enemy extends Entity{
 
   private Vector velocity;
   private float speed;
-  private int id, health, sleeptimer;
+  private int id, health, sleeptimer, damage;
   private boolean isDead, sleep;
   private double targetAngle;
 
@@ -48,9 +48,11 @@ public class Enemy extends Entity{
     sleeptimer = 0;
     if(id == 1) {
       health = 10;
+      damage = 2;
     }
     else if(id == 2) {
       health = 10;
+      damage = 2;
     }
     else {
       isDead = true;
@@ -85,7 +87,7 @@ public class Enemy extends Entity{
     if(id == 1) {
       Coordinate playerLocation = player1.getLocation();
       if(playerLocation.x == location.x && playerLocation.y == location.y) {
-        player1.damage(2);
+        player1.damage(damage);
         System.out.println("Player Hit! " + player1.getCurrentHealth());
         sleep = true;
         sleeptimer = 500;
@@ -100,7 +102,7 @@ public class Enemy extends Entity{
       // Check if the enemy has a clear line of sight on the player.
       if(lineOfSight(player1, tilemap)) {
         // targetAngle is set when lineOfSight() is called. It's an object property so we just need to access it.
-        projectileList.add(new Projectile(getX(), getY(), 2, targetAngle));
+        projectileList.add(new Projectile(getX(), getY(), 2, targetAngle, damage));
         System.out.println("Player in sight!");
         sleep = true;
         sleeptimer = 500;

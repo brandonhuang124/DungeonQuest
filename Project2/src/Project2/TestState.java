@@ -46,7 +46,7 @@ public class TestState extends BasicGameState {
     enemyList.add(new Enemy(DungeonGame.TILESIZE * 18, DungeonGame.TILESIZE * 5, 2));
     enemyList.add(new Enemy(DungeonGame.TILESIZE * 15, DungeonGame.TILESIZE * 6, 1));
     player = new Player((DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE),
-        (DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE));
+        (DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE), 1);
     container.setSoundOn(true);
   }
 
@@ -99,6 +99,7 @@ public class TestState extends BasicGameState {
       enemy.render(g);
     }
     player.render(g);
+    player.weapon.render(g);
   }
 
   @Override
@@ -114,7 +115,9 @@ public class TestState extends BasicGameState {
     // Left click for attacking
     if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
       System.out.println("LClick pressed");
-      projectileList.add(player.fire(getPlayerMouseAngle(input)));
+      Projectile newProjectile = player.fire(getPlayerMouseAngle(input));
+      if(newProjectile != null)
+        projectileList.add(newProjectile);
       for(Projectile p: projectileList) {
         System.out.println(p);
       }
