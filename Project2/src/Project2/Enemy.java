@@ -3,6 +3,7 @@ package Project2;
 import jig.Entity;
 import jig.ResourceManager;
 import jig.Vector;
+import org.newdawn.slick.Animation;
 
 import java.util.LinkedList;
 
@@ -20,6 +21,8 @@ import java.util.LinkedList;
  *  Important Fields:
  *    id: differentiates types of enemies
  *      1: Melee enemy, attacks from melee distance and moves directly toward the player.
+ *      2: Ranged enemy, attacks the player from range, only fires if they have line of sight on the player, and
+ *      other wise moves towards them.
  */
 
 
@@ -28,8 +31,9 @@ public class Enemy extends Entity{
   private Vector velocity;
   private float speed;
   private int id, health, sleeptimer, damage;
-  private boolean isDead, sleep;
+  private boolean isDead, sleep, faceRight;
   private double targetAngle;
+  private Animation moveLeft, moveRight, idleLeft, idleRight, current;
 
   /***
    * Constructor, prepares default stats and Images/anmiations
@@ -40,24 +44,54 @@ public class Enemy extends Entity{
    */
   public Enemy(final float x, final float y, int newid) {
     super(x,y);
-    addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_ARROWTEST_RSC));
+    // addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_ARROWTEST_RSC));
     velocity = new Vector(0,0);
     speed = 0.15f;
     id = newid;
-    isDead = sleep = false;
+    isDead = sleep = faceRight = false;
     sleeptimer = 0;
+    // Set animations and attributes based on type:
+    //  Melee
     if(id == 1) {
       health = 10;
       damage = 2;
+      moveLeft = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.ENEMY_MELEEMOVELEFT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
+      moveRight = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.ENEMY_MELEEMOVERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
+      idleLeft = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.ENEMY_MELEEIDLELEFT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
+      idleRight = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.ENEMY_MELEEIDLERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
     }
+    //  Ranged
     else if(id == 2) {
       health = 10;
       damage = 2;
+      moveLeft = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.ENEMY_RANGEDMOVELEFT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
+      moveRight = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.ENEMY_RANGEDMOVERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
+      idleLeft = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.ENEMY_RANGEDIDLELEFT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
+      idleRight = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.ENEMY_RANGEDIDLERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
     }
+    //  Invalid id, so we need to kill it immediately
     else {
       isDead = true;
       health = 0;
     }
+    addAnimation(idleLeft);
+    current = idleLeft;
   }
 
   /**
@@ -153,34 +187,94 @@ public class Enemy extends Entity{
   public boolean isDead() { return isDead;}
   /**+
    * Below are the 5 movement functions for allowing the player to move around the map
+   * They also set the proper animations for the enemy.
    */
   public void moveRight() {
     velocity = new Vector(speed, 0);
+    faceRight = true;
+    removeAnimation(current);
+    addAnimation(moveRight);
+    current = moveRight;
   }
 
   public void moveLeft() {
     velocity = new Vector(-speed, 0);
+    faceRight = false;
+    removeAnimation(current);
+    addAnimation(moveLeft);
+    current = moveLeft;
   }
 
   public void moveUp() {
     velocity = new Vector(0, -speed);
+    removeAnimation(current);
+    if(faceRight) {
+     addAnimation(moveRight);
+     current = moveRight;
+    }
+    else {
+      addAnimation(moveLeft);
+      current = moveLeft;
+    }
   }
 
   public void moveDown() {
     velocity = new Vector(0, speed);
+    removeAnimation(current);
+    if(faceRight) {
+      addAnimation(moveRight);
+      current = moveRight;
+    }
+    else {
+      addAnimation(moveLeft);
+      current = moveLeft;
+    }
   }
 
   // For the diaganol movement, speed is scaled in each direction by 1/sqrt(2) since its at a 45 degree angle.
-  public void moveDownRight() { velocity = new Vector(0.71f * speed, 0.71f * speed);}
+  public void moveDownRight() {
+    velocity = new Vector(0.71f * speed, 0.71f * speed);
+    faceRight = true;
+    removeAnimation(current);
+    addAnimation(moveRight);
+    current = moveRight;
+  }
 
-  public void moveDownLeft() { velocity = new Vector(-0.71f * speed, 0.71f * speed);}
+  public void moveDownLeft() {
+    velocity = new Vector(-0.71f * speed, 0.71f * speed);
+    faceRight = false;
+    removeAnimation(current);
+    addAnimation(moveLeft);
+    current = moveLeft;
+  }
 
-  public void moveUpRight() { velocity = new Vector(0.71f * speed, -0.71f * speed);}
+  public void moveUpRight() {
+    velocity = new Vector(0.71f * speed, -0.71f * speed);
+    faceRight = true;
+    removeAnimation(current);
+    addAnimation(moveRight);
+    current = moveRight;
+  }
 
-  public void moveUpLeft() { velocity = new Vector(-0.71f * speed, -0.71f * speed);}
+  public void moveUpLeft() {
+    velocity = new Vector(-0.71f * speed, -0.71f * speed);
+    faceRight = false;
+    removeAnimation(current);
+    addAnimation(moveLeft);
+    current = moveLeft;
+  }
 
   public void stop() {
     velocity = new Vector(0, 0);
+    removeAnimation(current);
+    if(faceRight) {
+      addAnimation(idleRight);
+      current = moveRight;
+    }
+    else {
+      addAnimation(idleLeft);
+      current = moveLeft;
+    }
   }
 
   /**
