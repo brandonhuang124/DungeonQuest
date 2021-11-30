@@ -19,7 +19,7 @@ public class Projectile extends Entity {
   private float speed;
   private Vector velocity;
   private boolean removeMe;
-  int id;
+  int id, damage;
 
   /***
    * Constructor
@@ -33,13 +33,14 @@ public class Projectile extends Entity {
    * @param angle
    *  Angle at which the projectile is fire in.
    */
-  public Projectile (final float x, final float y, int type, double angle) {
+  public Projectile (final float x, final float y, int type, double angle, int damageAmount) {
     super(x,y);
     id = type;
+    damage = damageAmount;
     // If player projectile
     if(id == 1) {
       speed = 1f;
-      addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_PROJECTILE_RSC));
+      addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_RANGEDARROW1_RSC));
     }
     // If enemy Projectile
     else if(id == 2) {
