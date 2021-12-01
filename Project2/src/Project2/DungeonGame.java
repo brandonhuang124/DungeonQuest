@@ -8,6 +8,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
+import javax.print.DocFlavor;
 import java.io.IOException;
 
 /**
@@ -45,6 +46,13 @@ public class DungeonGame extends StateBasedGame {
   public static final String PLAYER_RANGEDBOW1_RSC = "Project2/Assets/player/playerRangedBow1.png";
   public static final String PLAYER_RANGEDARROW1_RSC = "Project2/Assets/player/playerRangedArrow1.png";
 
+  public static final String PLAYER_MELEEIDLELEFT_RSC = "Project2/Assets/player/playerMeleeIdleLeft.png";
+  public static final String PLAYER_MELEEIDLERIGHT_RSC = "Project2/Assets/player/playerMeleeIdleRight.png";
+  public static final String PLAYER_MELEEMOVELEFT_RSC = "Project2/Assets/player/playerMeleeMoveLeft.png";
+  public static final String PLAYER_MELEEMOVERIGHT_RSC = "Project2/Assets/player/playerMeleeMoveRight.png";
+  public static final String PLAYER_MELEESWORD1_RSC = "Project2/Assets/player/playerMeleeSword1.png";
+  public static final String PLAYER_MELEESLASH_RSC = "Project2/Assets/player/slash.png";
+
   // Enemy
   public static final String ENEMY_MELEEIDLELEFT_RSC = "Project2/Assets/enemy/enemyMeleeIdleLeft.png";
   public static final String ENEMY_MELEEIDLERIGHT_RSC = "Project2/Assets/enemy/enemyMeleeIdleRight.png";
@@ -80,6 +88,7 @@ public class DungeonGame extends StateBasedGame {
     ScreenHeight = height;
     ScreenWidth = width;
 
+
     try {
       client = new Client("localhost", 4999);
       System.out.println("Client created: " + client);
@@ -104,6 +113,13 @@ public class DungeonGame extends StateBasedGame {
     ResourceManager.loadImage(PLAYER_RANGEDIDLERIGHT_RSC);
     ResourceManager.loadImage(PLAYER_RANGEDMOVELEFT_RSC);
     ResourceManager.loadImage(PLAYER_RANGEDMOVERIGHT_RSC);
+
+    ResourceManager.loadImage(PLAYER_MELEEIDLELEFT_RSC);
+    ResourceManager.loadImage(PLAYER_MELEEIDLERIGHT_RSC);
+    ResourceManager.loadImage(PLAYER_MELEEMOVELEFT_RSC);
+    ResourceManager.loadImage(PLAYER_MELEEMOVERIGHT_RSC);
+    ResourceManager.loadImage(PLAYER_MELEESLASH_RSC);
+    ResourceManager.loadImage(PLAYER_MELEESWORD1_RSC);
 
     // Enemy
     ResourceManager.loadImage(ENEMY_MELEEIDLELEFT_RSC);

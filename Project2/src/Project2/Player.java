@@ -20,7 +20,7 @@ import org.newdawn.slick.Animation;
 public class Player extends Entity {
   private Vector velocity;
   private float speed;
-  private int damage, maxhealth, health, attackCooldownTimer, attackCooldown;
+  private int damage, maxhealth, health, attackCooldownTimer, attackCooldown, playerType;
   private boolean faceRight, attackReady;
   private Animation moveLeft, moveRight, idleLeft, idleRight, current;
   public Weapon weapon;
@@ -39,6 +39,7 @@ public class Player extends Entity {
     maxhealth = 10;
     health = maxhealth;
     velocity = new Vector(0,0);
+    playerType = id;
     speed = 0.25f;
     // Ranged player assignments
     if(id == 1) {
@@ -53,6 +54,22 @@ public class Player extends Entity {
           true, 100, true);
       idleRight = new Animation(ResourceManager.getSpriteSheet(
           DungeonGame.PLAYER_RANGEDIDLERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
+      attackCooldown = 200;
+    }
+    // Melee player assignments
+    if(id == 2) {
+      moveLeft = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.PLAYER_MELEEMOVELEFT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
+      moveRight = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.PLAYER_MELEEMOVERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
+      idleLeft = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.PLAYER_MELEEIDLELEFT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
+      idleRight = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.PLAYER_MELEEIDLERIGHT_RSC, 32, 32), 0, 0, 3, 0,
           true, 100, true);
       attackCooldown = 200;
     }
@@ -313,7 +330,11 @@ public class Player extends Entity {
   public Projectile fire(double angle) {
     // Check if were ready to attack, and only fire if so.
     if(attackReady) {
-      Projectile newProjectile = new Projectile(this.getX(), this.getY(), 1, angle, damage);
+      Projectile newProjectile;
+      if(playerType == 1)
+        newProjectile = new Projectile(this.getX(), this.getY(), 1, angle, damage);
+      else
+        newProjectile = new Projectile(this.getX(), this.getY(), 3, angle, damage);
       attackReady = false;
       attackCooldownTimer = attackCooldown;
       return newProjectile;

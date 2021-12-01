@@ -19,6 +19,7 @@ public class Projectile extends Entity {
   private float speed;
   private Vector velocity;
   private boolean removeMe;
+  private int slashTimer;
   int id, damage;
 
   /***
@@ -37,7 +38,7 @@ public class Projectile extends Entity {
     super(x,y);
     id = type;
     damage = damageAmount;
-    // If player projectile
+    // If ranged player projectile
     if(id == 1) {
       speed = 1f;
       addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_RANGEDARROW1_RSC));
@@ -46,6 +47,12 @@ public class Projectile extends Entity {
     else if(id == 2) {
       speed = 0.5f;
       addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_PROJECTILE_RSC));
+    }
+    // If melee player "projectile"
+    else if(id == 3) {
+      speed = 0.3f;
+      slashTimer = 250;
+      addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_MELEESLASH_RSC));
     }
 
     velocity = new Vector(speed,0);
@@ -67,7 +74,7 @@ public class Projectile extends Entity {
       removeMe = true;
     }
     // If were a player projectile, do an enemy check
-    if(id == 1) {
+    if(id == 1 || id == 3) {
       for(Enemy enemy : enemyList) {
         Coordinate enemyLocation = enemy.getLocation();
         if(enemyLocation.x == location.x && enemyLocation.y == location.y) {
@@ -99,6 +106,13 @@ public class Projectile extends Entity {
   }
 
   public void update(final int delta) {
+    // Melee projectiles slashes are timed, and go away after an amount of time.
+    if(id == 3) {
+      slashTimer -= delta;
+      if(slashTimer <= 0) {
+        removeMe = true;
+      }
+    }
     translate(velocity.scale(delta));
   }
 

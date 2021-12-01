@@ -46,7 +46,7 @@ public class TestState extends BasicGameState {
     enemyList.add(new Enemy(DungeonGame.TILESIZE * 18, DungeonGame.TILESIZE * 5, 2));
     enemyList.add(new Enemy(DungeonGame.TILESIZE * 15, DungeonGame.TILESIZE * 6, 1));
     player = new Player((DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE),
-        (DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE), 1);
+        (DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE), 2);
     container.setSoundOn(true);
   }
 
@@ -127,49 +127,49 @@ public class TestState extends BasicGameState {
     // W and A for Up Left
     if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(7, tileMap)) {
       dg.client.inputString = "WA;" + playerloc.x + ";" + playerloc.y;
-      System.out.println(dg.client.inputString);
+      //System.out.println(dg.client.inputString);
       player.moveUpLeft();
     }
     // W and D for Up Right
     else if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(9, tileMap)) {
       dg.client.inputString = "WD;" + playerloc.x + ";" + playerloc.y;
-      System.out.println(dg.client.inputString);
+      //System.out.println(dg.client.inputString);
       player.moveUpRight();
     }
     // S and A for Down Left
     else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(1, tileMap)) {
       dg.client.inputString = "SA;" + playerloc.x + ";" + playerloc.y;
-      System.out.println(dg.client.inputString);
+      //System.out.println(dg.client.inputString);
       player.moveDownLeft();
     }
     // S and D for Down Right
     else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(3, tileMap)) {
       dg.client.inputString = "SD;" + playerloc.x + ";" + playerloc.y;
-      System.out.println(dg.client.inputString);
+      //System.out.println(dg.client.inputString);
       player.moveDownRight();
     }
     // W for moving up
     else if(input.isKeyDown(Input.KEY_W) && player.isMoveValid(8, tileMap)) {
       dg.client.inputString = "W;" + playerloc.x + ";" + playerloc.y;
-      System.out.println(dg.client.inputString);
+      //System.out.println(dg.client.inputString);
       player.moveUp();
     }
     // A for moving left
     else if(input.isKeyDown(Input.KEY_A) && player.isMoveValid(4, tileMap)) {
       dg.client.inputString = "A;" + playerloc.x + ";" + playerloc.y;
-      System.out.println(dg.client.inputString);
+      //System.out.println(dg.client.inputString);
       player.moveLeft();
     }
     // S for moving down
     else if(input.isKeyDown(Input.KEY_S) && player.isMoveValid(2, tileMap)) {
       dg.client.inputString = "S;" + playerloc.x + ";" + playerloc.y;
-      System.out.println(dg.client.inputString);
+      //System.out.println(dg.client.inputString);
       player.moveDown();
     }
     // D for moving right
     else if(input.isKeyDown(Input.KEY_D) && player.isMoveValid(6, tileMap)) {
       dg.client.inputString = "D;" + playerloc.x + ";" + playerloc.y;
-      System.out.println(dg.client.inputString);
+      //System.out.println(dg.client.inputString);
       player.moveRight();
     }
     else {
