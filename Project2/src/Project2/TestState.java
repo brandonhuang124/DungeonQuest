@@ -42,8 +42,8 @@ public class TestState extends BasicGameState {
     // See below method for details on construction.
     initializeLevel(1);
     projectileList = new LinkedList<Projectile>();
-    player = new Player((DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE),
-        (DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE));
+    player = new Player((MapUtil.TILESIZE * 4) + (0.5f * MapUtil.TILESIZE),
+        (MapUtil.TILESIZE * 4) + (0.5f * MapUtil.TILESIZE));
     container.setSoundOn(true);
   }
 
@@ -58,12 +58,12 @@ public class TestState extends BasicGameState {
         // Floor tile
         if(temp.getID() == 0) {
           g.drawImage(ResourceManager.getImage(DungeonGame.MAP_FLOOR_RSC).getScaledCopy(DungeonGame.SCALE),
-              x * DungeonGame.TILESIZE, y * DungeonGame.TILESIZE);
+              x * MapUtil.TILESIZE, y * MapUtil.TILESIZE);
         }
         // Wall tile
         else if(temp.getID() == 1) {
           g.drawImage(ResourceManager.getImage(DungeonGame.MAP_WALL_RSC).getScaledCopy(DungeonGame.SCALE),
-              x * DungeonGame.TILESIZE, y * DungeonGame.TILESIZE);
+              x * MapUtil.TILESIZE, y * MapUtil.TILESIZE);
         }
       }
     }
@@ -80,7 +80,7 @@ public class TestState extends BasicGameState {
           for(int y = 0; y < levelHeight; y++) {
             if(path[x][y].getDistance() < 1000) {
               //g.drawString("" + path[x][y].getDistance(), (x * DungeonGame.TILESIZE) + 5, (y * DungeonGame.TILESIZE) + 20);
-              g.drawString("" + path[x][y].getDirection(), (x * DungeonGame.TILESIZE) + 5, (y * DungeonGame.TILESIZE) + 8);
+              g.drawString("" + path[x][y].getDirection(), (x * MapUtil.TILESIZE) + 5, (y * MapUtil.TILESIZE) + 8);
             }
           }
         }

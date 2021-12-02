@@ -23,13 +23,8 @@ import java.util.LinkedList;
 public class Level1 extends BasicGameState {
     Player player;
     LinkedList<Projectile> projectileList;
-    Tile tileMap[][];
     Vertex [][] path;
     MapUtil levelMap;
-    int levelWidth, levelHeight;
-
-
-
 
 
     @Override
@@ -45,10 +40,6 @@ public class Level1 extends BasicGameState {
 
     @Override
     public void enter(GameContainer container, StateBasedGame game) {
-        levelWidth = 60;
-        levelHeight = 60;
-        levelMap.levelHeight = levelHeight;
-        levelMap.levelWidth = levelWidth;
 
         // parse the CSV map file, throw exception in case of IO error:
         try {
@@ -56,18 +47,15 @@ public class Level1 extends BasicGameState {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        tileMap = DungeonGame.getTileMap(levelMap.currentMapString,
-                levelWidth,levelHeight);
+        // keeping the string to matrix method in DungeonGame
+        levelMap.currentTileMap  = DungeonGame.getTileMap(levelMap.currentMapString,
+                MapUtil.LEVELWIDTH,MapUtil.LEVELWIDTH);
+        // grab map from DungeonGame
         projectileList = new LinkedList<Projectile>();
-        player = new Player((DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE),
-                (DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE));
+        player = new Player((MapUtil.TILESIZE * 4) + (0.5f * MapUtil.TILESIZE),
+                (MapUtil.TILESIZE * 4) + (0.5f * MapUtil.TILESIZE));
         container.setSoundOn(true);
         // record initial location of player in our Map:
-        levelMap.playerPrevLoc = player.getLocation(levelMap.screenTileRender);
-        levelMap.currentTileMap = tileMap;
-
-
     }
 
     @Override
@@ -75,7 +63,7 @@ public class Level1 extends BasicGameState {
         DungeonGame rg = (DungeonGame)game;
 
         // Render tiles
-        levelMap.renderMap(g);
+        levelMap.renderMapByCamera(g);
 
         // Render Dijkstras Overlay if needed
         /***
@@ -105,17 +93,14 @@ public class Level1 extends BasicGameState {
 
     @Override
     public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
-        Boolean playerMoved = false;
         Input input = container.getInput();
-        DungeonGame dg = (DungeonGame)game;
-        Coordinate playerloc = player.getLocation(levelMap.screenTileRender);
-
-       // path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, offsetX, offsetY);
+        Coordinate playerloc = player.getLocation();
+        //path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, offsetX, offsetY);
 
         /*** CONTROLS SECTION ***/
         // Left click for attacking
         if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
-            System.out.println("LClick pressed");
+            System.out.println("Left Click pressed");
             projectileList.add(player.fire(getPlayerMouseAngle(input)));
             for(Projectile p: projectileList) {
                 System.out.println(p);
@@ -127,44 +112,35 @@ public class Level1 extends BasicGameState {
 
         if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(7, levelMap)) {
             player.moveUpLeft();
-            levelMap.updateMap(playerloc);
         }
         // W and D for Up Right
         else if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(9, levelMap)) {
             player.moveUpRight();
-            levelMap.updateMap(playerloc);
         }
         // S and A for Down Left
         else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(1, levelMap)) {
             player.moveDownLeft();
-            levelMap.updateMap(playerloc);
+
         }
         // S and D for Down Right
         else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(3, levelMap)) {
             player.moveDownRight();
-            levelMap.updateMap(playerloc);
         }
         // W for moving up
         else if(input.isKeyDown(Input.KEY_W) && player.isMoveValid(8, levelMap)) {
             player.moveUp();
-            levelMap.updateMap(playerloc);
         }
         // A for moving left
         else if(input.isKeyDown(Input.KEY_A) && player.isMoveValid(4, levelMap)) {
             player.moveLeft();
-            levelMap.updateMap(playerloc);
         }
         // S for moving down
         else if(input.isKeyDown(Input.KEY_S) && player.isMoveValid(2, levelMap)) {
             player.moveDown();
-            levelMap.updateMap(playerloc);
         }
         // D for moving right
         else if(input.isKeyDown(Input.KEY_D) && player.isMoveValid(6, levelMap)) {
             player.moveRight();
-            if(levelMap.updateMap(playerloc)) {
-                player.setX(player.getX() - levelMap.TILESIZE);
-            }
         }
         else {
             player.stop();
@@ -173,12 +149,16 @@ public class Level1 extends BasicGameState {
 
         // Update the player model
         player.mouseRotate(getPlayerMouseAngle(input));
+        CameraCoordinate playerPrevPos = new CameraCoordinate(player.getX(), player.getY());
         player.update(delta);
+
+
 
         // Now offset if were near a wall so no in the wall happens
         player.offsetUpdate(levelMap);
-
-
+        CameraCoordinate playerPosDifference = new CameraCoordinate(player.getX() - playerPrevPos.x,
+                                                                    player.getY()- playerPrevPos.y );
+        levelMap.updateCamera(playerPosDifference);
 
         // Update projectiles
         for(Projectile p : projectileList) {
@@ -186,13 +166,13 @@ public class Level1 extends BasicGameState {
         }
         // Collision check for projectiles
         for(Projectile projectile : projectileList) {
-            projectile.collisionCheck(tileMap);
+            projectile.collisionCheck(levelMap.currentTileMap);
         }
         // Remove Projectiles that have collided with objects.
         projectileList.removeIf( (Projectile projectile) -> projectile.needsRemove());
 
         //TODO: Bugs
-        // - Why does it only move the map every two positions?
+        // - Why does it only move the map every two positions or more?
         // - How can we adjust the player position after the map updates?
     }
 

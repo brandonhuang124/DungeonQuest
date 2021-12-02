@@ -36,7 +36,6 @@ public class DungeonGame extends StateBasedGame {
   public static final int LEVEL1 = 2;
 
   // Important parameters
-  public static final int TILESIZE = 32;
   public static final int SCALE = 1;
 
   /*** ASSET PATHS ***/

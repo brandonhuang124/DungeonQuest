@@ -61,8 +61,8 @@ public class Projectile extends Entity {
    * A Coordinate object with an x and y field representing the location in the tilemap the player currently exists in.
    */
   public Coordinate getLocation() {
-    int x = Math.round((this.getX() - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
-    int y = Math.round((this.getY() - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
+    int x = Math.round((this.getX() - MapUtil.TILESIZE / 2) / MapUtil.TILESIZE);
+    int y = Math.round((this.getY() - MapUtil.TILESIZE / 2) / MapUtil.TILESIZE);
     return new Coordinate(x,y);
   }
 

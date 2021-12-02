@@ -76,11 +76,9 @@ public class Player extends Entity {
    * @return
    * A Coordinate object with an x and y field representing the location in the tilemap the player currently exists in.
    */
-  public Coordinate getLocation(Coordinate screenTileIndex) {
-    int x = Math.round((this.getX() - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
-    int y = Math.round((this.getY() - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
-    x += screenTileIndex.x;
-    y += screenTileIndex.y;
+  public Coordinate getLocation() {
+    int x = Math.round((this.getX() - MapUtil.TILESIZE / 2) / MapUtil.TILESIZE);
+    int y = Math.round((this.getY() - MapUtil.TILESIZE / 2) / MapUtil.TILESIZE);
     return new Coordinate(x,y);
   }
 
@@ -90,11 +88,10 @@ public class Player extends Entity {
    * A Vector containing the x and y difference between the center of the tile and the player
    */
   public Vector getTileOffset(MapUtil levelMap) {
-    Coordinate location = getLocation(levelMap.screenTileRender);
+    Coordinate location = getLocation();
     // The center of the tile location is (Tile * tilewidth) + 1/2 tile width, since the entity's origin is the center.
-    Vector screenPosition = levelMap.convertTileToPos(location);
-    float tilex = screenPosition.getX() + (DungeonGame.TILESIZE / 2);
-    float tiley = screenPosition.getY() + (DungeonGame.TILESIZE / 2);
+    float tilex = (location.x * MapUtil.TILESIZE) + (MapUtil.TILESIZE / 2);
+    float tiley = (location.y * MapUtil.TILESIZE) + (MapUtil.TILESIZE / 2);
     float x = this.getX();
     float y = this.getY();
     // Return the offset from the center
@@ -119,7 +116,7 @@ public class Player extends Entity {
    * A boolean showing if the move is valid or not.
    */
   public boolean isMoveValid(int direction, MapUtil levelMap) {
-    Coordinate playerloc = getLocation(levelMap.screenTileRender);
+    Coordinate playerloc = getLocation();
     boolean adjacencyCheck = false;
     // Diagonal directions must check both the directions they are the diagonal of and the diagonal tile.
     // Down
@@ -162,7 +159,7 @@ public class Player extends Entity {
       }
     }
 
-    // We only want to do the diagnol check if none of the adjacent tiles are walls, so hiccup movments don't happen.
+    // We only want to do the diagonal check if none of the adjacent tiles are walls, so hiccup movments don't happen.
     // ** Process is similar to cardinal direction checks, but we must check x AND y offsets to ensure we won't
     // enter the tile.
     if(!adjacencyCheck) {
@@ -227,7 +224,7 @@ public class Player extends Entity {
    */
   public void offsetUpdate(MapUtil levelMap) {
     // Check if any adjacent tiles are walls, and if were inside any of them. If so do an offset update.
-    Coordinate location = getLocation(levelMap.screenTileRender);
+    Coordinate location = getLocation();
     // Tile above
     if(levelMap.currentTileMap != null) {
       if (levelMap.currentTileMap[location.x][location.y - 1].getID() == 1 && getTileOffset(levelMap).getY() >= 0) {

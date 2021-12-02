@@ -14,31 +14,29 @@ public class MapUtil {
     private final String TAG = "MapUtil -";
     Boolean debug = true;
     //Path to the level 60x60 array:
-    private final String level1Data = "C:\\Users\\Sdesh\\IdeaProjects\\cs447finalgame\\Project2\\src\\Project2\\Data\\LevelOneMap.csv";
+    private final String level1Data = "C:\\Users\\Sdesh\\IdeaProjects\\cs447finalgame\\Project2\\src\\Project2\\Data\\LevelOneMap_2.csv";
     public static final int TILESIZE = 32;
+    public static final int SCREENWIDTH = 20;
+    public static final int SCREENHEIGHT = 20;
+    public static final int LEVELWIDTH = 60;
+    public static final int LEVELHEIGHT = 60;
 
-    String level2Data ="";
+
+    String level2Data = "";
     String level3Data = "";
 
-    int levelWidth;
-    int levelHeight;
-    Tile[][] currentTileMap;
-    Coordinate playerPrevLoc = new Coordinate(4,4);
-    Coordinate screenTileRender = new Coordinate(0,0);
-    Coordinate screenEndTiles = new Coordinate(20,20);
 
+    Tile[][] currentTileMap;
+    CameraCoordinate cameraPos = new CameraCoordinate(0, 0);
+    CameraCoordinate maxCameraPos = new CameraCoordinate((LEVELWIDTH * TILESIZE) - (SCREENWIDTH * TILESIZE),
+            (LEVELHEIGHT * TILESIZE) - (SCREENHEIGHT * TILESIZE));
 
 
     String currentMapString;
-    int scrollOffsetX = 0;
-    int scrollOffsetY = 0;
-    int startOffsetX = 0;
-    int startOffsetY = 0;
 
-    int maxTilesOnScreen = 20;
 
     public void loadLevelMap(int level) throws IOException {
-        switch(level){
+        switch (level) {
             case 1:
                 currentMapString = readLevelCSV(level1Data);
                 break;
@@ -54,74 +52,59 @@ public class MapUtil {
         }
     }
 
-    public Coordinate convertPosToTile(float posX, float posY){
-        Coordinate tileIndex = new Coordinate(Math.round(posX/TILESIZE), Math.round(posY/TILESIZE));
+    public Coordinate getTileIndexByCameraPosition(CameraCoordinate cameraPos) {
+        Coordinate tileIndex = new Coordinate(0, 0);
+        tileIndex.x = (int) Math.floor(cameraPos.x / TILESIZE);
+        tileIndex.y = (int) Math.floor(cameraPos.y / TILESIZE);
         return tileIndex;
     }
-    public Vector convertTileToPos(Coordinate tileIndex){
-        Vector screenPos = new Vector((tileIndex.x - screenTileRender.x) * TILESIZE, (tileIndex.y - screenTileRender.y) *TILESIZE);
-        return screenPos;
+
+    public CameraCoordinate getCameraTileOffset() {
+        CameraCoordinate cameraTilePos = new CameraCoordinate(cameraPos.x % TILESIZE, cameraPos.y % TILESIZE);
+        return cameraTilePos;
     }
 
-    // maybe used in correcting choppy-ness movement (x)
-    public float getDistanceFromCenterOfTile(float pos){
-        return pos % TILESIZE;
+    public void updateCamera(CameraCoordinate deltaMove) {
+        cameraPos.x += deltaMove.x;
+        cameraPos.y += deltaMove.y;
+        if (cameraPos.x < 0) {
+            cameraPos.x = 0;
+        } else if (cameraPos.x > maxCameraPos.x) {
+            cameraPos.x = maxCameraPos.x;
+        }
+        if (cameraPos.y < 0) {
+            cameraPos.y = 0;
+        } else if (cameraPos.y > maxCameraPos.y) {
+            cameraPos.y = maxCameraPos.y;
+        }
     }
-    
 
-    public void renderMap(Graphics g){
-
-        for(int screenX = 0; screenX < maxTilesOnScreen; screenX++){
-            for(int screenY = 0; screenY < maxTilesOnScreen; screenY++) {
-                int tileIndexX = screenTileRender.x + screenX;
-                int tileIndexY = screenTileRender.y + screenY;
-                Tile renderTile = currentTileMap[tileIndexX][tileIndexY];
+    public void renderMapByCamera(Graphics g) {
+        Coordinate currentTile = getTileIndexByCameraPosition(cameraPos);
+        CameraCoordinate cameraOffset = getCameraTileOffset();
+        float maxWidth = cameraPos.x + (SCREENWIDTH * TILESIZE);
+        float maxHeight = cameraPos.y + (SCREENHEIGHT * TILESIZE);
+        // -cameraOffset is the amount off screen to the left:
+        for (float renderX = (-cameraOffset.x); renderX <= maxWidth; renderX += TILESIZE, currentTile.x++) {
+            int currentY = currentTile.y;
+            for (float renderY = (-cameraOffset.y); renderY <= maxHeight; renderY += TILESIZE, currentY++) {
+                Tile renderTile = currentTileMap[currentTile.x][currentY];
                 // Floor tile
-                if(renderTile.getID() == 0) {
+                if (renderTile.getID() == 0) {
                     g.drawImage(ResourceManager.getImage(DungeonGame.MAP_FLOOR_RSC).getScaledCopy(DungeonGame.SCALE),
-                            screenX * DungeonGame.TILESIZE, screenY * DungeonGame.TILESIZE);
+                            renderX, renderY);
                 }
                 // Wall tile
-                else if(renderTile.getID() == 1) {
+                else if (renderTile.getID() == 1) {
                     g.drawImage(ResourceManager.getImage(DungeonGame.MAP_WALL_RSC).getScaledCopy(DungeonGame.SCALE),
-                            screenX * DungeonGame.TILESIZE, screenY * DungeonGame.TILESIZE);
+                            renderX, renderY);
                 }
             }
         }
     }
 
-    public Boolean updateMap(Coordinate playerLoc){
-        Boolean mapMoved = false;
-        if(playerLoc.x > playerPrevLoc.x + 1){
-            // scroll right
-            screenTileRender.x = Math.min(screenTileRender.x+1,levelWidth-1);
-            playerPrevLoc.x = playerLoc.x;
-            System.out.println(TAG + "player tile previous location: " + playerLoc.x +" , " + playerLoc.y);
-            mapMoved = true;
-        }
-        if(playerLoc.x < playerPrevLoc.x-1){
-            // scroll left
-            screenTileRender.x = Math.max(screenTileRender.x-1, 0);
-            playerPrevLoc.x = playerLoc.x;
-            mapMoved = true;
-        }
-        if(playerLoc.y > playerPrevLoc.y+1){
-            // scroll down
-            screenTileRender.y = Math.min(screenTileRender.y +1, levelHeight-1);
-            playerPrevLoc.y = playerLoc.y;
-            mapMoved = true;
-        }
-        if(playerLoc.y < playerPrevLoc.y-1){
-            // scroll up
-            screenTileRender.y = Math.max(screenTileRender.y-1, 0);
-            playerPrevLoc.y = playerLoc.y;
-            mapMoved = true;
-        }
-        return mapMoved;
-    }
 
     private String readLevelCSV(String MapData) throws IOException {
-
         File file = new File(level1Data);
         BufferedReader br = new BufferedReader(new FileReader(file));
         String map = "";
@@ -134,57 +117,5 @@ public class MapUtil {
             map += st;
         }
         return map;
-    }
-
-    /** the following methods are currently not implemented but maybe
-     * used later.
-     * @param x
-     * @param y
-     * @param levelWidth
-     * @return
-     */
-    public Coordinate scrollRight(int x, int y , int levelWidth){
-        Coordinate startRenderLoc = new Coordinate(x,y);
-        if(x+1 < levelWidth){
-            scrollOffsetX = x+1;
-            scrollOffsetY = y;
-
-            startRenderLoc = new Coordinate(scrollOffsetX, scrollOffsetY);
-        }
-        return startRenderLoc;
-    }
-
-    public Coordinate scrollLeft(int x, int y, int levelWidth){
-        Coordinate startRenderLoc = new Coordinate(x,y);
-        if(x-1 > 0){
-            //TODO set offset in maputil only
-            scrollOffsetX = x-1;
-            scrollOffsetY = y;
-
-            startRenderLoc = new Coordinate(scrollOffsetX, scrollOffsetY);
-        }
-        return startRenderLoc;
-    }
-
-    public Coordinate scrollDown(int x, int y, int levelHeight){
-        Coordinate startRenderLoc = new Coordinate(x,y);
-        if(y+1 < levelHeight){
-            scrollOffsetX = x;
-            scrollOffsetY = y+1;
-
-            startRenderLoc = new Coordinate(scrollOffsetX, scrollOffsetY);
-        }
-        return startRenderLoc;
-    }
-
-    public Coordinate scrollUp(int x, int y, int levelHeight){
-        Coordinate startRenderLoc = new Coordinate(x,y);
-        if(y-1 > 0){
-            scrollOffsetX = x;
-            scrollOffsetY = y-1;
-
-            startRenderLoc = new Coordinate(scrollOffsetX, scrollOffsetY);
-        }
-        return startRenderLoc;
     }
 }
