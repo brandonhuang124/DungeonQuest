@@ -5,10 +5,10 @@ package Project2;
  * Has only two properties, an x and y coordinate integer.
  */
 public class Coordinate {
-  public int x, y;
+    public float x, y;
 
-  public Coordinate(int setx, int sety) {
-    x = setx;
-    y = sety;
-  }
+    public Coordinate(float setx, float sety) {
+        x = setx;
+        y = sety;
+    }
 }

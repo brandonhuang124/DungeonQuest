@@ -3,7 +3,6 @@ package Project2;
 import jig.Entity;
 import jig.ResourceManager;
 import jig.Vector;
-import org.newdawn.slick.Animation;
 
 /***
  * Enitity class for reprsenting projectiles. Tied to an ID:
@@ -49,7 +48,7 @@ public class Projectile extends Entity {
    *  The tilemap representing the layout of the map.
    */
   public void collisionCheck(Tile[][] tilemap) {
-    Coordinate location = getLocation();
+    TileIndex location = getLocation();
     if(tilemap[location.x][location.y].getID() == 1) {
       removeMe = true;
     }
@@ -60,10 +59,10 @@ public class Projectile extends Entity {
    * @return
    * A Coordinate object with an x and y field representing the location in the tilemap the player currently exists in.
    */
-  public Coordinate getLocation() {
+  public TileIndex getLocation() {
     int x = Math.round((this.getX() - MapUtil.TILESIZE / 2) / MapUtil.TILESIZE);
     int y = Math.round((this.getY() - MapUtil.TILESIZE / 2) / MapUtil.TILESIZE);
-    return new Coordinate(x,y);
+    return new TileIndex(x,y);
   }
 
   public void update(final int delta) {

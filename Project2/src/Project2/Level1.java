@@ -1,6 +1,5 @@
 package Project2;
 
-import jig.ResourceManager;
 import jig.Vector;
 
 import org.newdawn.slick.GameContainer;
@@ -40,7 +39,6 @@ public class Level1 extends BasicGameState {
 
     @Override
     public void enter(GameContainer container, StateBasedGame game) {
-
         // parse the CSV map file, throw exception in case of IO error:
         try {
             levelMap.loadLevelMap(1);
@@ -50,12 +48,10 @@ public class Level1 extends BasicGameState {
         // keeping the string to matrix method in DungeonGame
         levelMap.currentTileMap  = DungeonGame.getTileMap(levelMap.currentMapString,
                 MapUtil.LEVELWIDTH,MapUtil.LEVELWIDTH);
-        // grab map from DungeonGame
         projectileList = new LinkedList<Projectile>();
         player = new Player((MapUtil.TILESIZE * 4) + (0.5f * MapUtil.TILESIZE),
                 (MapUtil.TILESIZE * 4) + (0.5f * MapUtil.TILESIZE));
         container.setSoundOn(true);
-        // record initial location of player in our Map:
     }
 
     @Override
@@ -94,7 +90,7 @@ public class Level1 extends BasicGameState {
     @Override
     public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
         Input input = container.getInput();
-        Coordinate playerloc = player.getLocation();
+        TileIndex playerloc = player.getLocation();
         //path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, offsetX, offsetY);
 
         /*** CONTROLS SECTION ***/
@@ -149,14 +145,14 @@ public class Level1 extends BasicGameState {
 
         // Update the player model
         player.mouseRotate(getPlayerMouseAngle(input));
-        CameraCoordinate playerPrevPos = new CameraCoordinate(player.getX(), player.getY());
+        Coordinate playerPrevPos = new Coordinate(player.getX(), player.getY());
         player.update(delta);
 
 
 
         // Now offset if were near a wall so no in the wall happens
         player.offsetUpdate(levelMap);
-        CameraCoordinate playerPosDifference = new CameraCoordinate(player.getX() - playerPrevPos.x,
+        Coordinate playerPosDifference = new Coordinate(player.getX() - playerPrevPos.x,
                                                                     player.getY()- playerPrevPos.y );
         levelMap.updateCamera(playerPosDifference);
 

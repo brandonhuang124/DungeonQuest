@@ -163,7 +163,7 @@ public class DungeonGame extends StateBasedGame {
     // Keep going until all nodes are seen
     while(hasUnseenNodes(seen, width , height)) {
       // Get the node with the current shortest distance
-      Coordinate current = shortestDistance(path, seen, width, height);
+      TileIndex current = shortestDistance(path, seen, width, height);
       int x = current.x;
       int y = current.y;
       // Mark the current node as seen.
@@ -269,8 +269,8 @@ public class DungeonGame extends StateBasedGame {
    * @return
    *  Coordinate of the node in the vertex which has the lowest distance and is unseen.
    */
-  private static Coordinate shortestDistance (Vertex graph[][], boolean seen[][], int width, int height) {
-    Coordinate shortest = new Coordinate(0,0);
+  private static TileIndex shortestDistance (Vertex graph[][], boolean seen[][], int width, int height) {
+    TileIndex shortest = new TileIndex(0,0);
     double distance = 100000000;
     // Iterate through the graph and find the right node.
     for(int x = 0; x < width; x++) {

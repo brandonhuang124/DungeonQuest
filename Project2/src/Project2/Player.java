@@ -76,10 +76,10 @@ public class Player extends Entity {
    * @return
    * A Coordinate object with an x and y field representing the location in the tilemap the player currently exists in.
    */
-  public Coordinate getLocation() {
+  public TileIndex getLocation() {
     int x = Math.round((this.getX() - MapUtil.TILESIZE / 2) / MapUtil.TILESIZE);
     int y = Math.round((this.getY() - MapUtil.TILESIZE / 2) / MapUtil.TILESIZE);
-    return new Coordinate(x,y);
+    return new TileIndex(x,y);
   }
 
   /**
@@ -88,7 +88,7 @@ public class Player extends Entity {
    * A Vector containing the x and y difference between the center of the tile and the player
    */
   public Vector getTileOffset(MapUtil levelMap) {
-    Coordinate location = getLocation();
+    TileIndex location = getLocation();
     // The center of the tile location is (Tile * tilewidth) + 1/2 tile width, since the entity's origin is the center.
     float tilex = (location.x * MapUtil.TILESIZE) + (MapUtil.TILESIZE / 2);
     float tiley = (location.y * MapUtil.TILESIZE) + (MapUtil.TILESIZE / 2);
@@ -116,7 +116,7 @@ public class Player extends Entity {
    * A boolean showing if the move is valid or not.
    */
   public boolean isMoveValid(int direction, MapUtil levelMap) {
-    Coordinate playerloc = getLocation();
+    TileIndex playerloc = getLocation();
     boolean adjacencyCheck = false;
     // Diagonal directions must check both the directions they are the diagonal of and the diagonal tile.
     // Down
@@ -224,7 +224,7 @@ public class Player extends Entity {
    */
   public void offsetUpdate(MapUtil levelMap) {
     // Check if any adjacent tiles are walls, and if were inside any of them. If so do an offset update.
-    Coordinate location = getLocation();
+    TileIndex location = getLocation();
     // Tile above
     if(levelMap.currentTileMap != null) {
       if (levelMap.currentTileMap[location.x][location.y - 1].getID() == 1 && getTileOffset(levelMap).getY() >= 0) {

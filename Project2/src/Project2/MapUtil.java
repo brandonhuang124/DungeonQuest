@@ -3,7 +3,6 @@ package Project2;
 
 
 import jig.ResourceManager;
-import jig.Vector;
 import org.newdawn.slick.Graphics;
 
 import java.io.*;
@@ -27,8 +26,8 @@ public class MapUtil {
 
 
     Tile[][] currentTileMap;
-    CameraCoordinate cameraPos = new CameraCoordinate(0, 0);
-    CameraCoordinate maxCameraPos = new CameraCoordinate((LEVELWIDTH * TILESIZE) - (SCREENWIDTH * TILESIZE),
+    Coordinate cameraPos = new Coordinate(0, 0);
+    Coordinate maxCameraPos = new Coordinate((LEVELWIDTH * TILESIZE) - (SCREENWIDTH * TILESIZE),
             (LEVELHEIGHT * TILESIZE) - (SCREENHEIGHT * TILESIZE));
 
 
@@ -52,19 +51,21 @@ public class MapUtil {
         }
     }
 
-    public Coordinate getTileIndexByCameraPosition(CameraCoordinate cameraPos) {
-        Coordinate tileIndex = new Coordinate(0, 0);
+    public TileIndex getTileIndexByCameraPosition(Coordinate cameraPos) {
+        TileIndex tileIndex = new TileIndex(0, 0);
         tileIndex.x = (int) Math.floor(cameraPos.x / TILESIZE);
         tileIndex.y = (int) Math.floor(cameraPos.y / TILESIZE);
         return tileIndex;
     }
 
-    public CameraCoordinate getCameraTileOffset() {
-        CameraCoordinate cameraTilePos = new CameraCoordinate(cameraPos.x % TILESIZE, cameraPos.y % TILESIZE);
+    public Coordinate getCameraTileOffset() {
+        Coordinate cameraTilePos = new Coordinate(cameraPos.x % TILESIZE, cameraPos.y % TILESIZE);
         return cameraTilePos;
     }
 
-    public void updateCamera(CameraCoordinate deltaMove) {
+
+
+    public void updateCamera(Coordinate deltaMove) {
         cameraPos.x += deltaMove.x;
         cameraPos.y += deltaMove.y;
         if (cameraPos.x < 0) {
@@ -80,8 +81,8 @@ public class MapUtil {
     }
 
     public void renderMapByCamera(Graphics g) {
-        Coordinate currentTile = getTileIndexByCameraPosition(cameraPos);
-        CameraCoordinate cameraOffset = getCameraTileOffset();
+        TileIndex currentTile = getTileIndexByCameraPosition(cameraPos);
+        Coordinate cameraOffset = getCameraTileOffset();
         float maxWidth = cameraPos.x + (SCREENWIDTH * TILESIZE);
         float maxHeight = cameraPos.y + (SCREENHEIGHT * TILESIZE);
         // -cameraOffset is the amount off screen to the left:
