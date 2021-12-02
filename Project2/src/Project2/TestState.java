@@ -100,6 +100,33 @@ public class TestState extends BasicGameState {
     }
     player.render(g);
     player.weapon.render(g);
+
+    // Render HUD
+    if(player.getPlayerType() == 1)
+      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_PARCHMENTRANGED_RSC), 20, 640);
+    else if(player.getPlayerType() == 2)
+      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_PARCHMENTMELEE_RSC), 20, 640);
+
+    g.drawImage(ResourceManager.getImage(DungeonGame.HUD_P1_RSC), 5, 640);
+    g.drawImage(ResourceManager.getImage(DungeonGame.HUD_DIVIDER_RSC), 276, 640);
+
+    // Render Left cap of health bar
+    if(player.getCurrentHealth() > 0)
+      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARL_RSC), 152, 660);
+    else
+      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARL_RSC), 152, 660);
+    // Render middle of bar
+    for(int i = 1; i < player.getMaxHealth(); i++) {
+      if(i <= player.getCurrentHealth())
+        g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBAR_RSC), 152 + (i*6), 660);
+      else
+        g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBAR_RSC), 152 + (i*6), 660);
+    }
+    // Render Right cap of health bar
+    if(player.getCurrentHealth() == player.getMaxHealth())
+      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARR_RSC), 152 + (player.getMaxHealth() * 6), 660);
+    else
+      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC), 152 + (player.getMaxHealth() * 6), 660);
   }
 
   @Override

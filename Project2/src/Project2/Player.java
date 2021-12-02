@@ -15,6 +15,10 @@ import org.newdawn.slick.Animation;
  *    moveRight()
  *    stop()
  *    fire()
+ *
+ *  Comes in two types:
+ *    1: Ranged player with bow attack
+ *    2: Melee player with slash attack
  */
 
 public class Player extends Entity {
@@ -31,6 +35,10 @@ public class Player extends Entity {
    *  x Coordinate to spawn the player in
    * @param y
    *  y coordinate to spawn the player in
+   * @param id
+   * Player type:
+   *  1: Ranged player
+   *  2: Melee player
    */
   public Player(final float x, final float y, int id) {
     super(x,y);
@@ -319,6 +327,10 @@ public class Player extends Entity {
   }
 
   public int getCurrentHealth() { return health;}
+
+  public int getMaxHealth() {return maxhealth;}
+
+  public int getPlayerType() { return playerType;}
 
   /***
    * This function is to be called when the player fire a projectile.
