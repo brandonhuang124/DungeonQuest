@@ -10,6 +10,9 @@ public class Weapon extends Entity {
     if(id == 1) {
      addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_RANGEDBOW1_RSC));
     }
+    if(id == 2) {
+      addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_MELEESWORD1_RSC));
+    }
   }
 
   public void update(final float x, final float y) {
