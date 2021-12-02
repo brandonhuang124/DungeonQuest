@@ -51,19 +51,42 @@ public class MapUtil {
         }
     }
 
-    public TileIndex getTileIndexByCameraPosition(Coordinate cameraPos) {
-        TileIndex tileIndex = new TileIndex(0, 0);
-        tileIndex.x = (int) Math.floor(cameraPos.x / TILESIZE);
-        tileIndex.y = (int) Math.floor(cameraPos.y / TILESIZE);
-        return tileIndex;
+    /***
+     * Screen coordinates: where objects are on camera.
+     * World coordinates: where objects are a separate
+     *      coordinate system relative to the entire map including off camera.
+     * TileIndex: the index of the tile map, a tile that a position is on.
+     */
+    public Coordinate convertScreenToWorld(Coordinate screenPos){
+        return new Coordinate(cameraPos.x + screenPos.x, cameraPos.y + screenPos.y);
+    }
+
+    public Coordinate convertWorldToScreen(Coordinate worldPos){
+        return new Coordinate(worldPos.x - cameraPos.x, worldPos.y - cameraPos.y);
+    }
+
+    public static Coordinate convertTileToWorld(TileIndex tileIndex){
+        return new Coordinate(tileIndex.x * TILESIZE, tileIndex.y * TILESIZE);
+    }
+
+    public Coordinate convertTileToScreen(TileIndex tileIndex){
+        Coordinate worldPos = convertTileToWorld(tileIndex);
+        return convertWorldToScreen(worldPos);
+    }
+
+    public static TileIndex convertWorldToTile(Coordinate worldPos){
+        return new TileIndex((int)Math.floor(worldPos.x / TILESIZE), (int)Math.floor(worldPos.y / TILESIZE));
+    }
+
+    public TileIndex convertScreenToTile(Coordinate screenPos){
+        Coordinate worldPos = convertScreenToWorld(screenPos);
+        return convertWorldToTile(worldPos);
     }
 
     public Coordinate getCameraTileOffset() {
         Coordinate cameraTilePos = new Coordinate(cameraPos.x % TILESIZE, cameraPos.y % TILESIZE);
         return cameraTilePos;
     }
-
-
 
     public void updateCamera(Coordinate deltaMove) {
         cameraPos.x += deltaMove.x;
@@ -77,18 +100,23 @@ public class MapUtil {
             cameraPos.y = 0;
         } else if (cameraPos.y > maxCameraPos.y) {
             cameraPos.y = maxCameraPos.y;
+        }else{
+            System.out.println(TAG + "cameraPos.y " + cameraPos.y);
         }
     }
 
     public void renderMapByCamera(Graphics g) {
-        TileIndex currentTile = getTileIndexByCameraPosition(cameraPos);
+        TileIndex currentTile = convertWorldToTile(cameraPos);
         Coordinate cameraOffset = getCameraTileOffset();
-        float maxWidth = cameraPos.x + (SCREENWIDTH * TILESIZE);
-        float maxHeight = cameraPos.y + (SCREENHEIGHT * TILESIZE);
+        float maxWidth =  SCREENWIDTH * TILESIZE;
+        float maxHeight = SCREENHEIGHT * TILESIZE;
         // -cameraOffset is the amount off screen to the left:
-        for (float renderX = (-cameraOffset.x); renderX <= maxWidth; renderX += TILESIZE, currentTile.x++) {
+        for (float renderX = (-cameraOffset.x); renderX < maxWidth; renderX += TILESIZE, currentTile.x++) {
             int currentY = currentTile.y;
-            for (float renderY = (-cameraOffset.y); renderY <= maxHeight; renderY += TILESIZE, currentY++) {
+            for (float renderY = (-cameraOffset.y); renderY < maxHeight; renderY += TILESIZE, currentY++) {
+                if(currentY == 60){
+                    System.out.println("currentY is 60");
+                }
                 Tile renderTile = currentTileMap[currentTile.x][currentY];
                 // Floor tile
                 if (renderTile.getID() == 0) {

@@ -49,8 +49,8 @@ public class Level1 extends BasicGameState {
         levelMap.currentTileMap  = DungeonGame.getTileMap(levelMap.currentMapString,
                 MapUtil.LEVELWIDTH,MapUtil.LEVELWIDTH);
         projectileList = new LinkedList<Projectile>();
-        player = new Player((MapUtil.TILESIZE * 4) + (0.5f * MapUtil.TILESIZE),
-                (MapUtil.TILESIZE * 4) + (0.5f * MapUtil.TILESIZE));
+        player = new Player( 0, 0);
+        player.setWorldPos(new TileIndex(4,4));
         container.setSoundOn(true);
     }
 
@@ -83,14 +83,16 @@ public class Level1 extends BasicGameState {
         for(Projectile p : projectileList) {
             p.render(g);
         }
-
+        Coordinate playerScreenPos = levelMap.convertWorldToScreen(player.worldPos);
+        player.setX(playerScreenPos.x);
+        player.setY(playerScreenPos.y);
         player.render(g);
     }
 
     @Override
     public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
         Input input = container.getInput();
-        TileIndex playerloc = player.getLocation();
+
         //path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, offsetX, offsetY);
 
         /*** CONTROLS SECTION ***/
@@ -105,8 +107,58 @@ public class Level1 extends BasicGameState {
 
         // Check diagonals first
         // W and A for Up Left
+        int direction = -1;
 
-        if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(7, levelMap)) {
+        if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A)) {
+            direction = 7;
+            player.moveUpLeft();
+        }
+        // W and D for Up Right
+        else if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_D)) {
+            direction = 9;
+            player.moveUpRight();
+        }
+        // S and A for Down Left
+        else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_A)) {
+            direction = 1;
+            player.moveDownLeft();
+
+        }
+        // S and D for Down Right
+        else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_D)) {
+            direction = 3;
+            player.moveDownRight();
+        }
+        // W for moving up
+        else if(input.isKeyDown(Input.KEY_W)) {
+            direction = 8;
+            player.moveUp();
+        }
+        // A for moving left
+        else if(input.isKeyDown(Input.KEY_A)) {
+            direction = 4;
+            player.moveLeft();
+        }
+        // S for moving down
+        else if(input.isKeyDown(Input.KEY_S)) {
+            direction = 2;
+            player.moveDown();
+        }
+        // D for moving right
+        else if(input.isKeyDown(Input.KEY_D)) {
+            direction = 6;
+            player.moveRight();
+        }
+        if(direction != -1 && player.isMoveValid(direction, player.getVelocity().scale(delta),levelMap)){
+
+        }
+        else {
+            player.stop();
+        }
+
+//////////////
+        /*
+        if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(7,  levelMap)) {
             player.moveUpLeft();
         }
         // W and D for Up Right
@@ -141,20 +193,16 @@ public class Level1 extends BasicGameState {
         else {
             player.stop();
         }
-
+        */
 
         // Update the player model
         player.mouseRotate(getPlayerMouseAngle(input));
-        Coordinate playerPrevPos = new Coordinate(player.getX(), player.getY());
         player.update(delta);
 
-
-
         // Now offset if were near a wall so no in the wall happens
-        player.offsetUpdate(levelMap);
-        Coordinate playerPosDifference = new Coordinate(player.getX() - playerPrevPos.x,
-                                                                    player.getY()- playerPrevPos.y );
-        levelMap.updateCamera(playerPosDifference);
+        //player.offsetUpdate(levelMap);
+
+        levelMap.updateCamera(player.prevMoveVelocity);
 
         // Update projectiles
         for(Projectile p : projectileList) {
