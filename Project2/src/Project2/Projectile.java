@@ -3,7 +3,6 @@ package Project2;
 import jig.Entity;
 import jig.ResourceManager;
 import jig.Vector;
-import org.newdawn.slick.Animation;
 
 import java.util.LinkedList;
 
@@ -68,7 +67,7 @@ public class Projectile extends Entity {
    *  The tilemap representing the layout of the map.
    */
   public void collisionCheck(Tile[][] tilemap, LinkedList<Enemy> enemyList, Player player) {
-    Coordinate location = getLocation();
+    TileIndex location = getLocation();
     // Always do a wall check
     if(tilemap[location.x][location.y].getID() == 1) {
       removeMe = true;
@@ -76,7 +75,7 @@ public class Projectile extends Entity {
     // If were a player projectile, do an enemy check
     if(id == 1 || id == 3) {
       for(Enemy enemy : enemyList) {
-        Coordinate enemyLocation = enemy.getLocation();
+        TileIndex enemyLocation = enemy.getLocation();
         if(enemyLocation.x == location.x && enemyLocation.y == location.y) {
           removeMe = true;
           enemy.damage(10);
@@ -85,7 +84,7 @@ public class Projectile extends Entity {
     }
     // If were an enemy projectile, do a player check
     if(id == 2) {
-      Coordinate playerLocation = player.getLocation();
+      TileIndex playerLocation = player.getTileIndex();
       if(playerLocation.x == location.x && playerLocation.y == location.y) {
         player.damage(2);
         System.out.println("Player hit by projectile: " + player.getCurrentHealth());
@@ -99,11 +98,12 @@ public class Projectile extends Entity {
    * @return
    * A Coordinate object with an x and y field representing the location in the tilemap the player currently exists in.
    */
-  public Coordinate getLocation() {
-    int x = Math.round((this.getX() - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
-    int y = Math.round((this.getY() - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
-    return new Coordinate(x,y);
+  public TileIndex getLocation() {
+    int x = Math.round((this.getX() - MapUtil.TILESIZE / 2) / MapUtil.TILESIZE);
+    int y = Math.round((this.getY() - MapUtil.TILESIZE / 2) / MapUtil.TILESIZE);
+    return new TileIndex(x,y);
   }
+
 
   public void update(final int delta) {
     // Melee projectiles slashes are timed, and go away after an amount of time.

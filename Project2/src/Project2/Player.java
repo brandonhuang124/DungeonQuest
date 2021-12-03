@@ -18,12 +18,16 @@ import org.newdawn.slick.Animation;
  */
 
 public class Player extends Entity {
+  private static final String TAG = "Player -";
+
   private Vector velocity;
   private float speed;
   private int damage, maxhealth, health, attackCooldownTimer, attackCooldown, playerType;
   private boolean faceRight, attackReady;
   private Animation moveLeft, moveRight, idleLeft, idleRight, current;
   public Weapon weapon;
+  public Coordinate worldPos;
+  public Coordinate prevMoveVelocity;
 
   /***
    * Constructor, prepares default stats and Images/anmiations
@@ -34,6 +38,7 @@ public class Player extends Entity {
    */
   public Player(final float x, final float y, int id) {
     super(x,y);
+
     weapon = new Weapon(x,y,id);
     damage = 10;
     maxhealth = 10;
@@ -41,6 +46,8 @@ public class Player extends Entity {
     velocity = new Vector(0,0);
     playerType = id;
     speed = 0.25f;
+
+
     // Ranged player assignments
     if(id == 1) {
       moveLeft = new Animation(ResourceManager.getSpriteSheet(
@@ -77,6 +84,15 @@ public class Player extends Entity {
     faceRight = false;
     current = idleRight;
     addAnimation(current);
+  }
+
+
+  public Vector getVelocity() {
+    return velocity;
+  }
+
+  public void setWorldPos(TileIndex tileIndex) {
+    worldPos = MapUtil.convertTileToWorld(tileIndex);
   }
 
   /**+
@@ -174,134 +190,87 @@ public class Player extends Entity {
   /**
    * This function is for getting the coordinate of the player.
    * @return
-   * A Coordinate object with an x and y field representing the location in the tilemap the player currently exists in.
+   * A TileIndex object with an x and y field representing the location in the tilemap the player currently exists in.
    */
-  public Coordinate getLocation() {
-    int x = Math.round((this.getX() - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
-    int y = Math.round((this.getY() - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
-    return new Coordinate(x,y);
+  public TileIndex getTileIndex() {
+    int x = Math.round((this.getX() - MapUtil.TILESIZE / 2) / MapUtil.TILESIZE);
+    int y = Math.round((this.getY() - MapUtil.TILESIZE / 2) / MapUtil.TILESIZE);
+    return new TileIndex(x, y);
   }
+
 
   /**
    * This function is for calculating the offset from the center of the tile the player currently exists in.
-   * @return
-   * A Vector containing the x and y difference between the center of the tile and the player
+   *
+   * @return A Vector containing the x and y difference between the center of the tile and the player
    */
-  public Vector getTileOffset() {
-    Coordinate location = getLocation();
+  public Vector getTileOffset(MapUtil levelMap) {
+    TileIndex location = getTileIndex();
     // The center of the tile location is (Tile * tilewidth) + 1/2 tile width, since the entity's origin is the center.
-    float tilex = (location.x * DungeonGame.TILESIZE) + (DungeonGame.TILESIZE / 2);
-    float tiley = (location.y * DungeonGame.TILESIZE) + (DungeonGame.TILESIZE / 2);
+    float tilex = (location.x * MapUtil.TILESIZE) + (MapUtil.TILESIZE / 2);
+    float tiley = (location.y * MapUtil.TILESIZE) + (MapUtil.TILESIZE / 2);
     float x = this.getX();
     float y = this.getY();
     // Return the offset from the center
     return new Vector(tilex - x, tiley - y);
   }
 
-  /**
-   * This function is to be called before executing a player move to ensure the move is valid.
-   * Directions ints come from their position on the numpad.
-   * @param direction
-   *  An int representing the direction of movement:
-   *  1: Down and Left
-   *  2: Down
-   *  3: Down and Right
-   *  4: Left
-   *  6: Right
-   *  7: Up and Left
-   *  8: Up
-   *  9: Up and Right
-   * @param tilemap
-   *  The tilemap representing the level layout.
-   * @return
-   * A boolean showing if the move is valid or not.
-   */
-  public boolean isMoveValid(int direction, Tile[][] tilemap) {
-    Coordinate location = getLocation();
-    boolean adjacencyCheck = false;
-    // Diagonol directions must check both the directions they are the diagonal of and the diagonal tile.
-    // Down
-    if(direction == 2 || direction == 1 || direction == 3) {
-      // Check if the tile left is a wall
-      if(tilemap[location.x][location.y+1].getID() == 1) {
-        // If it is, we need to check were not too far into the tile where we will go into the wall.
-        Vector offset = getTileOffset();
-        adjacencyCheck = true;
-        if(offset.getY() <= 0)
-          return false;
-      }
-    }
-    // Left
-    // ** Process for checking is similar to above, but directions and tiles checked are changed.
-    if (direction == 4 || direction == 1 || direction == 7) {
-      if(tilemap[location.x-1][location.y].getID() == 1) {
-        Vector offset = getTileOffset();
-        adjacencyCheck = true;
-        if(offset.getX() >= 0)
-          return false;
-      }
-    }
-    // Right
-    if (direction == 6 || direction == 9 || direction == 3) {
-      if(tilemap[location.x+1][location.y].getID() == 1) {
-        Vector offset = getTileOffset();
-        adjacencyCheck = true;
-        if(offset.getX() <= 0)
-          return false;
-      }
-    }
-    // Up
-    if (direction == 8 || direction == 7 || direction == 9) {
-      if(tilemap[location.x][location.y-1].getID() == 1) {
-        Vector offset = getTileOffset();
-        adjacencyCheck = true;
-        if(offset.getY() >= 0)
-          return false;
-      }
-    }
 
-    // We only want to do the diagnol check if none of the adjacent tiles are walls, so hiccup movments don't happen.
-    // ** Process is similar to cardinal direction checks, but we must check x AND y offsets to ensure we won't
-    // enter the tile.
-    if(!adjacencyCheck) {
-      // Up Right
-      if (direction == 9) {
-        if(tilemap[location.x+1][location.y-1].getID() == 1) {
-          Vector offset = getTileOffset();
-          if(offset.getY() >= 0 || offset.getX() <= 0)
-            return false;
-        }
+
+  public boolean isMoveValid(Direction direction, Vector movement, MapUtil levelMap) {
+    Vector moveDirection = movement.unit();
+    // this is where the player would be if the move was successful
+    Vector newPlayerPos = new Vector(worldPos.x + movement.getX(), worldPos.y + movement.getY());
+    moveDirection = moveDirection.scale((float)(MapUtil.TILESIZE /2));
+    newPlayerPos = newPlayerPos.setX(newPlayerPos.getX() + moveDirection.getX());
+    newPlayerPos = newPlayerPos.setY(newPlayerPos.getY() + moveDirection.getY());
+    TileIndex newTile = MapUtil.convertWorldToTile(newPlayerPos);
+
+    if (levelMap.hasCollision(newTile)) {
+      return false;
+    }
+    // ensure diagonals are not blocked by neighboring tiles
+    if (direction == Direction.DOWN_LEFT) {
+      // check the tile above new tile:
+      if (levelMap.hasCollision(new TileIndex(newTile.x, newTile.y - 1))) {
+        return false;
       }
-      // Up Left
-      else if (direction == 7) {
-        if(tilemap[location.x-1][location.y-1].getID() == 1) {
-          Vector offset = getTileOffset();
-          if(offset.getY() >= 0 || offset.getX() >= 0)
-            return false;
-        }
+      // check the tile to the right of the new tile:
+      if (levelMap.hasCollision(new TileIndex(newTile.x + 1, newTile.y))) {
+        return false;
       }
-      // Down Right
-      else if (direction == 3) {
-        if(tilemap[location.x+1][location.y+1].getID() == 1) {
-          Vector offset = getTileOffset();
-          if(offset.getY() <= 0 || offset.getX() <= 0)
-            return false;
-        }
+
+    } else if (direction == Direction.DOWN_RIGHT) {
+      // check the tile above new tile:
+      if (levelMap.hasCollision(new TileIndex(newTile.x, newTile.y - 1))) {
+        return false;
       }
-      // Down Left
-      else if (direction == 1) {
-        if(tilemap[location.x-1][location.y+1].getID() == 1) {
-          Vector offset = getTileOffset();
-          if(offset.getY() <= 0 || offset.getX() >= 0) {
-            return false;
-          }
-        }
+      // check the tile to the left of the new tile:
+      if (levelMap.hasCollision(new TileIndex(newTile.x - 1, newTile.y))) {
+        return false;
+      }
+    } else if (direction == Direction.UP_LEFT) {
+      // check the tile below new tile:
+      if (levelMap.hasCollision(new TileIndex(newTile.x, newTile.y + 1))) {
+        return false;
+      }
+      // check the tile to the right of the new tile:
+      if (levelMap.hasCollision(new TileIndex(newTile.x + 1, newTile.y))) {
+        return false;
+      }
+    } else if (direction == Direction.UP_RIGHT) {
+      // check the tile below new tile:
+      if (levelMap.hasCollision(new TileIndex(newTile.x, newTile.y + 1))) {
+        return false;
+      }
+      // check the tile to the left of the new tile:
+      if (levelMap.hasCollision(new TileIndex(newTile.x - 1, newTile.y))) {
+        return false;
       }
     }
-
-    // Return true if all tests were passed.
     return true;
   }
+
 
   /***
    * This function is to be called when the player takes damage from any source.
@@ -348,6 +317,11 @@ public class Player extends Entity {
    *  Amount of time passed
    */
   public void update(final int delta) {
+    Vector movement = velocity.scale(delta);
+    prevMoveVelocity = new Coordinate(movement.getX(), movement.getY());
+    worldPos.x += movement.getX();
+    worldPos.y += movement.getY();
+
     // Check if were on CD, if so decrement and release if the timer is finished
     if(!attackReady) {
       attackCooldownTimer -= delta;
@@ -356,31 +330,37 @@ public class Player extends Entity {
       }
     }
     weapon.update(getX(), getY());
-    translate(velocity.scale(delta));
   }
 
 
   /**
    * This function offsets the player's location so they aren't in walls. Call after every update.
    */
-  public void offsetUpdate(Tile[][] tilemap) {
+  /**
+   * This function offsets the player's location so they aren't in walls. Call after every update.
+   */
+  public void offsetUpdate(MapUtil levelMap) {
     // Check if any adjacent tiles are walls, and if were inside any of them. If so do an offset update.
-    Coordinate location = getLocation();
+    TileIndex location = getTileIndex();
     // Tile above
-    if(tilemap[location.x][location.y - 1].getID() == 1 && getTileOffset().getY() >= 0) {
-      translate(0, getTileOffset().getY());
-    }
-    // Tile Below
-    if(tilemap[location.x][location.y + 1].getID() == 1 && getTileOffset().getY() <= 0) {
-      translate(0, getTileOffset().getY());
-    }
-    // Tile Left
-    if(tilemap[location.x - 1][location.y].getID() == 1 && getTileOffset().getX() >= 0) {
-      translate(getTileOffset().getX(), 0 );
-    }
-    // Tile Right
-    if(tilemap[location.x + 1][location.y].getID() == 1 && getTileOffset().getX() <= 0) {
-      translate(getTileOffset().getX(), 0 );
+    if (levelMap.currentTileMap != null) {
+      if (levelMap.currentTileMap[location.x][location.y - 1].getID() == 1 && getTileOffset(levelMap).getY() >= 0) {
+        translate(0, getTileOffset(levelMap).getY());
+      }
+      // Tile Below
+      if (levelMap.currentTileMap[location.x][location.y + 1].getID() == 1 && getTileOffset(levelMap).getY() <= 0) {
+        translate(0, getTileOffset(levelMap).getY());
+      }
+      // Tile Left
+      if (levelMap.currentTileMap[location.x - 1][location.y].getID() == 1 && getTileOffset(levelMap).getX() >= 0) {
+        translate(getTileOffset(levelMap).getX(), 0);
+      }
+      // Tile Right
+      if (levelMap.currentTileMap[location.x + 1][location.y].getID() == 1 && getTileOffset(levelMap).getX() <= 0) {
+        translate(getTileOffset(levelMap).getX(), 0);
+      }
+    } else {
+      System.out.println(TAG + "TileMap is null");
     }
   }
 
