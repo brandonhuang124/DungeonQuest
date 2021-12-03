@@ -22,6 +22,7 @@ import java.util.LinkedList;
 public class Level1 extends BasicGameState {
     Player player;
     LinkedList<Projectile> projectileList;
+    LinkedList<Enemy> enemyList;
     Vertex [][] path;
     MapUtil levelMap;
 
@@ -34,7 +35,6 @@ public class Level1 extends BasicGameState {
     @Override
     public void init(GameContainer container, StateBasedGame game) throws SlickException {
         levelMap = new MapUtil();
-
     }
 
     @Override
@@ -51,6 +51,11 @@ public class Level1 extends BasicGameState {
         projectileList = new LinkedList<Projectile>();
         player = new Player( 0, 0, 1);
         player.setWorldPos(new TileIndex(4,4));
+        enemyList = new LinkedList<Enemy>();
+        enemyList.add(new Enemy(MapUtil.TILESIZE * 18, MapUtil.TILESIZE * 5, 2));
+        enemyList.add(new Enemy(MapUtil.TILESIZE * 15, MapUtil.TILESIZE * 6, 1));
+
+
         container.setSoundOn(true);
     }
 
@@ -65,10 +70,15 @@ public class Level1 extends BasicGameState {
         for(Projectile p : projectileList) {
             p.render(g);
         }
+        for(Enemy enemy : enemyList) {
+            enemy.render(g);
+        }
+
         Coordinate playerScreenPos = levelMap.convertWorldToScreen(player.worldPos);
         player.setX(playerScreenPos.x);
         player.setY(playerScreenPos.y);
         player.render(g);
+        player.weapon.render(g);
     }
 
     @Override
@@ -80,13 +90,14 @@ public class Level1 extends BasicGameState {
         /*** CONTROLS SECTION ***/
         // Left click for attacking
         if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
-            System.out.println("Left Click pressed");
-            projectileList.add(player.fire(getPlayerMouseAngle(input)));
+            System.out.println("LClick pressed");
+            Projectile newProjectile = player.fire(getPlayerMouseAngle(input));
+            if(newProjectile != null)
+                projectileList.add(newProjectile);
             for(Projectile p: projectileList) {
                 System.out.println(p);
             }
         }
-
         // Check diagonals first
         // W and A for Up Left
         Direction direction = Direction.NONE;
@@ -149,13 +160,29 @@ public class Level1 extends BasicGameState {
         for(Projectile p : projectileList) {
             p.update(delta);
         }
+        // Update All enemies
+        for(Enemy enemy : enemyList) {
+            enemy.makeMove(levelMap.currentTileMap, path, player, projectileList, delta);
+            enemy.update(delta);
+            enemy.offsetUpdate(levelMap.currentTileMap);
+        }
+
+        // Update the player model
+        player.mouseRotate(getPlayerMouseAngle(input));
+        player.update(delta);
+
+        // Now offset if were near a wall so no in the wall happens
+       //  player.offsetUpdate(levelMap);
+
         // Collision check for projectiles
         for(Projectile projectile : projectileList) {
-            //TODO add enemy here:
-       //     projectile.collisionCheck(levelMap.currentTileMap);
+            projectile.collisionCheck(levelMap.currentTileMap, enemyList, player);
         }
-        // Remove Projectiles that have collided with objects.
+
+        // Remove Projetiles that have collided with objects.
         projectileList.removeIf( (Projectile projectile) -> projectile.needsRemove());
+        // Remove enemies that have died.
+        enemyList.removeIf( (Enemy enemy) -> enemy.isDead());
     }
 
 

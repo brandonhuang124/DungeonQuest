@@ -45,6 +45,5 @@ public class StartState extends BasicGameState {
     DungeonGame rg = (DungeonGame)game;
 
     rg.enterState(DungeonGame.LEVEL1);
-
   }
 }
