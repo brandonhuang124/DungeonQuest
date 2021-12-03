@@ -25,8 +25,8 @@ public class TestState extends BasicGameState {
   LinkedList<Enemy> enemyList;
   Tile tileMap[][];
   Vertex [][] path;
-  int levelWidth, levelHeight;
-  boolean player1Dead, player2Dead, gameover;
+  int levelWidth, levelHeight, player1type, player2type;
+  boolean player1Dead, player2Dead, gameover, twoPlayer;
 
   @Override
   public int getID() {
@@ -35,20 +35,23 @@ public class TestState extends BasicGameState {
 
   @Override
   public void init(GameContainer container, StateBasedGame game) throws SlickException {
-
+    player1type = player2type = 0;
+    twoPlayer = false;
   }
 
   @Override
   public void enter(GameContainer container, StateBasedGame game) {
     // See below method for details on construction.
     initializeLevel(1);
+    if(player1type == 0)
+      player1type = 1;
     player1Dead = player2Dead = gameover = false;
     projectileList = new LinkedList<Projectile>();
     enemyList = new LinkedList<Enemy>();
     enemyList.add(new Enemy(DungeonGame.TILESIZE * 18, DungeonGame.TILESIZE * 5, 2));
     enemyList.add(new Enemy(DungeonGame.TILESIZE * 15, DungeonGame.TILESIZE * 6, 1));
     player = new Player((DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE),
-        (DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE), 2);
+        (DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE), player1type);
     container.setSoundOn(true);
   }
 
@@ -256,6 +259,17 @@ public class TestState extends BasicGameState {
     return angleVector.getRotation();
   }
 
+  public void setPlayerType(int id) {
+    player1type = id;
+  }
+
+  public void set2Player(boolean status) {
+    twoPlayer = status;
+    if(player1type == 1)
+      player2type = 2;
+    else
+      player2type = 1;
+  }
   /***
    * Internal function for construction of levels based on idd.
    * @param level

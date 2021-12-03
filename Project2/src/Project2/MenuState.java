@@ -188,18 +188,24 @@ public class MenuState extends BasicGameState {
         }
         else if(select == 2) {
           System.out.println("Melee Selected");
+          ((TestState)game.getState(DungeonGame.TESTSTATE)).setPlayerType(2);
           if(!singleplayer)
             phase = 3;
           else {
             System.out.println("Start game now");
+            ((TestState)game.getState(DungeonGame.TESTSTATE)).set2Player(false);
+            game.enterState(DungeonGame.TESTSTATE);
           }
         }
         else if(select == 3) {
           System.out.println("Ranged Selected");
+          ((TestState)game.getState(DungeonGame.TESTSTATE)).setPlayerType(1);
           if(!singleplayer)
             phase = 3;
           else {
-            System.out.println("StartGameNow");
+            System.out.println("Start Game Now");
+            ((TestState)game.getState(DungeonGame.TESTSTATE)).set2Player(false);
+            game.enterState(DungeonGame.TESTSTATE);
           }
         }
       }
@@ -220,6 +226,8 @@ public class MenuState extends BasicGameState {
         if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
           if(select == 1) {
             System.out.println("Start the game now");
+            ((TestState)game.getState(DungeonGame.TESTSTATE)).set2Player(true);
+            game.enterState(DungeonGame.TESTSTATE);
           }
         }
       }
