@@ -145,14 +145,16 @@ public class DungeonGame extends StateBasedGame {
    * @return
    *  A completed 2D vertex array, filled with costs and directions to move in.
    */
-  public static Vertex[][] getDijkstras(int sourcex, int sourcey, Tile[][] tileMap, int width, int height) {
+  public static Vertex[][] getDijkstras(int sourcex, int sourcey, MapUtil levelMap) {
+    int width = MapUtil.LEVELWIDTH;
+    int height = MapUtil.LEVELHEIGHT;
     Vertex path[][] = new Vertex[width][height];
     boolean seen[][] = new boolean[width][height];
 
-    // Intialize the path and seen arrays
+    // Initialize the path and seen arrays
     for(int x = 0; x < width; x++) {
       for(int y = 0; y < height; y++) {
-        path[x][y] = new Vertex(tileMap[x][y].getCost());
+        path[x][y] = new Vertex(levelMap.currentTileMap[x][y].getCost());
         seen[x][y] = false;
       }
     }

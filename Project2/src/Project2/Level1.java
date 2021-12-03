@@ -61,24 +61,6 @@ public class Level1 extends BasicGameState {
         // Render tiles
         levelMap.renderMapByCamera(g);
 
-        // Render Dijkstras Overlay if needed
-        /***
-         * Directions are listed by a integer in the overlay corresponding to the direction on the numpad
-         * 2: down, 4: left, 6: right, 8: up
-         * 1: down left, 3: down right, 7: up left, 9: up right
-         */
-     /*   if(true) {
-            if(path != null) {
-                for(int x = 0; x < offsetX; x++) {
-                    for(int y = 0; y < offsetY; y++) {
-                        if(path[x][y].getDistance() < 1000) {
-                            //g.drawString("" + path[x][y].getDistance(), (x * DungeonGame.TILESIZE) + 5, (y * DungeonGame.TILESIZE) + 20);
-                            g.drawString("" + path[x][y].getDirection(), (x * DungeonGame.TILESIZE) + 5, (y * DungeonGame.TILESIZE) + 8);
-                        }
-                    }
-                }
-            }
-        } */
         // Render projectiles on the screen
         for(Projectile p : projectileList) {
             p.render(g);
@@ -92,8 +74,8 @@ public class Level1 extends BasicGameState {
     @Override
     public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
         Input input = container.getInput();
-
-        //path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, offsetX, offsetY);
+        TileIndex playerTile = levelMap.convertWorldToTile(player.worldPos);
+        path = DungeonGame.getDijkstras(playerTile.x,playerTile.y, levelMap);
 
         /*** CONTROLS SECTION ***/
         // Left click for attacking
@@ -107,93 +89,52 @@ public class Level1 extends BasicGameState {
 
         // Check diagonals first
         // W and A for Up Left
-        int direction = -1;
-
+        Direction direction = Direction.NONE;
         if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A)) {
-            direction = 7;
+            direction = Direction.UP_LEFT;
             player.moveUpLeft();
         }
         // W and D for Up Right
         else if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_D)) {
-            direction = 9;
+            direction = Direction.UP_RIGHT;
             player.moveUpRight();
         }
         // S and A for Down Left
         else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_A)) {
-            direction = 1;
+            direction = Direction.DOWN_LEFT;
             player.moveDownLeft();
 
         }
         // S and D for Down Right
         else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_D)) {
-            direction = 3;
+            direction = Direction.DOWN_RIGHT;
             player.moveDownRight();
         }
         // W for moving up
         else if(input.isKeyDown(Input.KEY_W)) {
-            direction = 8;
+            direction = Direction.UP;
             player.moveUp();
         }
         // A for moving left
         else if(input.isKeyDown(Input.KEY_A)) {
-            direction = 4;
+            direction = Direction.LEFT;
             player.moveLeft();
         }
         // S for moving down
         else if(input.isKeyDown(Input.KEY_S)) {
-            direction = 2;
+            direction = Direction.DOWN;
             player.moveDown();
         }
         // D for moving right
         else if(input.isKeyDown(Input.KEY_D)) {
-            direction = 6;
+            direction = Direction.RIGHT;
             player.moveRight();
         }
-        if(direction != -1 && player.isMoveValid(direction, player.getVelocity().scale(delta),levelMap)){
-
+        if(direction != Direction.NONE && player.isMoveValid(direction, player.getVelocity().scale(delta),levelMap)){
         }
         else {
             player.stop();
         }
-
-//////////////
-        /*
-        if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(7,  levelMap)) {
-            player.moveUpLeft();
-        }
-        // W and D for Up Right
-        else if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(9, levelMap)) {
-            player.moveUpRight();
-        }
-        // S and A for Down Left
-        else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(1, levelMap)) {
-            player.moveDownLeft();
-
-        }
-        // S and D for Down Right
-        else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(3, levelMap)) {
-            player.moveDownRight();
-        }
-        // W for moving up
-        else if(input.isKeyDown(Input.KEY_W) && player.isMoveValid(8, levelMap)) {
-            player.moveUp();
-        }
-        // A for moving left
-        else if(input.isKeyDown(Input.KEY_A) && player.isMoveValid(4, levelMap)) {
-            player.moveLeft();
-        }
-        // S for moving down
-        else if(input.isKeyDown(Input.KEY_S) && player.isMoveValid(2, levelMap)) {
-            player.moveDown();
-        }
-        // D for moving right
-        else if(input.isKeyDown(Input.KEY_D) && player.isMoveValid(6, levelMap)) {
-            player.moveRight();
-        }
-        else {
-            player.stop();
-        }
-        */
 
         // Update the player model
         player.mouseRotate(getPlayerMouseAngle(input));
@@ -214,10 +155,6 @@ public class Level1 extends BasicGameState {
         }
         // Remove Projectiles that have collided with objects.
         projectileList.removeIf( (Projectile projectile) -> projectile.needsRemove());
-
-        //TODO: Bugs
-        // - Why does it only move the map every two positions or more?
-        // - How can we adjust the player position after the map updates?
     }
 
 

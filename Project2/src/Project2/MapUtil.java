@@ -3,6 +3,7 @@ package Project2;
 
 
 import jig.ResourceManager;
+import jig.Vector;
 import org.newdawn.slick.Graphics;
 
 import java.io.*;
@@ -72,6 +73,15 @@ public class MapUtil {
     public Coordinate convertTileToScreen(TileIndex tileIndex){
         Coordinate worldPos = convertTileToWorld(tileIndex);
         return convertWorldToScreen(worldPos);
+    }
+
+    public Boolean hasCollision(TileIndex tileIndex){
+        int tileValue = currentTileMap[tileIndex.x][tileIndex.y].getID();
+        return tileValue == 1;
+    }
+
+    public static TileIndex convertWorldToTile(Vector worldPos){
+        return new TileIndex((int)Math.floor(worldPos.getX() / TILESIZE), (int)Math.floor(worldPos.getY() / TILESIZE));
     }
 
     public static TileIndex convertWorldToTile(Coordinate worldPos){
