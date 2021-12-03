@@ -32,6 +32,7 @@ public class DungeonGame extends StateBasedGame {
   // States
   public static final int STARTUPSTATE = 0;
   public static final int TESTSTATE = 1;
+  public static final int MENUSTATE = 2;
 
   // Important parameters
   public static final int TILESIZE = 32;
@@ -85,6 +86,21 @@ public class DungeonGame extends StateBasedGame {
   public static final String HUD_P2_RSC = "Project2/Assets/hud/p2.png";
   public static final String HUD_DIVIDER_RSC = "Project2/Assets/hud/hudDivider.png";
 
+  // Menu
+  public static final String MENU_1P_RSC = "Project2/Assets/menu/1player.png";
+  public static final String MENU_2P_RSC = "Project2/Assets/menu/2player.png";
+  public static final String MENU_BACK_RSC = "Project2/Assets/menu/back.png";
+  public static final String MENU_CHARACTERSELECT_RSC = "Project2/Assets/menu/characterSelect.png";
+  public static final String MENU_HOWTOPLAY_RSC = "Project2/Assets/menu/howToPlay.png";
+  public static final String MENU_JOIN_RSC = "Project2/Assets/menu/join.png";
+  public static final String MENU_MELEEICON_RSC = "Project2/Assets/menu/meleeIcon.png";
+  public static final String MENU_PLAY_RSC = "Project2/Assets/menu/play.png";
+  public static final String MENU_RANGEDICON_RSC = "Project2/Assets/menu/rangedIcon.png";
+  public static final String MENU_SELECTOR_RSC = "Project2/Assets/menu/selector.png";
+  public static final String MENU_TITLE_RSC = "Project2/Assets/menu/titleCard.png";
+  public static final String MENU_WAIT_RSC = "Project2/Assets/menu/waiting.png";
+  public static final String MENU_FOUND_RSC = "Project2/Assets/menu/found.png";
+
 
   // Other
   public static final String PLAYER_ARROWTEST_RSC = "Project2/Assets/arrow.png";
@@ -125,6 +141,7 @@ public class DungeonGame extends StateBasedGame {
     // Load states
     addState(new StartState());
     addState(new TestState());
+    addState(new MenuState());
 
     /*** RESOURCE LOADING ***/
     // Player
@@ -173,6 +190,21 @@ public class DungeonGame extends StateBasedGame {
     ResourceManager.loadImage(HUD_P1_RSC);
     ResourceManager.loadImage(HUD_P2_RSC);
     ResourceManager.loadImage(HUD_DIVIDER_RSC);
+
+    // Menu
+    ResourceManager.loadImage(MENU_1P_RSC);
+    ResourceManager.loadImage(MENU_2P_RSC);
+    ResourceManager.loadImage(MENU_BACK_RSC);
+    ResourceManager.loadImage(MENU_CHARACTERSELECT_RSC);
+    ResourceManager.loadImage(MENU_HOWTOPLAY_RSC);
+    ResourceManager.loadImage(MENU_MELEEICON_RSC);
+    ResourceManager.loadImage(MENU_PLAY_RSC);
+    ResourceManager.loadImage(MENU_RANGEDICON_RSC);
+    ResourceManager.loadImage(MENU_TITLE_RSC);
+    ResourceManager.loadImage(MENU_SELECTOR_RSC);
+    ResourceManager.loadImage(MENU_JOIN_RSC);
+    ResourceManager.loadImage(MENU_WAIT_RSC);
+    ResourceManager.loadImage(MENU_FOUND_RSC);
 
     // Other
     ResourceManager.loadImage(PLAYER_ARROWTEST_RSC);

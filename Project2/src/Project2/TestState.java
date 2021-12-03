@@ -26,6 +26,7 @@ public class TestState extends BasicGameState {
   Tile tileMap[][];
   Vertex [][] path;
   int levelWidth, levelHeight;
+  boolean player1Dead, player2Dead, gameover;
 
   @Override
   public int getID() {
@@ -41,6 +42,7 @@ public class TestState extends BasicGameState {
   public void enter(GameContainer container, StateBasedGame game) {
     // See below method for details on construction.
     initializeLevel(1);
+    player1Dead = player2Dead = gameover = false;
     projectileList = new LinkedList<Projectile>();
     enemyList = new LinkedList<Enemy>();
     enemyList.add(new Enemy(DungeonGame.TILESIZE * 18, DungeonGame.TILESIZE * 5, 2));
@@ -138,6 +140,12 @@ public class TestState extends BasicGameState {
     Coordinate playerloc = player.getLocation();
     path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, levelWidth, levelHeight);
 
+    // Check if gameover occured.
+    if(gameover) {
+      System.out.println("Gameover");
+      container.exit();
+    }
+
     /*** CONTROLS SECTION ***/
     // Left click for attacking
     if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
@@ -228,6 +236,10 @@ public class TestState extends BasicGameState {
       projectile.collisionCheck(tileMap, enemyList, player);
     }
 
+    // Check if players have died.
+    if(player.getCurrentHealth() <= 0) {
+      gameover = true;
+    }
 
     // Remove Projetiles that have collided with objects.
     projectileList.removeIf( (Projectile projectile) -> projectile.needsRemove());
