@@ -5,10 +5,12 @@ import jig.ResourceManager;
 import jig.Vector;
 import org.newdawn.slick.Animation;
 
+import java.util.LinkedList;
+
 /***
  * Enitity class for reprsenting projectiles. Tied to an ID:
  *  ID = 1: Ranged Player projectile
- *
+ *  ID = 2: Ranged Enemy projectile
  * Methods:
  *
  */
@@ -17,7 +19,8 @@ public class Projectile extends Entity {
   private float speed;
   private Vector velocity;
   private boolean removeMe;
-  int id;
+  private int slashTimer;
+  int id, damage;
 
   /***
    * Constructor
@@ -31,13 +34,29 @@ public class Projectile extends Entity {
    * @param angle
    *  Angle at which the projectile is fire in.
    */
-  public Projectile (final float x, final float y, int type, double angle) {
+  public Projectile (final float x, final float y, int type, double angle, int damageAmount) {
     super(x,y);
-    speed = 1f;
     id = type;
+    damage = damageAmount;
+    // If ranged player projectile
+    if(id == 1) {
+      speed = 1f;
+      addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_RANGEDARROW1_RSC));
+    }
+    // If enemy Projectile
+    else if(id == 2) {
+      speed = 0.5f;
+      addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_PROJECTILE_RSC));
+    }
+    // If melee player "projectile"
+    else if(id == 3) {
+      speed = 0.3f;
+      slashTimer = 250;
+      addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_MELEESLASH_RSC));
+    }
+
     velocity = new Vector(speed,0);
     velocity = velocity.setRotation(angle);
-    addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_PROJECTILE_RSC));
     setRotation(angle);
     removeMe = false;
   }
@@ -48,10 +67,30 @@ public class Projectile extends Entity {
    * @param tilemap
    *  The tilemap representing the layout of the map.
    */
-  public void collisionCheck(Tile[][] tilemap) {
+  public void collisionCheck(Tile[][] tilemap, LinkedList<Enemy> enemyList, Player player) {
     Coordinate location = getLocation();
+    // Always do a wall check
     if(tilemap[location.x][location.y].getID() == 1) {
       removeMe = true;
+    }
+    // If were a player projectile, do an enemy check
+    if(id == 1 || id == 3) {
+      for(Enemy enemy : enemyList) {
+        Coordinate enemyLocation = enemy.getLocation();
+        if(enemyLocation.x == location.x && enemyLocation.y == location.y) {
+          removeMe = true;
+          enemy.damage(10);
+        }
+      }
+    }
+    // If were an enemy projectile, do a player check
+    if(id == 2) {
+      Coordinate playerLocation = player.getLocation();
+      if(playerLocation.x == location.x && playerLocation.y == location.y) {
+        player.damage(2);
+        System.out.println("Player hit by projectile: " + player.getCurrentHealth());
+        removeMe = true;
+      }
     }
   }
 
@@ -67,6 +106,13 @@ public class Projectile extends Entity {
   }
 
   public void update(final int delta) {
+    // Melee projectiles slashes are timed, and go away after an amount of time.
+    if(id == 3) {
+      slashTimer -= delta;
+      if(slashTimer <= 0) {
+        removeMe = true;
+      }
+    }
     translate(velocity.scale(delta));
   }
 

@@ -8,6 +8,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
+import javax.print.DocFlavor;
 import java.io.IOException;
 
 /**
@@ -37,9 +38,38 @@ public class DungeonGame extends StateBasedGame {
   public static final int SCALE = 1;
 
   /*** ASSET PATHS ***/
+  // Player
+  public static final String PLAYER_RANGEDIDLELEFT_RSC = "Project2/Assets/player/playerRangedIdleLeft.png";
+  public static final String PLAYER_RANGEDIDLERIGHT_RSC = "Project2/Assets/player/playerRangedIdleRight.png";
+  public static final String PLAYER_RANGEDMOVELEFT_RSC = "Project2/Assets/player/playerRangedMoveLeft.png";
+  public static final String PLAYER_RANGEDMOVERIGHT_RSC = "Project2/Assets/player/playerRangedMoveRight.png";
+  public static final String PLAYER_RANGEDBOW1_RSC = "Project2/Assets/player/playerRangedBow1.png";
+  public static final String PLAYER_RANGEDARROW1_RSC = "Project2/Assets/player/playerRangedArrow1.png";
+
+  public static final String PLAYER_MELEEIDLELEFT_RSC = "Project2/Assets/player/playerMeleeIdleLeft.png";
+  public static final String PLAYER_MELEEIDLERIGHT_RSC = "Project2/Assets/player/playerMeleeIdleRight.png";
+  public static final String PLAYER_MELEEMOVELEFT_RSC = "Project2/Assets/player/playerMeleeMoveLeft.png";
+  public static final String PLAYER_MELEEMOVERIGHT_RSC = "Project2/Assets/player/playerMeleeMoveRight.png";
+  public static final String PLAYER_MELEESWORD1_RSC = "Project2/Assets/player/playerMeleeSword1.png";
+  public static final String PLAYER_MELEESLASH_RSC = "Project2/Assets/player/slash.png";
+
+  // Enemy
+  public static final String ENEMY_MELEEIDLELEFT_RSC = "Project2/Assets/enemy/enemyMeleeIdleLeft.png";
+  public static final String ENEMY_MELEEIDLERIGHT_RSC = "Project2/Assets/enemy/enemyMeleeIdleRight.png";
+  public static final String ENEMY_MELEEMOVELEFT_RSC = "Project2/Assets/enemy/enemyMeleeMoveLeft.png";
+  public static final String ENEMY_MELEEMOVERIGHT_RSC = "Project2/Assets/enemy/enemyMeleeMoveRight.png";
+
+  public static final String ENEMY_RANGEDIDLELEFT_RSC = "Project2/Assets/enemy/enemyRangedIdleLeft.png";
+  public static final String ENEMY_RANGEDIDLERIGHT_RSC = "Project2/Assets/enemy/enemyRangedIdleRight.png";
+  public static final String ENEMY_RANGEDMOVELEFT_RSC = "Project2/Assets/enemy/enemyRangedMoveLeft.png";
+  public static final String ENEMY_RANGEDMOVERIGHT_RSC = "Project2/Assets/enemy/enemyRangedMoveRight.png";
+  public static final String ENEMY_RANGEDPROJECTILE_RSC = "Project2/Assets/enemy/enemyRangedProjectile.png";
+
+  // Other
   public static final String PLAYER_ARROWTEST_RSC = "Project2/Assets/arrow.png";
   public static final String PLAYER_PROJECTILE_RSC = "Project2/Assets/projectile.png";
 
+  // Map
   public static final String MAP_WALL_RSC = "Project2/Assets/wall.png";
   public static final String MAP_FLOOR_RSC = "Project2/Assets/floor.png";
 
@@ -58,7 +88,13 @@ public class DungeonGame extends StateBasedGame {
     ScreenHeight = height;
     ScreenWidth = width;
 
-    //Client client = new Client("localhost", 4999);
+
+    try {
+      client = new Client("localhost", 4999);
+      System.out.println("Client created: " + client);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
     Entity.setCoarseGrainedCollisionBoundary(Entity.CIRCLE);
   }
@@ -70,9 +106,38 @@ public class DungeonGame extends StateBasedGame {
     addState(new TestState());
 
     /*** RESOURCE LOADING ***/
+    // Player
+    ResourceManager.loadImage(PLAYER_RANGEDARROW1_RSC);
+    ResourceManager.loadImage(PLAYER_RANGEDBOW1_RSC);
+    ResourceManager.loadImage(PLAYER_RANGEDIDLELEFT_RSC);
+    ResourceManager.loadImage(PLAYER_RANGEDIDLERIGHT_RSC);
+    ResourceManager.loadImage(PLAYER_RANGEDMOVELEFT_RSC);
+    ResourceManager.loadImage(PLAYER_RANGEDMOVERIGHT_RSC);
+
+    ResourceManager.loadImage(PLAYER_MELEEIDLELEFT_RSC);
+    ResourceManager.loadImage(PLAYER_MELEEIDLERIGHT_RSC);
+    ResourceManager.loadImage(PLAYER_MELEEMOVELEFT_RSC);
+    ResourceManager.loadImage(PLAYER_MELEEMOVERIGHT_RSC);
+    ResourceManager.loadImage(PLAYER_MELEESLASH_RSC);
+    ResourceManager.loadImage(PLAYER_MELEESWORD1_RSC);
+
+    // Enemy
+    ResourceManager.loadImage(ENEMY_MELEEIDLELEFT_RSC);
+    ResourceManager.loadImage(ENEMY_MELEEIDLERIGHT_RSC);
+    ResourceManager.loadImage(ENEMY_MELEEMOVELEFT_RSC);
+    ResourceManager.loadImage(ENEMY_MELEEMOVERIGHT_RSC);
+
+    ResourceManager.loadImage(ENEMY_RANGEDIDLELEFT_RSC);
+    ResourceManager.loadImage(ENEMY_RANGEDIDLERIGHT_RSC);
+    ResourceManager.loadImage(ENEMY_RANGEDMOVELEFT_RSC);
+    ResourceManager.loadImage(ENEMY_RANGEDMOVERIGHT_RSC);
+    ResourceManager.loadImage(ENEMY_RANGEDPROJECTILE_RSC);
+
+    // Other
     ResourceManager.loadImage(PLAYER_ARROWTEST_RSC);
     ResourceManager.loadImage(PLAYER_PROJECTILE_RSC);
 
+    // Map
     ResourceManager.loadImage(MAP_FLOOR_RSC);
     ResourceManager.loadImage(MAP_WALL_RSC);
   }

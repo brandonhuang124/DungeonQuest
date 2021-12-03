@@ -3,6 +3,7 @@ package Project2;
 import jig.Entity;
 import jig.ResourceManager;
 import jig.Vector;
+import org.newdawn.slick.Animation;
 
 /***
  * Enitity class for reprsenting the player character.
@@ -19,6 +20,10 @@ import jig.Vector;
 public class Player extends Entity {
   private Vector velocity;
   private float speed;
+  private int damage, maxhealth, health, attackCooldownTimer, attackCooldown, playerType;
+  private boolean faceRight, attackReady;
+  private Animation moveLeft, moveRight, idleLeft, idleRight, current;
+  public Weapon weapon;
 
   /***
    * Constructor, prepares default stats and Images/anmiations
@@ -27,43 +32,143 @@ public class Player extends Entity {
    * @param y
    *  y coordinate to spawn the player in
    */
-  public Player(final float x, final float y) {
+  public Player(final float x, final float y, int id) {
     super(x,y);
-    addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_ARROWTEST_RSC));
+    weapon = new Weapon(x,y,id);
+    damage = 10;
+    maxhealth = 10;
+    health = maxhealth;
     velocity = new Vector(0,0);
+    playerType = id;
     speed = 0.25f;
+    // Ranged player assignments
+    if(id == 1) {
+      moveLeft = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.PLAYER_RANGEDMOVELEFT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
+      moveRight = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.PLAYER_RANGEDMOVERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
+      idleLeft = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.PLAYER_RANGEDIDLELEFT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
+      idleRight = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.PLAYER_RANGEDIDLERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
+      attackCooldown = 200;
+    }
+    // Melee player assignments
+    if(id == 2) {
+      moveLeft = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.PLAYER_MELEEMOVELEFT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
+      moveRight = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.PLAYER_MELEEMOVERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
+      idleLeft = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.PLAYER_MELEEIDLELEFT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
+      idleRight = new Animation(ResourceManager.getSpriteSheet(
+          DungeonGame.PLAYER_MELEEIDLERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+          true, 100, true);
+      attackCooldown = 200;
+    }
+    attackReady = true;
+    faceRight = false;
+    current = idleRight;
+    addAnimation(current);
   }
 
   /**+
    * Below are the 5 movement functions for allowing the player to move around the map
+   * Each movement function also sets the proper animation.
    */
   public void moveRight() {
     velocity = new Vector(speed, 0);
+    faceRight = true;
+    removeAnimation(current);
+    addAnimation(moveRight);
+    current = moveRight;
   }
 
   public void moveLeft() {
     velocity = new Vector(-speed, 0);
+    faceRight = false;
+    removeAnimation(current);
+    addAnimation(moveLeft);
+    current = moveLeft;
   }
 
   public void moveUp() {
     velocity = new Vector(0, -speed);
+    removeAnimation(current);
+    if(faceRight) {
+      addAnimation(moveRight);
+      current = moveRight;
+    }
+    else {
+      addAnimation(moveLeft);
+      current = moveLeft;
+    }
   }
 
   public void moveDown() {
     velocity = new Vector(0, speed);
+    removeAnimation(current);
+    if(faceRight) {
+      addAnimation(moveRight);
+      current = moveRight;
+    }
+    else {
+      addAnimation(moveLeft);
+      current = moveLeft;
+    }
   }
 
   // For the diaganol movement, speed is scaled in each direction by 1/sqrt(2) since its at a 45 degree angle.
-  public void moveDownRight() { velocity = new Vector(0.71f * speed, 0.71f * speed);}
+  public void moveDownRight() {
+    velocity = new Vector(0.71f * speed, 0.71f * speed);
+    faceRight = true;
+    removeAnimation(current);
+    addAnimation(moveRight);
+    current = moveRight;
+  }
 
-  public void moveDownLeft() { velocity = new Vector(-0.71f * speed, 0.71f * speed);}
+  public void moveDownLeft() {
+    velocity = new Vector(-0.71f * speed, 0.71f * speed);
+    faceRight = false;
+    removeAnimation(current);
+    addAnimation(moveLeft);
+    current = moveLeft;
+  }
 
-  public void moveUpRight() { velocity = new Vector(0.71f * speed, -0.71f * speed);}
+  public void moveUpRight() {
+    velocity = new Vector(0.71f * speed, -0.71f * speed);
+    faceRight = true;
+    removeAnimation(current);
+    addAnimation(moveRight);
+    current = moveRight;
+  }
 
-  public void moveUpLeft() { velocity = new Vector(-0.71f * speed, -0.71f * speed);}
+  public void moveUpLeft() {
+    velocity = new Vector(-0.71f * speed, -0.71f * speed);
+    faceRight = false;
+    removeAnimation(current);
+    addAnimation(moveLeft);
+    current = moveLeft;
+  }
 
   public void stop() {
     velocity = new Vector(0, 0);
+    removeAnimation(current);
+    if(faceRight) {
+      addAnimation(idleRight);
+      current = idleRight;
+    }
+    else {
+      addAnimation(idleLeft);
+      current = idleLeft;
+    }
   }
 
   /**
@@ -199,6 +304,23 @@ public class Player extends Entity {
   }
 
   /***
+   * This function is to be called when the player takes damage from any source.
+   * @param damage
+   *  The amount of damage taken as a positive integer
+   * @return
+   *  true: if the player's health is 0 or less
+   *  false: otherwise
+   */
+  public boolean damage(int damage) {
+    health -= damage;
+    if(health <= 0)
+      return true;
+    return false;
+  }
+
+  public int getCurrentHealth() { return health;}
+
+  /***
    * This function is to be called when the player fire a projectile.
    * @param angle
    * The angle to which the projectile will be fired in.
@@ -206,11 +328,34 @@ public class Player extends Entity {
    * The newly constructed projectile with the angle, originated at the player.
    */
   public Projectile fire(double angle) {
-    Projectile newProjectile = new Projectile(this.getX(), this.getY(), 1, angle);
-    return newProjectile;
+    // Check if were ready to attack, and only fire if so.
+    if(attackReady) {
+      Projectile newProjectile;
+      if(playerType == 1)
+        newProjectile = new Projectile(this.getX(), this.getY(), 1, angle, damage);
+      else
+        newProjectile = new Projectile(this.getX(), this.getY(), 3, angle, damage);
+      attackReady = false;
+      attackCooldownTimer = attackCooldown;
+      return newProjectile;
+    }
+    return null;
   }
 
+  /***
+   * This function updates all time based things attached to the player, such as cooldowns and location.
+   * @param delta
+   *  Amount of time passed
+   */
   public void update(final int delta) {
+    // Check if were on CD, if so decrement and release if the timer is finished
+    if(!attackReady) {
+      attackCooldownTimer -= delta;
+      if(attackCooldownTimer <= 0) {
+        attackReady = true;
+      }
+    }
+    weapon.update(getX(), getY());
     translate(velocity.scale(delta));
   }
 
@@ -240,12 +385,12 @@ public class Player extends Entity {
   }
 
   /***
-   * This function rotates the player in the given direction. Meant to be used towards the mouse and called every
-   * update.
+   * This function rotates the player's weapon in the given direction. Meant to be used towards the mouse and
+   * called every update.
    * @param theta
    *  The absolute angle to rotate to.
    */
   public void mouseRotate(final double theta) {
-    setRotation(theta);
+    weapon.setRotation(theta);
   }
 }
