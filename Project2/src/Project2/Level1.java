@@ -1,0 +1,202 @@
+package Project2;
+
+import jig.Vector;
+
+import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Input;
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.state.BasicGameState;
+import org.newdawn.slick.state.StateBasedGame;
+
+import java.io.IOException;
+import java.util.LinkedList;
+
+/***
+ * Description:
+ *
+ * Transitions From StartState
+ *
+ * Transitions To
+ */
+public class Level1 extends BasicGameState {
+    Player player;
+    LinkedList<Projectile> projectileList;
+    LinkedList<Enemy> enemyList;
+    Vertex [][] path;
+    MapUtil levelMap;
+
+
+    @Override
+    public int getID() {
+        return DungeonGame.LEVEL1;
+    }
+
+    @Override
+    public void init(GameContainer container, StateBasedGame game) throws SlickException {
+        levelMap = new MapUtil();
+    }
+
+    @Override
+    public void enter(GameContainer container, StateBasedGame game) {
+        // parse the CSV map file, throw exception in case of IO error:
+        try {
+            levelMap.loadLevelMap(1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // keeping the string to matrix method in DungeonGame
+        levelMap.currentTileMap  = DungeonGame.getTileMap(levelMap.currentMapString,
+                MapUtil.LEVELWIDTH,MapUtil.LEVELWIDTH);
+        projectileList = new LinkedList<Projectile>();
+        player = new Player( 0, 0, 1);
+        player.setWorldPos(new TileIndex(4,4));
+        enemyList = new LinkedList<Enemy>();
+        enemyList.add(new Enemy(0, 0, 2));
+        enemyList.add(new Enemy(0, 0, 1));
+        for(Enemy enemy : enemyList) {
+            if(enemy.id == 1){
+                enemy.setWorldPos(new TileIndex(10,10));
+            }else if(enemy.id == 2){
+                enemy.setWorldPos(new TileIndex(18,18));
+            }else{
+                enemy.setWorldPos(new TileIndex(20,20));
+            }
+
+        }
+
+        container.setSoundOn(true);
+    }
+
+    @Override
+    public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
+        DungeonGame rg = (DungeonGame)game;
+
+        // Render tiles
+        levelMap.renderMapByCamera(g);
+
+        // Render projectiles on the screen
+        for(Projectile p : projectileList) {
+            Coordinate pScreenPos = levelMap.convertWorldToScreen(p.worldPos);
+            p.setX(pScreenPos.x);
+            p.setY(pScreenPos.y);
+            p.render(g);
+        }
+        for(Enemy enemy : enemyList) {
+            Coordinate enemyScreenPos = levelMap.convertWorldToScreen(enemy.worldPos);
+            enemy.setX(enemyScreenPos.x);
+            enemy.setY(enemyScreenPos.y);
+            enemy.render(g);
+        }
+
+        Coordinate playerScreenPos = levelMap.convertWorldToScreen(player.worldPos);
+        player.setX(playerScreenPos.x);
+        player.setY(playerScreenPos.y);
+        player.render(g);
+        player.weapon.render(g);
+    }
+
+    @Override
+    public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
+        Input input = container.getInput();
+        TileIndex playerTile = levelMap.convertWorldToTile(player.worldPos);
+        path = DungeonGame.getDijkstras(playerTile.x,playerTile.y, levelMap);
+
+        /*** CONTROLS SECTION ***/
+        // Left click for attacking
+        if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+            System.out.println("Left Click pressed");
+            Projectile newProjectile = player.fire(getPlayerMouseAngle(input));
+            if(newProjectile != null)
+                projectileList.add(newProjectile);
+            for(Projectile p: projectileList) {
+                System.out.println(p);
+            }
+        }
+        // Check diagonals first
+        // W and A for Up Left
+        Direction direction = Direction.NONE;
+        if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A)) {
+            direction = Direction.UP_LEFT;
+            player.moveUpLeft();
+        }
+        // W and D for Up Right
+        else if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_D)) {
+            direction = Direction.UP_RIGHT;
+            player.moveUpRight();
+        }
+        // S and A for Down Left
+        else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_A)) {
+            direction = Direction.DOWN_LEFT;
+            player.moveDownLeft();
+
+        }
+        // S and D for Down Right
+        else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_D)) {
+            direction = Direction.DOWN_RIGHT;
+            player.moveDownRight();
+        }
+        // W for moving up
+        else if(input.isKeyDown(Input.KEY_W)) {
+            direction = Direction.UP;
+            player.moveUp();
+        }
+        // A for moving left
+        else if(input.isKeyDown(Input.KEY_A)) {
+            direction = Direction.LEFT;
+            player.moveLeft();
+        }
+        // S for moving down
+        else if(input.isKeyDown(Input.KEY_S)) {
+            direction = Direction.DOWN;
+            player.moveDown();
+        }
+        // D for moving right
+        else if(input.isKeyDown(Input.KEY_D)) {
+            direction = Direction.RIGHT;
+            player.moveRight();
+        }
+        if(direction == Direction.NONE || !player.isMoveValid(direction,
+                player.getVelocity().scale(delta),levelMap)){
+            player.stop();
+        }
+
+        // Update the player model
+        player.mouseRotate(getPlayerMouseAngle(input));
+        player.update(delta);
+
+
+        levelMap.updateCamera(player.prevMoveVelocity);
+
+        // Update projectiles
+        for(Projectile p : projectileList) {
+            p.update(delta);
+        }
+        // Update All enemies
+        for(Enemy enemy : enemyList) {
+            enemy.makeMove(levelMap.currentTileMap, path, player, projectileList, delta);
+            enemy.update(delta);
+        }
+
+
+        // Collision check for projectiles
+        for(Projectile projectile : projectileList) {
+            projectile.collisionCheck(levelMap.currentTileMap, enemyList, player);
+        }
+
+        // Remove Projectiles that have collided with objects.
+        projectileList.removeIf( (Projectile projectile) -> projectile.needsRemove());
+        // Remove enemies that have died.
+        enemyList.removeIf( (Enemy enemy) -> enemy.isDead());
+    }
+
+
+    public double getPlayerMouseAngle(Input input) {
+        float mousex = input.getMouseX();
+        float mousey = input.getMouseY();
+        float playerx = player.getX();
+        float playery = player.getY();
+        Vector angleVector = new Vector(mousex - playerx, mousey - playery);
+        return angleVector.getRotation();
+    }
+}

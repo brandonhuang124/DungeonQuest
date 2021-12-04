@@ -3,9 +3,10 @@ package Project2;
 import jig.Entity;
 import jig.ResourceManager;
 import jig.Vector;
-import org.newdawn.slick.Animation;
+
 
 import java.util.LinkedList;
+
 
 /***
  * Enitity class for reprsenting projectiles. Tied to an ID:
@@ -21,6 +22,7 @@ public class Projectile extends Entity {
   private boolean removeMe;
   private int slashTimer;
   int id, damage;
+  Coordinate worldPos;
 
   /***
    * Constructor
@@ -61,6 +63,7 @@ public class Projectile extends Entity {
     removeMe = false;
   }
 
+
   /**
    * This function is for collision checking the projectile, should be called every update.
    * Marks the removeMe field if the projectile needs to be removed.
@@ -68,24 +71,28 @@ public class Projectile extends Entity {
    *  The tilemap representing the layout of the map.
    */
   public void collisionCheck(Tile[][] tilemap, LinkedList<Enemy> enemyList, Player player) {
-    Coordinate location = getLocation();
+    TileIndex location = MapUtil.convertWorldToTile(worldPos);
+    if(location.x < 0 || location.y < 0 || location.x >= 60 || location.y >=60){
+      removeMe = true;
+      return;
+    }
     // Always do a wall check
     if(tilemap[location.x][location.y].getID() == 1) {
       removeMe = true;
     }
-    // If were a player projectile, do an enemy check
+    // If we're a player projectile, do an enemy check
     if(id == 1 || id == 3) {
       for(Enemy enemy : enemyList) {
-        Coordinate enemyLocation = enemy.getLocation();
+        TileIndex enemyLocation = enemy.getLocation();
         if(enemyLocation.x == location.x && enemyLocation.y == location.y) {
           removeMe = true;
           enemy.damage(10);
         }
       }
     }
-    // If were an enemy projectile, do a player check
+    // If we're an enemy projectile, do a player check
     if(id == 2) {
-      Coordinate playerLocation = player.getLocation();
+      TileIndex playerLocation = player.getTileIndex();
       if(playerLocation.x == location.x && playerLocation.y == location.y) {
         player.damage(2);
         System.out.println("Player hit by projectile: " + player.getCurrentHealth());
@@ -99,11 +106,10 @@ public class Projectile extends Entity {
    * @return
    * A Coordinate object with an x and y field representing the location in the tilemap the player currently exists in.
    */
-  public Coordinate getLocation() {
-    int x = Math.round((this.getX() - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
-    int y = Math.round((this.getY() - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
-    return new Coordinate(x,y);
+  public TileIndex getLocation() {
+      return MapUtil.convertWorldToTile(worldPos);
   }
+
 
   public void update(final int delta) {
     // Melee projectiles slashes are timed, and go away after an amount of time.
@@ -113,7 +119,9 @@ public class Projectile extends Entity {
         removeMe = true;
       }
     }
-    translate(velocity.scale(delta));
+    Vector movement = velocity.scale(delta);
+    worldPos.x += movement.getX();
+    worldPos.y += movement.getY();
   }
 
   public boolean needsRemove() {return removeMe;}

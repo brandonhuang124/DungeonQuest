@@ -8,7 +8,6 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
-import javax.print.DocFlavor;
 import java.io.IOException;
 
 /**
@@ -32,9 +31,9 @@ public class DungeonGame extends StateBasedGame {
   // States
   public static final int STARTUPSTATE = 0;
   public static final int TESTSTATE = 1;
+  public static final int LEVEL1 = 2;
 
   // Important parameters
-  public static final int TILESIZE = 32;
   public static final int SCALE = 1;
 
   /*** ASSET PATHS ***/
@@ -103,8 +102,8 @@ public class DungeonGame extends StateBasedGame {
   public void initStatesList(GameContainer container) throws SlickException {
     // Load states
     addState(new StartState());
-    addState(new TestState());
-
+    //addState(new TestState());
+    addState(new Level1());
     /*** RESOURCE LOADING ***/
     // Player
     ResourceManager.loadImage(PLAYER_RANGEDARROW1_RSC);
@@ -169,6 +168,8 @@ public class DungeonGame extends StateBasedGame {
    */
   public static Tile[][] getTileMap(String map, int width, int height) {
     // Check if an invalid string to build was given.
+    System.out.println(map.length());
+    System.out.println(width + " , " + height);
     if(width * height != map.length()) {
       System.out.println("String length did not match map dimensions");
       return null;
@@ -188,6 +189,7 @@ public class DungeonGame extends StateBasedGame {
     return tileMap;
   }
 
+
   /**
    * Dijkstras Algorithm for a 10x10 map of Tile objects. Will build a 2D Vertex array to be used for pathfinding for
    * enemies in the game. Only works for 10x10 maps currently
@@ -202,14 +204,17 @@ public class DungeonGame extends StateBasedGame {
    * @return
    *  A completed 2D vertex array, filled with costs and directions to move in.
    */
-  public static Vertex[][] getDijkstras(int sourcex, int sourcey, Tile[][] tileMap, int width, int height) {
+  public static Vertex[][] getDijkstras(int sourcex, int sourcey, MapUtil levelMap) {
+    int width = MapUtil.LEVELWIDTH;
+    int height = MapUtil.LEVELHEIGHT;
+
     Vertex path[][] = new Vertex[width][height];
     boolean seen[][] = new boolean[width][height];
 
     // Intialize the path and seen arrays
     for(int x = 0; x < width; x++) {
       for(int y = 0; y < height; y++) {
-        path[x][y] = new Vertex(tileMap[x][y].getCost());
+        path[x][y] = new Vertex(levelMap.currentTileMap[x][y].getCost());
         seen[x][y] = false;
       }
     }
@@ -220,7 +225,7 @@ public class DungeonGame extends StateBasedGame {
     // Keep going until all nodes are seen
     while(hasUnseenNodes(seen, width , height)) {
       // Get the node with the current shortest distance
-      Coordinate current = shortestDistance(path, seen, width, height);
+      TileIndex current = shortestDistance(path, seen, width, height);
       int x = current.x;
       int y = current.y;
       // Mark the current node as seen.
@@ -326,8 +331,8 @@ public class DungeonGame extends StateBasedGame {
    * @return
    *  Coordinate of the node in the vertex which has the lowest distance and is unseen.
    */
-  private static Coordinate shortestDistance (Vertex graph[][], boolean seen[][], int width, int height) {
-    Coordinate shortest = new Coordinate(0,0);
+  private static TileIndex shortestDistance (Vertex graph[][], boolean seen[][], int width, int height) {
+    TileIndex shortest = new TileIndex(0,0);
     double distance = 100000000;
     // Iterate through the graph and find the right node.
     for(int x = 0; x < width; x++) {
