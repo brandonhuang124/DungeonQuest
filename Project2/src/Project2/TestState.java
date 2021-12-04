@@ -19,7 +19,6 @@ import java.util.LinkedList;
  *
  * Transitions To
  */
-
 public class TestState extends BasicGameState {
   Player player;
   LinkedList<Projectile> projectileList;
@@ -27,7 +26,6 @@ public class TestState extends BasicGameState {
   Tile tileMap[][];
   Vertex [][] path;
   int levelWidth, levelHeight;
-  MapUtil levelMap;
 
   @Override
   public int getID() {
@@ -41,21 +39,20 @@ public class TestState extends BasicGameState {
 
   @Override
   public void enter(GameContainer container, StateBasedGame game) {
-    levelMap = new MapUtil();
     // See below method for details on construction.
     initializeLevel(1);
     projectileList = new LinkedList<Projectile>();
     enemyList = new LinkedList<Enemy>();
-    enemyList.add(new Enemy(MapUtil.TILESIZE * 18, MapUtil.TILESIZE * 5, 2));
-    enemyList.add(new Enemy(MapUtil.TILESIZE * 15, MapUtil.TILESIZE * 6, 1));
-    player = new Player((MapUtil.TILESIZE * 4) + (0.5f * MapUtil.TILESIZE),
-        (MapUtil.TILESIZE * 4) + (0.5f * MapUtil.TILESIZE), 2);
+    enemyList.add(new Enemy(DungeonGame.TILESIZE * 18, DungeonGame.TILESIZE * 5, 2));
+    enemyList.add(new Enemy(DungeonGame.TILESIZE * 15, DungeonGame.TILESIZE * 6, 1));
+    player = new Player((DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE),
+        (DungeonGame.TILESIZE * 4) + (0.5f * DungeonGame.TILESIZE), 2);
     container.setSoundOn(true);
   }
 
   @Override
   public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
-
+    DungeonGame rg = (DungeonGame)game;
 
     // Render tiles
     for(int y = 0;  y < levelHeight; y++) {
@@ -64,12 +61,12 @@ public class TestState extends BasicGameState {
         // Floor tile
         if(temp.getID() == 0) {
           g.drawImage(ResourceManager.getImage(DungeonGame.MAP_FLOOR_RSC).getScaledCopy(DungeonGame.SCALE),
-              x * MapUtil.TILESIZE, y * MapUtil.TILESIZE);
+              x * DungeonGame.TILESIZE, y * DungeonGame.TILESIZE);
         }
         // Wall tile
         else if(temp.getID() == 1) {
           g.drawImage(ResourceManager.getImage(DungeonGame.MAP_WALL_RSC).getScaledCopy(DungeonGame.SCALE),
-              x * MapUtil.TILESIZE, y * MapUtil.TILESIZE);
+              x * DungeonGame.TILESIZE, y * DungeonGame.TILESIZE);
         }
       }
     }
@@ -86,7 +83,7 @@ public class TestState extends BasicGameState {
           for(int y = 0; y < levelHeight; y++) {
             if(path[x][y].getDistance() < 1000) {
               //g.drawString("" + path[x][y].getDistance(), (x * DungeonGame.TILESIZE) + 5, (y * DungeonGame.TILESIZE) + 20);
-              g.drawString("" + path[x][y].getDirection(), (x * MapUtil.TILESIZE) + 5, (y * MapUtil.TILESIZE) + 8);
+              g.drawString("" + path[x][y].getDirection(), (x * DungeonGame.TILESIZE) + 5, (y * DungeonGame.TILESIZE) + 8);
             }
           }
         }
@@ -111,8 +108,8 @@ public class TestState extends BasicGameState {
     DungeonGame dg = (DungeonGame)game;
 
     // Methods called at the start of every update for usage in the loop
-    TileIndex playerloc = player.getTileIndex();
-    path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,levelMap);
+    Coordinate playerloc = player.getLocation();
+    path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,tileMap, levelWidth, levelHeight);
 
     /*** CONTROLS SECTION ***/
     // Left click for attacking
@@ -126,74 +123,65 @@ public class TestState extends BasicGameState {
       }
     }
 
-    // Check diagonals first
+    // Check diagonols first
     // W and A for Up Left
-    Direction direction = Direction.NONE;
-    if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A)) {
-      direction = Direction.UP_LEFT;
+    if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(7, tileMap)) {
+      dg.client.inputString = "WA;" + playerloc.x + ";" + playerloc.y;
+      //System.out.println(dg.client.inputString);
       player.moveUpLeft();
     }
     // W and D for Up Right
-    else if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_D)) {
-      direction = Direction.UP_RIGHT;
+    else if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(9, tileMap)) {
+      dg.client.inputString = "WD;" + playerloc.x + ";" + playerloc.y;
+      //System.out.println(dg.client.inputString);
       player.moveUpRight();
     }
     // S and A for Down Left
-    else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_A)) {
-      direction = Direction.DOWN_LEFT;
+    else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(1, tileMap)) {
+      dg.client.inputString = "SA;" + playerloc.x + ";" + playerloc.y;
+      //System.out.println(dg.client.inputString);
       player.moveDownLeft();
-
     }
     // S and D for Down Right
-    else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_D)) {
-      direction = Direction.DOWN_RIGHT;
+    else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(3, tileMap)) {
+      dg.client.inputString = "SD;" + playerloc.x + ";" + playerloc.y;
+      //System.out.println(dg.client.inputString);
       player.moveDownRight();
     }
     // W for moving up
-    else if(input.isKeyDown(Input.KEY_W)) {
-      direction = Direction.UP;
+    else if(input.isKeyDown(Input.KEY_W) && player.isMoveValid(8, tileMap)) {
+      dg.client.inputString = "W;" + playerloc.x + ";" + playerloc.y;
+      //System.out.println(dg.client.inputString);
       player.moveUp();
     }
     // A for moving left
-    else if(input.isKeyDown(Input.KEY_A)) {
-      direction = Direction.LEFT;
+    else if(input.isKeyDown(Input.KEY_A) && player.isMoveValid(4, tileMap)) {
+      dg.client.inputString = "A;" + playerloc.x + ";" + playerloc.y;
+      //System.out.println(dg.client.inputString);
       player.moveLeft();
     }
     // S for moving down
-    else if(input.isKeyDown(Input.KEY_S)) {
-      direction = Direction.DOWN;
+    else if(input.isKeyDown(Input.KEY_S) && player.isMoveValid(2, tileMap)) {
+      dg.client.inputString = "S;" + playerloc.x + ";" + playerloc.y;
+      //System.out.println(dg.client.inputString);
       player.moveDown();
     }
     // D for moving right
-    else if(input.isKeyDown(Input.KEY_D)) {
-      direction = Direction.RIGHT;
+    else if(input.isKeyDown(Input.KEY_D) && player.isMoveValid(6, tileMap)) {
+      dg.client.inputString = "D;" + playerloc.x + ";" + playerloc.y;
+      //System.out.println(dg.client.inputString);
       player.moveRight();
-    }
-    if(direction != Direction.NONE && player.isMoveValid(direction, player.getVelocity().scale(delta),levelMap)){
     }
     else {
       player.stop();
     }
 
-    // Update the player model
-    player.mouseRotate(getPlayerMouseAngle(input));
-    player.update(delta);
 
-    // Now offset if were near a wall so no in the wall happens
-    //player.offsetUpdate(levelMap);
-
-    levelMap.updateCamera(player.prevMoveVelocity);
-
-    // Update projectiles
-    for(Projectile p : projectileList) {
-      p.update(delta);
-    }
-
-  // Update All enemies
+    // Update All enemies
     for(Enemy enemy : enemyList) {
       enemy.makeMove(tileMap, path, player, projectileList, delta);
       enemy.update(delta);
-   //   enemy.offsetUpdate(levelMap);
+      enemy.offsetUpdate(tileMap);
     }
 
     // Update the player model
@@ -201,7 +189,7 @@ public class TestState extends BasicGameState {
     player.update(delta);
 
     // Now offset if were near a wall so no in the wall happens
-   // player.offsetUpdate(levelMap);
+    player.offsetUpdate(tileMap);
 
     // Update projectiles
     for(Projectile p : projectileList) {
@@ -261,4 +249,3 @@ public class TestState extends BasicGameState {
         levelWidth,levelHeight);
   }
 }
-
