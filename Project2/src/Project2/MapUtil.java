@@ -110,8 +110,6 @@ public class MapUtil {
             cameraPos.y = 0;
         } else if (cameraPos.y > maxCameraPos.y) {
             cameraPos.y = maxCameraPos.y;
-        }else{
-            System.out.println(TAG + "cameraPos.y " + cameraPos.y);
         }
     }
 
@@ -124,9 +122,6 @@ public class MapUtil {
         for (float renderX = (-cameraOffset.x); renderX < maxWidth; renderX += TILESIZE, currentTile.x++) {
             int currentY = currentTile.y;
             for (float renderY = (-cameraOffset.y); renderY < maxHeight; renderY += TILESIZE, currentY++) {
-                if(currentY == 60){
-                    System.out.println("currentY is 60");
-                }
                 Tile renderTile = currentTileMap[currentTile.x][currentY];
                 // Floor tile
                 if (renderTile.getID() == 0) {
