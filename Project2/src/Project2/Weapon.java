@@ -5,6 +5,9 @@ import jig.ResourceManager;
 import jig.Vector;
 
 public class Weapon extends Entity {
+
+  public Coordinate worldPos;
+
   public Weapon(final float x, final float y, int id) {
     super(x,y);
     if(id == 1) {

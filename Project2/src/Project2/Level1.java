@@ -52,9 +52,18 @@ public class Level1 extends BasicGameState {
         player = new Player( 0, 0, 1);
         player.setWorldPos(new TileIndex(4,4));
         enemyList = new LinkedList<Enemy>();
-        enemyList.add(new Enemy(MapUtil.TILESIZE * 18, MapUtil.TILESIZE * 5, 2));
-        enemyList.add(new Enemy(MapUtil.TILESIZE * 15, MapUtil.TILESIZE * 6, 1));
+        enemyList.add(new Enemy(0, 0, 2));
+        enemyList.add(new Enemy(0, 0, 1));
+        for(Enemy enemy : enemyList) {
+            if(enemy.id == 1){
+                enemy.setWorldPos(new TileIndex(10,10));
+            }else if(enemy.id == 2){
+                enemy.setWorldPos(new TileIndex(18,18));
+            }else{
+                enemy.setWorldPos(new TileIndex(20,20));
+            }
 
+        }
 
         container.setSoundOn(true);
     }
@@ -68,9 +77,15 @@ public class Level1 extends BasicGameState {
 
         // Render projectiles on the screen
         for(Projectile p : projectileList) {
+            Coordinate pScreenPos = levelMap.convertWorldToScreen(p.worldPos);
+            p.setX(pScreenPos.x);
+            p.setY(pScreenPos.y);
             p.render(g);
         }
         for(Enemy enemy : enemyList) {
+            Coordinate enemyScreenPos = levelMap.convertWorldToScreen(enemy.worldPos);
+            enemy.setX(enemyScreenPos.x);
+            enemy.setY(enemyScreenPos.y);
             enemy.render(g);
         }
 
@@ -90,7 +105,7 @@ public class Level1 extends BasicGameState {
         /*** CONTROLS SECTION ***/
         // Left click for attacking
         if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
-            System.out.println("LClick pressed");
+            System.out.println("Left Click pressed");
             Projectile newProjectile = player.fire(getPlayerMouseAngle(input));
             if(newProjectile != null)
                 projectileList.add(newProjectile);
@@ -141,9 +156,8 @@ public class Level1 extends BasicGameState {
             direction = Direction.RIGHT;
             player.moveRight();
         }
-        if(direction != Direction.NONE && player.isMoveValid(direction, player.getVelocity().scale(delta),levelMap)){
-        }
-        else {
+        if(direction == Direction.NONE || !player.isMoveValid(direction,
+                player.getVelocity().scale(delta),levelMap)){
             player.stop();
         }
 
@@ -151,8 +165,6 @@ public class Level1 extends BasicGameState {
         player.mouseRotate(getPlayerMouseAngle(input));
         player.update(delta);
 
-        // Now offset if were near a wall so no in the wall happens
-        //player.offsetUpdate(levelMap);
 
         levelMap.updateCamera(player.prevMoveVelocity);
 
@@ -164,22 +176,15 @@ public class Level1 extends BasicGameState {
         for(Enemy enemy : enemyList) {
             enemy.makeMove(levelMap.currentTileMap, path, player, projectileList, delta);
             enemy.update(delta);
-            enemy.offsetUpdate(levelMap.currentTileMap);
         }
 
-        // Update the player model
-        player.mouseRotate(getPlayerMouseAngle(input));
-        player.update(delta);
-
-        // Now offset if were near a wall so no in the wall happens
-       //  player.offsetUpdate(levelMap);
 
         // Collision check for projectiles
         for(Projectile projectile : projectileList) {
             projectile.collisionCheck(levelMap.currentTileMap, enemyList, player);
         }
 
-        // Remove Projetiles that have collided with objects.
+        // Remove Projectiles that have collided with objects.
         projectileList.removeIf( (Projectile projectile) -> projectile.needsRemove());
         // Remove enemies that have died.
         enemyList.removeIf( (Enemy enemy) -> enemy.isDead());
@@ -194,6 +199,4 @@ public class Level1 extends BasicGameState {
         Vector angleVector = new Vector(mousex - playerx, mousey - playery);
         return angleVector.getRotation();
     }
-
-
 }

@@ -193,7 +193,7 @@ public class TestState extends BasicGameState {
     for(Enemy enemy : enemyList) {
       enemy.makeMove(tileMap, path, player, projectileList, delta);
       enemy.update(delta);
-      enemy.offsetUpdate(tileMap);
+   //   enemy.offsetUpdate(levelMap);
     }
 
     // Update the player model
@@ -201,7 +201,7 @@ public class TestState extends BasicGameState {
     player.update(delta);
 
     // Now offset if were near a wall so no in the wall happens
-    player.offsetUpdate(levelMap);
+   // player.offsetUpdate(levelMap);
 
     // Update projectiles
     for(Projectile p : projectileList) {

@@ -141,7 +141,7 @@ public class Player extends Entity {
     }
   }
 
-  // For the diaganol movement, speed is scaled in each direction by 1/sqrt(2) since its at a 45 degree angle.
+  // For the diagonal movement, speed is scaled in each direction by 1/sqrt(2) since its at a 45 degree angle.
   public void moveDownRight() {
     velocity = new Vector(0.71f * speed, 0.71f * speed);
     faceRight = true;
@@ -193,27 +193,10 @@ public class Player extends Entity {
    * A TileIndex object with an x and y field representing the location in the tilemap the player currently exists in.
    */
   public TileIndex getTileIndex() {
-    int x = Math.round((this.getX() - MapUtil.TILESIZE / 2) / MapUtil.TILESIZE);
-    int y = Math.round((this.getY() - MapUtil.TILESIZE / 2) / MapUtil.TILESIZE);
-    return new TileIndex(x, y);
+    return MapUtil.convertWorldToTile(worldPos);
   }
 
 
-  /**
-   * This function is for calculating the offset from the center of the tile the player currently exists in.
-   *
-   * @return A Vector containing the x and y difference between the center of the tile and the player
-   */
-  public Vector getTileOffset(MapUtil levelMap) {
-    TileIndex location = getTileIndex();
-    // The center of the tile location is (Tile * tilewidth) + 1/2 tile width, since the entity's origin is the center.
-    float tilex = (location.x * MapUtil.TILESIZE) + (MapUtil.TILESIZE / 2);
-    float tiley = (location.y * MapUtil.TILESIZE) + (MapUtil.TILESIZE / 2);
-    float x = this.getX();
-    float y = this.getY();
-    // Return the offset from the center
-    return new Vector(tilex - x, tiley - y);
-  }
 
 
 
@@ -306,6 +289,7 @@ public class Player extends Entity {
         newProjectile = new Projectile(this.getX(), this.getY(), 3, angle, damage);
       attackReady = false;
       attackCooldownTimer = attackCooldown;
+      newProjectile.worldPos = new Coordinate(worldPos.x, worldPos.y);
       return newProjectile;
     }
     return null;
@@ -316,6 +300,7 @@ public class Player extends Entity {
    * @param delta
    *  Amount of time passed
    */
+
   public void update(final int delta) {
     Vector movement = velocity.scale(delta);
     prevMoveVelocity = new Coordinate(movement.getX(), movement.getY());
@@ -330,38 +315,6 @@ public class Player extends Entity {
       }
     }
     weapon.update(getX(), getY());
-  }
-
-
-  /**
-   * This function offsets the player's location so they aren't in walls. Call after every update.
-   */
-  /**
-   * This function offsets the player's location so they aren't in walls. Call after every update.
-   */
-  public void offsetUpdate(MapUtil levelMap) {
-    // Check if any adjacent tiles are walls, and if were inside any of them. If so do an offset update.
-    TileIndex location = getTileIndex();
-    // Tile above
-    if (levelMap.currentTileMap != null) {
-      if (levelMap.currentTileMap[location.x][location.y - 1].getID() == 1 && getTileOffset(levelMap).getY() >= 0) {
-        translate(0, getTileOffset(levelMap).getY());
-      }
-      // Tile Below
-      if (levelMap.currentTileMap[location.x][location.y + 1].getID() == 1 && getTileOffset(levelMap).getY() <= 0) {
-        translate(0, getTileOffset(levelMap).getY());
-      }
-      // Tile Left
-      if (levelMap.currentTileMap[location.x - 1][location.y].getID() == 1 && getTileOffset(levelMap).getX() >= 0) {
-        translate(getTileOffset(levelMap).getX(), 0);
-      }
-      // Tile Right
-      if (levelMap.currentTileMap[location.x + 1][location.y].getID() == 1 && getTileOffset(levelMap).getX() <= 0) {
-        translate(getTileOffset(levelMap).getX(), 0);
-      }
-    } else {
-      System.out.println(TAG + "TileMap is null");
-    }
   }
 
   /***
