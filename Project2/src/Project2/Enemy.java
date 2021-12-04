@@ -30,11 +30,12 @@ public class Enemy extends Entity{
 
   private Vector velocity;
   private float speed;
-  private int id, health, sleeptimer, damage;
+  public int id;
+  private int health, sleeptimer, damage;
   private boolean isDead, sleep, faceRight;
   private double targetAngle;
   private Animation moveLeft, moveRight, idleLeft, idleRight, current;
-
+  public Coordinate worldPos;
   /***
    * Constructor, prepares default stats and Images/anmiations
    * @param x
@@ -94,6 +95,9 @@ public class Enemy extends Entity{
     current = idleLeft;
   }
 
+  public void setWorldPos(TileIndex tileIndex) {
+    worldPos = MapUtil.convertTileToWorld(tileIndex);
+  }
   /**
    * This method is to be called before every enemy update. Contains all behaviors.
    * @param tilemap
@@ -103,7 +107,8 @@ public class Enemy extends Entity{
    * @param player1
    *  Player object representing player 1.
    */
-  public void makeMove(Tile[][] tilemap, Vertex[][] path1, Player player1, LinkedList<Projectile> projectileList, int delta) {
+  public void makeMove(Tile[][] tilemap, Vertex[][] path1, Player player1,
+                        LinkedList<Projectile> projectileList, int delta) {
     // First check if were currently asleep due to actions such as attacking.
     if(sleep) {
       sleeptimer -= delta;
@@ -113,13 +118,13 @@ public class Enemy extends Entity{
     }
 
     // Get location and retrieve direction from the vertex map.
-    Coordinate location = getLocation();
+    TileIndex playerLocation = MapUtil.convertWorldToTile(player1.worldPos);
+    TileIndex location = MapUtil.convertWorldToTile(worldPos);
     int direction = path1[location.x][location.y].getDirection();
 
     // Attempt attacks depending on enemy type:
     //  Melee
     if(id == 1) {
-      Coordinate playerLocation = player1.getLocation();
       if(playerLocation.x == location.x && playerLocation.y == location.y) {
         player1.damage(damage);
         System.out.println("Player Hit! " + player1.getCurrentHealth());
@@ -132,11 +137,12 @@ public class Enemy extends Entity{
 
     //  Ranged
     if(id == 2) {
-      Coordinate playerLocation = player1.getLocation();
       // Check if the enemy has a clear line of sight on the player.
       if(lineOfSight(player1, tilemap)) {
         // targetAngle is set when lineOfSight() is called. It's an object property so we just need to access it.
-        projectileList.add(new Projectile(getX(), getY(), 2, targetAngle, damage));
+        Projectile newProjectile = new Projectile(getX(), getY(), 2, targetAngle, damage);
+        newProjectile.worldPos = new Coordinate(worldPos.x, worldPos.y);
+        projectileList.add(newProjectile);
         System.out.println("Player in sight!");
         sleep = true;
         sleeptimer = 500;
@@ -282,10 +288,8 @@ public class Enemy extends Entity{
    * @return
    * A Coordinate object with an x and y field representing the location in the tilemap the player currently exists in.
    */
-  public Coordinate getLocation() {
-    int x = Math.round((this.getX() - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
-    int y = Math.round((this.getY() - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
-    return new Coordinate(x,y);
+  public TileIndex getLocation() {
+      return MapUtil.convertWorldToTile(worldPos);
   }
 
   /**
@@ -293,16 +297,24 @@ public class Enemy extends Entity{
    * @return
    * A Vector containing the x and y difference between the center of the tile and the Enemy
    */
+  public TileIndex getTileIndex() {
+    int x = Math.round((this.getX() - MapUtil.TILESIZE / 2) / MapUtil.TILESIZE);
+    int y = Math.round((this.getY() - MapUtil.TILESIZE / 2) / MapUtil.TILESIZE);
+    return new TileIndex(x, y);
+  }
+
+
   public Vector getTileOffset() {
-    Coordinate location = getLocation();
+    TileIndex location = getTileIndex();
     // The center of the tile location is (Tile * tilewidth) + 1/2 tile width, since the entity's origin is the center.
-    float tilex = (location.x * DungeonGame.TILESIZE) + (DungeonGame.TILESIZE / 2);
-    float tiley = (location.y * DungeonGame.TILESIZE) + (DungeonGame.TILESIZE / 2);
+    float tilex = (location.x * MapUtil.TILESIZE) + (MapUtil.TILESIZE / 2);
+    float tiley = (location.y * MapUtil.TILESIZE) + (MapUtil.TILESIZE / 2);
     float x = this.getX();
     float y = this.getY();
     // Return the offset from the center
     return new Vector(tilex - x, tiley - y);
   }
+
 
   /**
    * This function is to be called before executing an enemy move.
@@ -315,33 +327,12 @@ public class Enemy extends Entity{
   }
 
   public void update(final int delta) {
-    translate(velocity.scale(delta));
+    Vector movement = velocity.scale(delta);
+    worldPos.x += movement.getX();
+    worldPos.y += movement.getY();
   }
 
 
-  /**
-   * This function offsets the enemies's location so they aren't in walls. Call after every update.
-   */
-  public void offsetUpdate(Tile[][] tilemap) {
-    // Check if any adjacent tiles are walls, and if were inside any of them. If so do an offset update.
-    Coordinate location = getLocation();
-    // Tile above
-    if(tilemap[location.x][location.y - 1].getID() == 1 && getTileOffset().getY() >= 0) {
-      translate(0, getTileOffset().getY());
-    }
-    // Tile Below
-    if(tilemap[location.x][location.y + 1].getID() == 1 && getTileOffset().getY() <= 0) {
-      translate(0, getTileOffset().getY());
-    }
-    // Tile Left
-    if(tilemap[location.x - 1][location.y].getID() == 1 && getTileOffset().getX() >= 0) {
-      translate(getTileOffset().getX(), 0 );
-    }
-    // Tile Right
-    if(tilemap[location.x + 1][location.y].getID() == 1 && getTileOffset().getX() <= 0) {
-      translate(getTileOffset().getX(), 0 );
-    }
-  }
 
   /***
    * Function for determining if there is a clear line between a target and the enemy.
@@ -350,14 +341,14 @@ public class Enemy extends Entity{
    * @return
    */
   private boolean lineOfSight(Player player, Tile[][] tilemap) {
-    float enemyx = getX();
-    float enemyy = getY();
-    float playerx = player.getX();
-    float playery = player.getY();
+    float enemyx = worldPos.x;
+    float enemyy = worldPos.y;
+    float playerx = player.worldPos.x;
+    float playery = player.worldPos.y;
 
     // Get a Vector between the two objects and scale it to 1.
     Vector sightLine = new Vector(playerx - enemyx, playery - enemyy);
-    sightLine = sightLine.setLength(1);
+    sightLine = sightLine.unit();
     targetAngle = sightLine.getRotation();
 
     // Starting at the enemy, and iterating through this unit vector until we reach or pass the player,
@@ -365,7 +356,7 @@ public class Enemy extends Entity{
     // Check which x coordinate is greater to determine which way to do the check.
     if(enemyx > playerx) {
       while(enemyx > playerx) {
-        Coordinate currentLocation = getLineLocation(enemyx, enemyy);
+        TileIndex currentLocation = MapUtil.convertWorldToTile(new Coordinate(enemyx,enemyy));
         // Check if were in a wall
         if(tilemap[currentLocation.x][currentLocation.y].getID() == 1) {
           return false;
@@ -375,10 +366,10 @@ public class Enemy extends Entity{
         enemyy += sightLine.getY();
       }
     }
-    // POSSIBLY ADD A CHECK IF WERE DIRECTLY VERTICLE OF THE PLAYER. THIS IS AN EDGE CASE ALTHOUGH
+    // POSSIBLY ADD A CHECK IF WERE DIRECTLY VERTICAL OF THE PLAYER. THIS IS AN EDGE CASE ALTHOUGH
     else {
       while(enemyx < playerx) {
-        Coordinate currentLocation = getLineLocation(enemyx, enemyy);
+        TileIndex currentLocation = MapUtil.convertWorldToTile(new Coordinate(enemyx,enemyy));
         // Check if were in a wall
         if(tilemap[currentLocation.x][currentLocation.y].getID() == 1) {
           return false;
@@ -389,20 +380,5 @@ public class Enemy extends Entity{
       }
     }
     return true;
-  }
-
-  /***
-   * Internal function of lineOfSight() to determine tilemap location while traversing line.
-   * @param x
-   *  x float position of current location in line
-   * @param y
-   *  y float position of current location in line
-   * @return
-   *  A coordinate containing the tile map location of the current location in the line.
-   */
-  private Coordinate getLineLocation(float x, float y) {
-    int xcoord = Math.round((x - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
-    int ycoord = Math.round((y - DungeonGame.TILESIZE / 2) / DungeonGame.TILESIZE);
-    return new Coordinate(xcoord, ycoord);
   }
 }
