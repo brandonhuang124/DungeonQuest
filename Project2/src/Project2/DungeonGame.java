@@ -3,6 +3,7 @@ package Project2;
 import jig.Entity;
 import jig.ResourceManager;
 
+import org.lwjgl.Sys;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.SlickException;
@@ -78,6 +79,7 @@ public class DungeonGame extends StateBasedGame {
   public final int ScreenHeight;
 
   Client client;
+
   /**
    * Create a new state based game
    *
@@ -87,7 +89,6 @@ public class DungeonGame extends StateBasedGame {
     super(title);
     ScreenHeight = height;
     ScreenWidth = width;
-
 
     try {
       client = new Client("localhost", 4999);

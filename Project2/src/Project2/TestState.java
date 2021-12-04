@@ -10,6 +10,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
+import java.io.IOException;
 import java.util.LinkedList;
 
 /***
@@ -126,55 +127,125 @@ public class TestState extends BasicGameState {
     // Check diagonols first
     // W and A for Up Left
     if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(7, tileMap)) {
-      dg.client.inputString = "WA;" + playerloc.x + ";" + playerloc.y;
-      //System.out.println(dg.client.inputString);
-      player.moveUpLeft();
+      try {
+        dg.client.dataOutputStream.writeUTF("WA;" + playerloc.x + ";" + playerloc.y);
+        if(dg.client.dataInputStream.readUTF().equals("A")) {
+          player.moveUpLeft();
+        }
+        else {
+          System.out.println("Unable to perform action:  WA");
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
     // W and D for Up Right
     else if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(9, tileMap)) {
-      dg.client.inputString = "WD;" + playerloc.x + ";" + playerloc.y;
-      //System.out.println(dg.client.inputString);
-      player.moveUpRight();
+      try {
+        dg.client.dataOutputStream.writeUTF("WD;" + playerloc.x + ";" + playerloc.y);
+        if(dg.client.dataInputStream.readUTF().equals("A")) {
+          player.moveUpRight();
+        }
+        else {
+          System.out.println("Unable to perform action:  WD");
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
     // S and A for Down Left
     else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(1, tileMap)) {
-      dg.client.inputString = "SA;" + playerloc.x + ";" + playerloc.y;
-      //System.out.println(dg.client.inputString);
-      player.moveDownLeft();
+      try {
+        dg.client.dataOutputStream.writeUTF("SA;" + playerloc.x + ";" + playerloc.y);
+        if(dg.client.dataInputStream.readUTF().equals("A")) {
+          player.moveDownLeft();
+        }
+        else {
+          System.out.println("Unable to perform action:  SA");
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
     // S and D for Down Right
     else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(3, tileMap)) {
-      dg.client.inputString = "SD;" + playerloc.x + ";" + playerloc.y;
-      //System.out.println(dg.client.inputString);
-      player.moveDownRight();
+      try {
+        dg.client.dataOutputStream.writeUTF("SD;" + playerloc.x + ";" + playerloc.y);
+        if(dg.client.dataInputStream.readUTF().equals("A")) {
+          player.moveDownRight();
+        }
+        else {
+          System.out.println("Unable to perform action:  SD");
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
     // W for moving up
     else if(input.isKeyDown(Input.KEY_W) && player.isMoveValid(8, tileMap)) {
-      dg.client.inputString = "W;" + playerloc.x + ";" + playerloc.y;
-      //System.out.println(dg.client.inputString);
-      player.moveUp();
+      try {
+        dg.client.dataOutputStream.writeUTF("W;" + playerloc.x + ";" + playerloc.y);
+        if(dg.client.dataInputStream.readUTF().equals("A")) {
+          player.moveUp();
+        }
+        else {
+          System.out.println("Unable to perform action:  W");
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
     // A for moving left
     else if(input.isKeyDown(Input.KEY_A) && player.isMoveValid(4, tileMap)) {
-      dg.client.inputString = "A;" + playerloc.x + ";" + playerloc.y;
-      //System.out.println(dg.client.inputString);
-      player.moveLeft();
+      try {
+        dg.client.dataOutputStream.writeUTF("A;" + playerloc.x + ";" + playerloc.y);
+        if(dg.client.dataInputStream.readUTF().equals("A")) {
+          player.moveLeft();
+        }
+        else {
+          System.out.println("Unable to perform action:  A");
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
     // S for moving down
     else if(input.isKeyDown(Input.KEY_S) && player.isMoveValid(2, tileMap)) {
-      dg.client.inputString = "S;" + playerloc.x + ";" + playerloc.y;
-      //System.out.println(dg.client.inputString);
-      player.moveDown();
+      try {
+        dg.client.dataOutputStream.writeUTF("S;" + playerloc.x + ";" + playerloc.y);
+        if(dg.client.dataInputStream.readUTF().equals("A")) {
+          player.moveDown();
+        }
+        else {
+          System.out.println("Unable to perform action:  S");
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
     // D for moving right
     else if(input.isKeyDown(Input.KEY_D) && player.isMoveValid(6, tileMap)) {
-      dg.client.inputString = "D;" + playerloc.x + ";" + playerloc.y;
-      //System.out.println(dg.client.inputString);
-      player.moveRight();
+      try {
+        dg.client.dataOutputStream.writeUTF("D;" + playerloc.x + ";" + playerloc.y);
+        if(dg.client.dataInputStream.readUTF().equals("A")) {
+          player.moveRight();
+        }
+        else {
+          System.out.println("Unable to perform action:  D");
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
     else {
       player.stop();
     }
+
+//    try {
+//      Client.main(null);
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//    }
 
 
     // Update All enemies
