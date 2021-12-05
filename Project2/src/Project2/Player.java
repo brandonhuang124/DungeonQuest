@@ -197,9 +197,6 @@ public class Player extends Entity {
   }
 
 
-
-
-
   public boolean isMoveValid(Direction direction, Vector movement, MapUtil levelMap) {
     Vector moveDirection = movement.unit();
     // this is where the player would be if the move was successful

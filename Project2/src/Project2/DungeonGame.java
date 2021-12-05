@@ -194,15 +194,6 @@ public class DungeonGame extends StateBasedGame {
    * Dijkstras Algorithm for a 10x10 map of Tile objects. Will build a 2D Vertex array to be used for pathfinding for
    * enemies in the game. Only works for 10x10 maps currently
    * Note: If different maps sizes are ever used, this function needs to be modified.
-   *
-   * @param sourcex
-   *  The x coordinate to path to
-   * @param sourcey
-   *  The y coordinate to path to
-   * @param tileMap
-   *  The constructed tile map showing the map layout
-   * @return
-   *  A completed 2D vertex array, filled with costs and directions to move in.
    */
   public static Vertex[][] getDijkstras(int sourcex, int sourcey, MapUtil levelMap) {
     int width = MapUtil.LEVELWIDTH;

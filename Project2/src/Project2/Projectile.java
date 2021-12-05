@@ -107,7 +107,7 @@ public class Projectile extends Entity {
    * A Coordinate object with an x and y field representing the location in the tilemap the player currently exists in.
    */
   public TileIndex getLocation() {
-      return MapUtil.convertWorldToTile(worldPos);
+    return MapUtil.convertWorldToTile(worldPos);
   }
 
 

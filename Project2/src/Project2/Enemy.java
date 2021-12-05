@@ -57,34 +57,34 @@ public class Enemy extends Entity{
       health = 10;
       damage = 2;
       moveLeft = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.ENEMY_MELEEMOVELEFT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.ENEMY_MELEEMOVELEFT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       moveRight = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.ENEMY_MELEEMOVERIGHT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.ENEMY_MELEEMOVERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       idleLeft = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.ENEMY_MELEEIDLELEFT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.ENEMY_MELEEIDLELEFT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       idleRight = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.ENEMY_MELEEIDLERIGHT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.ENEMY_MELEEIDLERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
     }
     //  Ranged
     else if(id == 2) {
       health = 10;
       damage = 2;
       moveLeft = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.ENEMY_RANGEDMOVELEFT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.ENEMY_RANGEDMOVELEFT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       moveRight = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.ENEMY_RANGEDMOVERIGHT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.ENEMY_RANGEDMOVERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       idleLeft = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.ENEMY_RANGEDIDLELEFT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.ENEMY_RANGEDIDLELEFT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       idleRight = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.ENEMY_RANGEDIDLERIGHT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.ENEMY_RANGEDIDLERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
     }
     //  Invalid id, so we need to kill it immediately
     else {
@@ -108,7 +108,7 @@ public class Enemy extends Entity{
    *  Player object representing player 1.
    */
   public void makeMove(Tile[][] tilemap, Vertex[][] path1, Player player1,
-                        LinkedList<Projectile> projectileList, int delta) {
+                       LinkedList<Projectile> projectileList, int delta) {
     // First check if were currently asleep due to actions such as attacking.
     if(sleep) {
       sleeptimer -= delta;
@@ -154,23 +154,23 @@ public class Enemy extends Entity{
     // If attacks are unavailable, the enemy will just move.
     switch (direction) {
       case 1:  moveDownLeft();
-               break;
+        break;
       case 2:  moveDown();
-               break;
+        break;
       case 3:  moveDownRight();
-               break;
+        break;
       case 4:  moveLeft();
-               break;
+        break;
       case 6:  moveRight();
-               break;
+        break;
       case 7:  moveUpLeft();
-               break;
+        break;
       case 8:  moveUp();
-               break;
+        break;
       case 9:  moveUpRight();
-               break;
+        break;
       default: stop();
-               break;
+        break;
     }
   }
 
@@ -215,8 +215,8 @@ public class Enemy extends Entity{
     velocity = new Vector(0, -speed);
     removeAnimation(current);
     if(faceRight) {
-     addAnimation(moveRight);
-     current = moveRight;
+      addAnimation(moveRight);
+      current = moveRight;
     }
     else {
       addAnimation(moveLeft);
@@ -289,7 +289,7 @@ public class Enemy extends Entity{
    * A Coordinate object with an x and y field representing the location in the tilemap the player currently exists in.
    */
   public TileIndex getLocation() {
-      return MapUtil.convertWorldToTile(worldPos);
+    return MapUtil.convertWorldToTile(worldPos);
   }
 
   /**
