@@ -27,7 +27,9 @@ public class TestState extends BasicGameState {
   LinkedList<Enemy> enemyList;
   Tile tileMap[][];
   Vertex [][] path;
-  int levelWidth, levelHeight;
+  int levelWidth, levelHeight, player1type, player2type;;
+  boolean player1Dead, player2Dead, gameover, twoPlayer;
+
   MapUtil levelMap;
 
   @Override
@@ -37,7 +39,8 @@ public class TestState extends BasicGameState {
 
   @Override
   public void init(GameContainer container, StateBasedGame game) throws SlickException {
-
+    player1type = player2type = 0;
+    twoPlayer = false;
   }
 
   @Override
@@ -45,12 +48,15 @@ public class TestState extends BasicGameState {
     levelMap = new MapUtil();
     // See below method for details on construction.
     initializeLevel(1);
+    if(player1type == 0)
+      player1type = 1;
+    player1Dead = player2Dead = gameover = false;
     projectileList = new LinkedList<Projectile>();
     enemyList = new LinkedList<Enemy>();
     enemyList.add(new Enemy(MapUtil.TILESIZE * 18, MapUtil.TILESIZE * 5, 2));
     enemyList.add(new Enemy(MapUtil.TILESIZE * 15, MapUtil.TILESIZE * 6, 1));
     player = new Player((MapUtil.TILESIZE * 4) + (0.5f * MapUtil.TILESIZE),
-            (MapUtil.TILESIZE * 4) + (0.5f * MapUtil.TILESIZE), 2);
+            (MapUtil.TILESIZE * 4) + (0.5f * MapUtil.TILESIZE), player1type);
     container.setSoundOn(true);
   }
 
@@ -104,6 +110,33 @@ public class TestState extends BasicGameState {
     }
     player.render(g);
     player.weapon.render(g);
+
+    // Render HUD
+    if(player.getPlayerType() == 1)
+      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_PARCHMENTRANGED_RSC), 20, 640);
+    else if(player.getPlayerType() == 2)
+      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_PARCHMENTMELEE_RSC), 20, 640);
+
+    g.drawImage(ResourceManager.getImage(DungeonGame.HUD_P1_RSC), 5, 640);
+    g.drawImage(ResourceManager.getImage(DungeonGame.HUD_DIVIDER_RSC), 276, 640);
+
+    // Render Left cap of health bar
+    if(player.getCurrentHealth() > 0)
+      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARL_RSC), 152, 660);
+    else
+      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARL_RSC), 152, 660);
+    // Render middle of bar
+    for(int i = 1; i < player.getMaxHealth(); i++) {
+      if(i <= player.getCurrentHealth())
+        g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBAR_RSC), 152 + (i*6), 660);
+      else
+        g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBAR_RSC), 152 + (i*6), 660);
+    }
+    // Render Right cap of health bar
+    if(player.getCurrentHealth() == player.getMaxHealth())
+      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARR_RSC), 152 + (player.getMaxHealth() * 6), 660);
+    else
+      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC), 152 + (player.getMaxHealth() * 6), 660);
   }
 
   @Override
@@ -114,6 +147,12 @@ public class TestState extends BasicGameState {
     // Methods called at the start of every update for usage in the loop
     TileIndex playerloc = player.getTileIndex();
     path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,levelMap);
+
+    // Check if gameover occured.
+    if(gameover) {
+      System.out.println("Gameover");
+      container.exit();
+    }
 
     /*** CONTROLS SECTION ***/
     // Left click for attacking
@@ -285,6 +324,10 @@ public class TestState extends BasicGameState {
       projectile.collisionCheck(tileMap, enemyList, player);
     }
 
+    // Check if players have died.
+    if(player.getCurrentHealth() <= 0) {
+      gameover = true;
+    }
 
     // Remove Projetiles that have collided with objects.
     projectileList.removeIf( (Projectile projectile) -> projectile.needsRemove());
@@ -299,6 +342,18 @@ public class TestState extends BasicGameState {
     float playery = player.getY();
     Vector angleVector = new Vector(mousex - playerx, mousey - playery);
     return angleVector.getRotation();
+  }
+
+  public void setPlayerType(int id) {
+    player1type = id;
+  }
+
+  public void set2Player(boolean status) {
+    twoPlayer = status;
+    if(player1type == 1)
+      player2type = 2;
+    else
+      player2type = 1;
   }
 
   /***

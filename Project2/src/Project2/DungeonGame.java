@@ -32,6 +32,7 @@ public class DungeonGame extends StateBasedGame {
   public static final int STARTUPSTATE = 0;
   public static final int TESTSTATE = 1;
   public static final int LEVEL1 = 2;
+  public static final int MENUSTATE = 3;
 
   // Important parameters
   public static final int SCALE = 1;
@@ -63,6 +64,41 @@ public class DungeonGame extends StateBasedGame {
   public static final String ENEMY_RANGEDMOVELEFT_RSC = "Project2/Assets/enemy/enemyRangedMoveLeft.png";
   public static final String ENEMY_RANGEDMOVERIGHT_RSC = "Project2/Assets/enemy/enemyRangedMoveRight.png";
   public static final String ENEMY_RANGEDPROJECTILE_RSC = "Project2/Assets/enemy/enemyRangedProjectile.png";
+
+  // HUD
+  public static final String HUD_GBAR_RSC = "Project2/Assets/hud/barGreen.png";
+  public static final String HUD_GBARL_RSC = "Project2/Assets/hud/barGreenCapL.png";
+  public static final String HUD_GBARR_RSC = "Project2/Assets/hud/barGreenCapR.png";
+  public static final String HUD_RBAR_RSC = "Project2/Assets/hud/barRed.png";
+  public static final String HUD_RBARL_RSC = "Project2/Assets/hud/barRedCapL.png";
+  public static final String HUD_RBARR_RSC = "Project2/Assets/hud/barRedCapR.png";
+  public static final String HUD_PBAR_RSC = "Project2/Assets/hud/barPurple.png";
+  public static final String HUD_PBARL_RSC = "Project2/Assets/hud/barPurpleCapL.png";
+  public static final String HUD_PBARR_RSC = "Project2/Assets/hud/barPurpleCapR.png";
+  public static final String HUD_WBAR_RSC = "Project2/Assets/hud/barWhite.png";
+  public static final String HUD_WBARL_RSC = "Project2/Assets/hud/barWhiteCapL.png";
+  public static final String HUD_WBARR_RSC = "Project2/Assets/hud/barWhiteCapR.png";
+
+  public static final String HUD_PARCHMENTMELEE_RSC = "Project2/Assets/hud/parchmentHUDMelee.png";
+  public static final String HUD_PARCHMENTRANGED_RSC = "Project2/Assets/hud/parchmentHUDRanged.png";
+  public static final String HUD_P1_RSC = "Project2/Assets/hud/p1.png";
+  public static final String HUD_P2_RSC = "Project2/Assets/hud/p2.png";
+  public static final String HUD_DIVIDER_RSC = "Project2/Assets/hud/hudDivider.png";
+
+  // Menu
+  public static final String MENU_1P_RSC = "Project2/Assets/menu/1player.png";
+  public static final String MENU_2P_RSC = "Project2/Assets/menu/2player.png";
+  public static final String MENU_BACK_RSC = "Project2/Assets/menu/back.png";
+  public static final String MENU_CHARACTERSELECT_RSC = "Project2/Assets/menu/characterSelect.png";
+  public static final String MENU_HOWTOPLAY_RSC = "Project2/Assets/menu/howToPlay.png";
+  public static final String MENU_JOIN_RSC = "Project2/Assets/menu/join.png";
+  public static final String MENU_MELEEICON_RSC = "Project2/Assets/menu/meleeIcon.png";
+  public static final String MENU_PLAY_RSC = "Project2/Assets/menu/play.png";
+  public static final String MENU_RANGEDICON_RSC = "Project2/Assets/menu/rangedIcon.png";
+  public static final String MENU_SELECTOR_RSC = "Project2/Assets/menu/selector.png";
+  public static final String MENU_TITLE_RSC = "Project2/Assets/menu/titleCard.png";
+  public static final String MENU_WAIT_RSC = "Project2/Assets/menu/waiting.png";
+  public static final String MENU_FOUND_RSC = "Project2/Assets/menu/found.png";
 
   // Other
   public static final String PLAYER_ARROWTEST_RSC = "Project2/Assets/arrow.png";
@@ -104,6 +140,7 @@ public class DungeonGame extends StateBasedGame {
     addState(new StartState());
     //addState(new TestState());
     addState(new Level1());
+    addState(new MenuState());
     /*** RESOURCE LOADING ***/
     // Player
     ResourceManager.loadImage(PLAYER_RANGEDARROW1_RSC);
@@ -131,6 +168,41 @@ public class DungeonGame extends StateBasedGame {
     ResourceManager.loadImage(ENEMY_RANGEDMOVELEFT_RSC);
     ResourceManager.loadImage(ENEMY_RANGEDMOVERIGHT_RSC);
     ResourceManager.loadImage(ENEMY_RANGEDPROJECTILE_RSC);
+
+    // HUD
+    ResourceManager.loadImage(HUD_GBAR_RSC);
+    ResourceManager.loadImage(HUD_GBARL_RSC);
+    ResourceManager.loadImage(HUD_GBARR_RSC);
+    ResourceManager.loadImage(HUD_RBAR_RSC);
+    ResourceManager.loadImage(HUD_RBARL_RSC);
+    ResourceManager.loadImage(HUD_RBARR_RSC);
+    ResourceManager.loadImage(HUD_PBAR_RSC);
+    ResourceManager.loadImage(HUD_PBARL_RSC);
+    ResourceManager.loadImage(HUD_PBARR_RSC);
+    ResourceManager.loadImage(HUD_WBAR_RSC);
+    ResourceManager.loadImage(HUD_WBARL_RSC);
+    ResourceManager.loadImage(HUD_WBARR_RSC);
+
+    ResourceManager.loadImage(HUD_PARCHMENTMELEE_RSC);
+    ResourceManager.loadImage(HUD_PARCHMENTRANGED_RSC);
+    ResourceManager.loadImage(HUD_P1_RSC);
+    ResourceManager.loadImage(HUD_P2_RSC);
+    ResourceManager.loadImage(HUD_DIVIDER_RSC);
+
+    // Menu
+    ResourceManager.loadImage(MENU_1P_RSC);
+    ResourceManager.loadImage(MENU_2P_RSC);
+    ResourceManager.loadImage(MENU_BACK_RSC);
+    ResourceManager.loadImage(MENU_CHARACTERSELECT_RSC);
+    ResourceManager.loadImage(MENU_HOWTOPLAY_RSC);
+    ResourceManager.loadImage(MENU_MELEEICON_RSC);
+    ResourceManager.loadImage(MENU_PLAY_RSC);
+    ResourceManager.loadImage(MENU_RANGEDICON_RSC);
+    ResourceManager.loadImage(MENU_TITLE_RSC);
+    ResourceManager.loadImage(MENU_SELECTOR_RSC);
+    ResourceManager.loadImage(MENU_JOIN_RSC);
+    ResourceManager.loadImage(MENU_WAIT_RSC);
+    ResourceManager.loadImage(MENU_FOUND_RSC);
 
     // Other
     ResourceManager.loadImage(PLAYER_ARROWTEST_RSC);

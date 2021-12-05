@@ -35,6 +35,10 @@ public class Player extends Entity {
    *  x Coordinate to spawn the player in
    * @param y
    *  y coordinate to spawn the player in
+   * @param id
+   *  Player type:
+   *    1: Ranged player
+   *    2: Melee player
    */
   public Player(final float x, final float y, int id) {
     super(x,y);
@@ -269,6 +273,10 @@ public class Player extends Entity {
 
   public int getCurrentHealth() { return health;}
 
+  public int getMaxHealth() {return maxhealth;}
+
+  public int getPlayerType() { return playerType;}
+
   /***
    * This function is to be called when the player fire a projectile.
    * @param angle
@@ -313,6 +321,51 @@ public class Player extends Entity {
     }
     weapon.update(getX(), getY());
   }
+
+  /**
+   * This function offsets the player's location so they aren't in walls. Call after every update.
+   */
+  /** Putting these here temporarily as I'm going to need these as reference when fixing things.
+  public void offsetUpdate(Tile[][] tilemap) {
+    // Check if any adjacent tiles are walls, and if were inside any of them. If so do an offset update.
+    Coordinate location = getLocation();
+    // Tile above
+    if (tilemap[location.x][location.y - 1].getID() == 1 && getTileOffset().getY() >= 0) {
+      translate(0, getTileOffset().getY());
+    }
+    // Tile Below
+    if (tilemap[location.x][location.y + 1].getID() == 1 && getTileOffset().getY() <= 0) {
+      translate(0, getTileOffset().getY());
+    }
+    // Tile Left
+    if (tilemap[location.x - 1][location.y].getID() == 1 && getTileOffset().getX() >= 0) {
+      translate(getTileOffset().getX(), 0);
+    }
+    // Tile Right
+    if (tilemap[location.x + 1][location.y].getID() == 1 && getTileOffset().getX() <= 0) {
+      translate(getTileOffset().getX(), 0);
+    }
+  }
+  **/
+
+  /**
+   * This function is for calculating the offset from the center of the tile the player currently exists in.
+   * @return
+   * A Vector containing the x and y difference between the center of the tile and the player
+   */
+  /**
+  public Vector getTileOffset() {
+    Coordinate location = getLocation();
+    // The center of the tile location is (Tile * tilewidth) + 1/2 tile width, since the entity's origin is the center.
+    float tilex = (location.x * DungeonGame.TILESIZE) + (DungeonGame.TILESIZE / 2);
+    float tiley = (location.y * DungeonGame.TILESIZE) + (DungeonGame.TILESIZE / 2);
+    float x = this.getX();
+    float y = this.getY();
+    // Return the offset from the center
+    return new Vector(tilex - x, tiley - y);
+  }
+   **/
+
 
   /***
    * This function rotates the player's weapon in the given direction. Meant to be used towards the mouse and
