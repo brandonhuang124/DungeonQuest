@@ -10,6 +10,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
+import java.io.IOException;
 import java.util.LinkedList;
 
 /***
@@ -131,43 +132,114 @@ public class TestState extends BasicGameState {
     Direction direction = Direction.NONE;
     if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A)) {
       direction = Direction.UP_LEFT;
-      player.moveUpLeft();
+      try {
+        dg.client.dataOutputStream.writeUTF("WA;" + playerloc.x + ";" + playerloc.y);
+        if (dg.client.dataInputStream.readUTF().equals("A")) {
+          player.moveUpLeft();
+        } else {
+          System.out.println("Unable to perform action:  WA");
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
-    // W and D for Up Right
+      // W and D for Up Right
     else if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_D)) {
       direction = Direction.UP_RIGHT;
-      player.moveUpRight();
+      try {
+        dg.client.dataOutputStream.writeUTF("WD;" + playerloc.x + ";" + playerloc.y);
+        if (dg.client.dataInputStream.readUTF().equals("A")) {
+          player.moveUpRight();
+        } else {
+          System.out.println("Unable to perform action:  WD");
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
     // S and A for Down Left
     else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_A)) {
       direction = Direction.DOWN_LEFT;
-      player.moveDownLeft();
-
+      try {
+        dg.client.dataOutputStream.writeUTF("SA;" + playerloc.x + ";" + playerloc.y);
+        if (dg.client.dataInputStream.readUTF().equals("A")) {
+          player.moveDownLeft();
+        } else {
+          System.out.println("Unable to perform action:  SA");
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
     // S and D for Down Right
     else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_D)) {
       direction = Direction.DOWN_RIGHT;
-      player.moveDownRight();
+      try {
+        dg.client.dataOutputStream.writeUTF("SD;" + playerloc.x + ";" + playerloc.y);
+        if (dg.client.dataInputStream.readUTF().equals("A")) {
+          player.moveDownRight();
+        } else {
+          System.out.println("Unable to perform action:  SD");
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
     // W for moving up
     else if(input.isKeyDown(Input.KEY_W)) {
       direction = Direction.UP;
-      player.moveUp();
+      try {
+        dg.client.dataOutputStream.writeUTF("W;" + playerloc.x + ";" + playerloc.y);
+        if (dg.client.dataInputStream.readUTF().equals("A")) {
+          player.moveUp();
+        } else {
+          System.out.println("Unable to perform action:  W");
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
     // A for moving left
     else if(input.isKeyDown(Input.KEY_A)) {
       direction = Direction.LEFT;
-      player.moveLeft();
+      try {
+        dg.client.dataOutputStream.writeUTF("A;" + playerloc.x + ";" + playerloc.y);
+        if (dg.client.dataInputStream.readUTF().equals("A")) {
+          player.moveLeft();
+        } else {
+          System.out.println("Unable to perform action:  A");
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
     // S for moving down
     else if(input.isKeyDown(Input.KEY_S)) {
       direction = Direction.DOWN;
-      player.moveDown();
+      try {
+        dg.client.dataOutputStream.writeUTF("S;" + playerloc.x + ";" + playerloc.y);
+        if (dg.client.dataInputStream.readUTF().equals("A")) {
+          player.moveDown();
+        } else {
+          System.out.println("Unable to perform action:  S");
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
     // D for moving right
     else if(input.isKeyDown(Input.KEY_D)) {
       direction = Direction.RIGHT;
-      player.moveRight();
+      try {
+        dg.client.dataOutputStream.writeUTF("D;" + playerloc.x + ";" + playerloc.y);
+        if (dg.client.dataInputStream.readUTF().equals("A")) {
+          player.moveRight();
+        } else {
+          System.out.println("Unable to perform action:  D");
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
     if(direction != Direction.NONE && player.isMoveValid(direction, player.getVelocity().scale(delta),levelMap)){
     }
