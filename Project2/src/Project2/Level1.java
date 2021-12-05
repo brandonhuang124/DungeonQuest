@@ -1,5 +1,6 @@
 package Project2;
 
+import jig.ResourceManager;
 import jig.Vector;
 
 import org.newdawn.slick.GameContainer;
@@ -25,7 +26,8 @@ public class Level1 extends BasicGameState {
     LinkedList<Enemy> enemyList;
     Vertex [][] path;
     MapUtil levelMap;
-
+    int player1type, player2type;;
+    boolean player1Dead, player2Dead, gameover, twoPlayer;
 
     @Override
     public int getID() {
@@ -34,11 +36,15 @@ public class Level1 extends BasicGameState {
 
     @Override
     public void init(GameContainer container, StateBasedGame game) throws SlickException {
+        player1type = player2type = 0;
         levelMap = new MapUtil();
     }
 
     @Override
     public void enter(GameContainer container, StateBasedGame game) {
+        if(player1type == 0)
+          player1type = 1;
+        player1Dead = player2Dead = gameover = false;
         // parse the CSV map file, throw exception in case of IO error:
         try {
             levelMap.loadLevelMap(1);
@@ -49,7 +55,7 @@ public class Level1 extends BasicGameState {
         levelMap.currentTileMap  = DungeonGame.getTileMap(levelMap.currentMapString,
                 MapUtil.LEVELWIDTH,MapUtil.LEVELWIDTH);
         projectileList = new LinkedList<Projectile>();
-        player = new Player( 0, 0, 1);
+        player = new Player( 0, 0, player1type);
         player.setWorldPos(new TileIndex(4,4));
         enemyList = new LinkedList<Enemy>();
         enemyList.add(new Enemy(0, 0, 2));
@@ -94,6 +100,33 @@ public class Level1 extends BasicGameState {
         player.setY(playerScreenPos.y);
         player.render(g);
         player.weapon.render(g);
+
+      // Render HUD
+      if(player.getPlayerType() == 1)
+          g.drawImage(ResourceManager.getImage(DungeonGame.HUD_PARCHMENTRANGED_RSC), 20, 640);
+      else if(player.getPlayerType() == 2)
+          g.drawImage(ResourceManager.getImage(DungeonGame.HUD_PARCHMENTMELEE_RSC), 20, 640);
+
+      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_P1_RSC), 5, 640);
+      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_DIVIDER_RSC), 276, 640);
+
+      // Render Left cap of health bar
+      if(player.getCurrentHealth() > 0)
+          g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARL_RSC), 152, 660);
+      else
+          g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARL_RSC), 152, 660);
+      // Render middle of bar
+      for(int i = 1; i < player.getMaxHealth(); i++) {
+          if(i <= player.getCurrentHealth())
+            g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBAR_RSC), 152 + (i*6), 660);
+        else
+            g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBAR_RSC), 152 + (i*6), 660);
+      }
+      // Render Right cap of health bar
+      if(player.getCurrentHealth() == player.getMaxHealth())
+          g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARR_RSC), 152 + (player.getMaxHealth() * 6), 660);
+      else
+          g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC), 152 + (player.getMaxHealth() * 6), 660);
     }
 
     @Override
@@ -184,12 +217,28 @@ public class Level1 extends BasicGameState {
             projectile.collisionCheck(levelMap.currentTileMap, enemyList, player);
         }
 
+        // Check if players have died.
+        if(player.getCurrentHealth() <= 0) {
+          gameover = true;
+        }
+
         // Remove Projectiles that have collided with objects.
         projectileList.removeIf( (Projectile projectile) -> projectile.needsRemove());
         // Remove enemies that have died.
         enemyList.removeIf( (Enemy enemy) -> enemy.isDead());
     }
 
+  public void setPlayerType(int id) {
+    player1type = id;
+  }
+
+  public void set2Player(boolean status) {
+    twoPlayer = status;
+    if(player1type == 1)
+      player2type = 2;
+    else
+      player2type = 1;
+  }
 
     public double getPlayerMouseAngle(Input input) {
         float mousex = input.getMouseX();

@@ -218,7 +218,7 @@ public class DungeonGame extends StateBasedGame {
     // Open the game
     try {
       app = new AppGameContainer(new DungeonGame("Project2", 1000,1000));
-      app.setDisplayMode(640,640, false);
+      app.setDisplayMode(640,736, false);
       app.setVSync(true);
       app.setTargetFrameRate(60);
       app.start();
