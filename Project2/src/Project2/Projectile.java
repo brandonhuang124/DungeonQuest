@@ -88,6 +88,7 @@ public class Projectile extends Entity {
         if(enemyLocation.x == location.x && enemyLocation.y == location.y) {
           removeMe = true;
           enemy.damage(10);
+          break;
         }
       }
     }
