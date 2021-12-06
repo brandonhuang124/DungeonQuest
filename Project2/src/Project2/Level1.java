@@ -23,11 +23,11 @@ import java.util.Random;
  * Transitions To
  */
 public class Level1 extends BasicGameState {
-    Player player;
+    Player player, player2;
     ArrayList<Projectile> projectileList;
     ArrayList<Enemy> enemyList;
     ArrayList<Powerup> powerupList;
-    Vertex [][] path;
+    Vertex [][] path, path2;
     MapUtil levelMap;
     int player1type, player2type;;
     boolean player1Dead, player2Dead, gameover, twoPlayer;
@@ -45,6 +45,7 @@ public class Level1 extends BasicGameState {
 
     @Override
     public void enter(GameContainer container, StateBasedGame game) {
+        path2 = null;
         if(player1type == 0)
           player1type = 1;
         player1Dead = player2Dead = gameover = false;
@@ -61,6 +62,10 @@ public class Level1 extends BasicGameState {
         powerupList = new ArrayList<Powerup>();
         powerupList.add(new Powerup(5,3,1));
         player = new Player( 0, 0, player1type);
+        if(twoPlayer) {
+          player2 = new Player(0,0, player2type);
+          player2.setWorldPos(new TileIndex(4,5));
+        }
         player.setWorldPos(new TileIndex(4,4));
         enemyList = new ArrayList<Enemy>();
         enemyList.add(new Enemy(10, 10, 2));
@@ -92,6 +97,12 @@ public class Level1 extends BasicGameState {
         player.render(g);
         player.weapon.render(g);
 
+        // If were in two player
+        if(twoPlayer) {
+          player2.render(g);
+          player2.weapon.render(g);
+        }
+
         // Render HUD
         g.drawImage(ResourceManager.getImage(DungeonGame.HUD_BG_RSC), 0, 640);
         if(player.getPlayerType() == 1)
@@ -119,6 +130,35 @@ public class Level1 extends BasicGameState {
             g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARR_RSC), 152 + (player.getMaxHealth() * 6), 660);
         else
             g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC), 152 + (player.getMaxHealth() * 6), 660);
+
+        // Now if were in two player, render the second players HUD
+        if(twoPlayer) {
+          float player2HudOffset = 342;
+          if(player2.getPlayerType() == 1)
+            g.drawImage(ResourceManager.getImage(DungeonGame.HUD_PARCHMENTRANGED_RSC), 20 + player2HudOffset, 640);
+          else if(player2.getPlayerType() == 2)
+            g.drawImage(ResourceManager.getImage(DungeonGame.HUD_PARCHMENTMELEE_RSC), 20 + player2HudOffset, 640);
+
+          g.drawImage(ResourceManager.getImage(DungeonGame.HUD_P2_RSC), 5 + player2HudOffset, 640);
+
+          // Render Left cap of health bar
+          if(player2.getCurrentHealth() > 0)
+            g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARL_RSC), 152 + player2HudOffset, 660);
+          else
+            g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARL_RSC), 152 + player2HudOffset, 660);
+          // Render middle of bar
+          for(int i = 1; i < player2.getMaxHealth(); i++) {
+            if(i <= player2.getCurrentHealth())
+              g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBAR_RSC), 152 + (i*6) + player2HudOffset, 660);
+            else
+              g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBAR_RSC), 152 + (i*6) + player2HudOffset, 660);
+          }
+          // Render Right cap of health bar
+          if(player2.getCurrentHealth() == player2.getMaxHealth())
+            g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARR_RSC), 152 + (player2.getMaxHealth() * 6) + player2HudOffset, 660);
+          else
+            g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC), 152 + (player2.getMaxHealth() * 6) + player2HudOffset, 660);
+        }
     }
 
     @Override
@@ -128,6 +168,10 @@ public class Level1 extends BasicGameState {
         Input input = container.getInput();
         TileIndex playerTile = levelMap.convertWorldToTile(player.worldPos);
         path = DungeonGame.getDijkstras(playerTile.x,playerTile.y, levelMap);
+        if(twoPlayer) {
+          TileIndex player2Tile = levelMap.convertWorldToTile(player2.worldPos);
+          path2 = DungeonGame.getDijkstras(player2Tile.x, player2Tile.y, levelMap);
+        }
 
         /*** CONTROLS SECTION ***/
         // Left click for attacking
@@ -184,13 +228,82 @@ public class Level1 extends BasicGameState {
           player.stop();
         }
 
-        // Update the player model
+      /*** EXTRA CONTROLS SECTION FOR TESTING WITH TWO PLAYERS ***/
+        if(twoPlayer) {
+          // Left click for attacking
+          if(input.isMousePressed(Input.MOUSE_RIGHT_BUTTON)) {
+            // System.out.println("Left Click pressed");
+            Projectile newProjectile = player2.fire(getPlayer2MouseAngle(input));
+            if(newProjectile != null) {
+              System.out.println("ahh");
+              projectileList.add(newProjectile);
+            }
+          }
+          // Check diagonals first
+          // W and A for Up Left
+          if(input.isKeyDown(Input.KEY_UP) && input.isKeyDown(Input.KEY_LEFT) && player2.isMoveValid(Direction.UP_LEFT,
+              player2.getVelocity().scale(delta),levelMap)) {
+            player2.moveUpLeft();
+          }
+          // W and D for Up Right
+          else if(input.isKeyDown(Input.KEY_UP) && input.isKeyDown(Input.KEY_RIGHT) && player2.isMoveValid(Direction.UP_RIGHT,
+              player2.getVelocity().scale(delta),levelMap)) {
+            player2.moveUpRight();
+          }
+          // S and A for Down Left
+          else if(input.isKeyDown(Input.KEY_DOWN) && input.isKeyDown(Input.KEY_LEFT) && player2.isMoveValid(Direction.DOWN_LEFT,
+              player2.getVelocity().scale(delta),levelMap)) {
+            player2.moveDownLeft();
+
+          }
+          // S and D for Down Right
+          else if(input.isKeyDown(Input.KEY_DOWN) && input.isKeyDown(Input.KEY_RIGHT) && player2.isMoveValid(Direction.DOWN_RIGHT,
+              player2.getVelocity().scale(delta),levelMap)) {
+            player2.moveDownRight();
+          }
+          // W for moving up
+          else if(input.isKeyDown(Input.KEY_UP) && player2.isMoveValid(Direction.UP, player2.getVelocity().scale(delta),
+              levelMap)) {
+            player2.moveUp();
+          }
+          // A for moving left
+          else if(input.isKeyDown(Input.KEY_LEFT) && player2.isMoveValid(Direction.LEFT, player2.getVelocity().scale(delta),
+              levelMap)) {
+            player2.moveLeft();
+          }
+          // S for moving down
+          else if(input.isKeyDown(Input.KEY_DOWN) && player2.isMoveValid(Direction.DOWN, player2.getVelocity().scale(delta),
+              levelMap)) {
+            player2.moveDown();
+          }
+          // D for moving right
+          else if(input.isKeyDown(Input.KEY_RIGHT) && player2.isMoveValid(Direction.RIGHT, player2.getVelocity().scale(delta),
+              levelMap)) {
+            player2.moveRight();
+          }
+          // Other wise were just gonna stop moving.
+          else {
+            player2.stop();
+          }
+        }
+
+      // Update the player model
         Coordinate playerScreenPos = levelMap.convertWorldToScreen(player.worldPos);
         player.setX(playerScreenPos.x);
         player.setY(playerScreenPos.y);
         player.mouseRotate(getPlayerMouseAngle(input));
         player.update(delta);
         player.offsetUpdate(levelMap.currentTileMap);
+
+        // Update P2 if applicable.
+        if(twoPlayer) {
+          Coordinate player2ScreenPos = levelMap.convertWorldToScreen(player2.worldPos);
+          player2.setX(player2ScreenPos.x);
+          player2.setY(player2ScreenPos.y);
+          player2.mouseRotate(getPlayer2MouseAngle(input));
+          player2.update(delta);
+          player2.offsetUpdate(levelMap.currentTileMap);
+        }
 
         levelMap.updateCamera(player.worldPos);
 
@@ -203,7 +316,10 @@ public class Level1 extends BasicGameState {
         }
         // Update All enemies
         for(Enemy enemy : enemyList) {
-            enemy.makeMove(levelMap.currentTileMap, path, player, projectileList, delta);
+            if(twoPlayer)
+              enemy.makeMove2P(levelMap.currentTileMap, path, player, path2, player2, projectileList, delta);
+            else
+              enemy.makeMove(levelMap.currentTileMap, path, player, projectileList, delta);
             enemy.update(delta);
             enemy.offsetUpdate(levelMap.currentTileMap);
             Coordinate enemyScreenPos = levelMap.convertWorldToScreen(enemy.worldPos);
@@ -222,16 +338,26 @@ public class Level1 extends BasicGameState {
         // Collision check for projectiles
         for(Projectile projectile : projectileList) {
             projectile.collisionCheck(levelMap.currentTileMap, enemyList, player);
+            if(twoPlayer)
+              projectile.collisionCheck(levelMap.currentTileMap, enemyList, player2);
         }
 
         // Collision check for powerups
         for(Powerup p : powerupList) {
             p.playerCollision(player);
+            if(twoPlayer)
+              p.playerCollision(player2);
         }
 
         // Check if players have died.
         if(player.getCurrentHealth() <= 0) {
           gameover = true;
+        }
+        // Check if p2 died
+        if(twoPlayer) {
+          if(player2.getCurrentHealth() <= 0 ) {
+            gameover = true;
+          }
         }
 
         // Remove Projectiles that have collided with objects.
@@ -270,5 +396,14 @@ public class Level1 extends BasicGameState {
         float playery = player.getY();
         Vector angleVector = new Vector(mousex - playerx, mousey - playery);
         return angleVector.getRotation();
+    }
+
+    public double getPlayer2MouseAngle(Input input) {
+      float mousex = input.getMouseX();
+      float mousey = input.getMouseY();
+      float playerx = player2.getX();
+      float playery = player2.getY();
+      Vector angleVector = new Vector(mousex - playerx, mousey - playery);
+      return angleVector.getRotation();
     }
 }

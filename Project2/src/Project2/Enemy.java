@@ -123,7 +123,7 @@ public class Enemy extends Entity{
       }
       return;
     }
-    // Now heck if were currently asleep due to actions such as attacking.
+    // Now check if were currently asleep due to actions such as attacking.
     if(sleep) {
       sleeptimer -= delta;
       if(sleeptimer <= 0)
@@ -152,6 +152,101 @@ public class Enemy extends Entity{
     if(id == 2) {
       // Check if the enemy has a clear line of sight on the player.
       if(lineOfSight(player1, tilemap)) {
+        // targetAngle is set when lineOfSight() is called. It's an object property so we just need to access it.
+        Projectile newProjectile = new Projectile(getX(), getY(), 2, targetAngle, damage);
+        newProjectile.worldPos = new Coordinate(worldPos.x, worldPos.y);
+        projectileList.add(newProjectile);
+        sleep = true;
+        sleeptimer = 1000;
+        stop();
+        return;
+      }
+    }
+
+    // If attacks are unavailable, the enemy will just move.
+    switch (direction) {
+      case 1:  moveDownLeft();
+        break;
+      case 2:  moveDown();
+        break;
+      case 3:  moveDownRight();
+        break;
+      case 4:  moveLeft();
+        break;
+      case 6:  moveRight();
+        break;
+      case 7:  moveUpLeft();
+        break;
+      case 8:  moveUp();
+        break;
+      case 9:  moveUpRight();
+        break;
+      default: stop();
+        break;
+    }
+  }
+
+  /**
+   * This method is to be called before every enemy update when in twoplayer mode. Contains all behaviors.
+   * @param tilemap
+   *  Tilemap representing the level the enemy is in
+   * @param path1
+   *  Vertex map from getDijkstras() which helps the enemy determine the path it wants to take. Pathing towards player 1
+   * @param player1
+   *  Player object representing player 1.
+   */
+  public void makeMove2P(Tile[][] tilemap, Vertex[][] path1, Player player1, Vertex[][] path2, Player player2,
+                       ArrayList<Projectile> projectileList, int delta) {
+    TileIndex location = MapUtil.convertWorldToTile(worldPos);
+    // First Check if the enemy was ever activated (by being in range of the player)
+    if (!active) {
+      // 240 is the range since thats about 16 * sqrt(2) * 10 or right past the edge of the screen (tile cost = 10)
+      if (path1[location.x][location.y].getDistance() <= 240 || path2[location.x][location.y].getDistance() <= 240) {
+        active = true;
+        return;
+      }
+      return;
+    }
+    // Now check if were currently asleep due to actions such as attacking.
+    if (sleep) {
+      sleeptimer -= delta;
+      if (sleeptimer <= 0)
+        sleep = false;
+      return;
+    }
+
+    // Decide which player is closer
+    Player closestPlayer;
+    int direction;
+    if (path1[location.x][location.y].getDistance() < path2[location.x][location.y].getDistance()) {
+      direction = path1[location.x][location.y].getDirection();
+      closestPlayer = player1;
+    }
+    else {
+      direction = path2[location.x][location.y].getDirection();
+      closestPlayer = player2;
+    }
+    // Get location and retrieve direction from the vertex map.
+    TileIndex playerLocation = MapUtil.convertWorldToTile(closestPlayer.worldPos);
+
+
+    // Attempt attacks depending on enemy type:
+    //  Melee
+    if(id == 1) {
+      if(playerLocation.x == location.x && playerLocation.y == location.y) {
+        closestPlayer.damage(damage);
+        System.out.println("Player Hit! " + closestPlayer.getCurrentHealth());
+        sleep = true;
+        sleeptimer = 500;
+        stop();
+        return;
+      }
+    }
+
+    //  Ranged
+    if(id == 2) {
+      // Check if the enemy has a clear line of sight on the player.
+      if(lineOfSight(closestPlayer, tilemap)) {
         // targetAngle is set when lineOfSight() is called. It's an object property so we just need to access it.
         Projectile newProjectile = new Projectile(getX(), getY(), 2, targetAngle, damage);
         newProjectile.worldPos = new Coordinate(worldPos.x, worldPos.y);
