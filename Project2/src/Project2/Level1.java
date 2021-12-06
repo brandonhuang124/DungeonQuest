@@ -58,17 +58,10 @@ public class Level1 extends BasicGameState {
         player = new Player( 0, 0, player1type);
         player.setWorldPos(new TileIndex(4,4));
         enemyList = new LinkedList<Enemy>();
-        enemyList.add(new Enemy(0, 0, 2));
-        enemyList.add(new Enemy(0, 0, 1));
-        for(Enemy enemy : enemyList) {
-            if(enemy.id == 1){
-                enemy.setWorldPos(new TileIndex(10,10));
-            }else if(enemy.id == 2){
-                enemy.setWorldPos(new TileIndex(18,18));
-            }else{
-                enemy.setWorldPos(new TileIndex(20,20));
-            }
-
+        enemyList.add(new Enemy(10, 10, 2));
+        enemyList.add(new Enemy(18, 18, 1));
+        for(int i = 0; i < 10; i++) {
+          enemyList.add(new Enemy(10,i + 11,1));
         }
 
         container.setSoundOn(true);
@@ -93,6 +86,7 @@ public class Level1 extends BasicGameState {
         player.weapon.render(g);
 
       // Render HUD
+      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_BG_RSC), 0, 640);
       if(player.getPlayerType() == 1)
           g.drawImage(ResourceManager.getImage(DungeonGame.HUD_PARCHMENTRANGED_RSC), 20, 640);
       else if(player.getPlayerType() == 2)
@@ -191,7 +185,7 @@ public class Level1 extends BasicGameState {
         player.update(delta);
         player.offsetUpdate(levelMap.currentTileMap);
 
-        levelMap.updateCamera(player.prevMoveVelocity);
+        levelMap.updateCamera(player.worldPos);
 
         // Update projectiles
         for(Projectile p : projectileList) {

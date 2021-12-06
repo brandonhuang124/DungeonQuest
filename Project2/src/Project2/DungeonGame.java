@@ -84,6 +84,7 @@ public class DungeonGame extends StateBasedGame {
   public static final String HUD_P1_RSC = "Project2/Assets/hud/p1.png";
   public static final String HUD_P2_RSC = "Project2/Assets/hud/p2.png";
   public static final String HUD_DIVIDER_RSC = "Project2/Assets/hud/hudDivider.png";
+  public static final String HUD_BG_RSC = "Project2/Assets/hud/hudBG.png";
 
   // Menu
   public static final String MENU_1P_RSC = "Project2/Assets/menu/1player.png";
@@ -184,6 +185,7 @@ public class DungeonGame extends StateBasedGame {
     ResourceManager.loadImage(HUD_WBAR_RSC);
     ResourceManager.loadImage(HUD_WBARL_RSC);
     ResourceManager.loadImage(HUD_WBARR_RSC);
+    ResourceManager.loadImage(HUD_BG_RSC);
 
     ResourceManager.loadImage(HUD_PARCHMENTMELEE_RSC);
     ResourceManager.loadImage(HUD_PARCHMENTRANGED_RSC);

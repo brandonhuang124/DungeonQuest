@@ -99,8 +99,8 @@ public class MapUtil {
     }
 
     public void updateCamera(Coordinate deltaMove) {
-        cameraPos.x += deltaMove.x;
-        cameraPos.y += deltaMove.y;
+        cameraPos.x = deltaMove.x - (0.5f * SCREENWIDTH * TILESIZE);
+        cameraPos.y = deltaMove.y - (0.5f * SCREENHEIGHT * TILESIZE);
         if (cameraPos.x < 0) {
             cameraPos.x = 0;
         } else if (cameraPos.x > maxCameraPos.x) {

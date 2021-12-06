@@ -36,15 +36,17 @@ public class Enemy extends Entity{
   private double targetAngle;
   private Animation moveLeft, moveRight, idleLeft, idleRight, current;
   public Coordinate worldPos;
+
   /***
    * Constructor, prepares default stats and Images/anmiations
    * @param x
-   *  x Coordinate to spawn the player in
+   *  x Tile Coordinate to spawn the player in
    * @param y
-   *  y coordinate to spawn the player in
+   *  y Tile coordinate to spawn the player in
    */
-  public Enemy(final float x, final float y, int newid) {
-    super(x,y);
+  public Enemy(final int x, final int y, int newid) {
+    TileIndex tileIndex = new TileIndex(x,y);
+    worldPos = MapUtil.convertTileToWorld(tileIndex);
     // addImageWithBoundingBox(ResourceManager.getImage(DungeonGame.PLAYER_ARROWTEST_RSC));
     velocity = new Vector(0,0);
     speed = 0.15f;
