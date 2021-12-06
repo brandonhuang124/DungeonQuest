@@ -298,9 +298,7 @@ public class Enemy extends Entity{
    * A Vector containing the x and y difference between the center of the tile and the Enemy
    */
   public TileIndex getTileIndex() {
-    int x = Math.round((this.getX() - MapUtil.TILESIZE / 2) / MapUtil.TILESIZE);
-    int y = Math.round((this.getY() - MapUtil.TILESIZE / 2) / MapUtil.TILESIZE);
-    return new TileIndex(x, y);
+    return MapUtil.convertWorldToTile(worldPos);
   }
 
 
@@ -309,8 +307,8 @@ public class Enemy extends Entity{
     // The center of the tile location is (Tile * tilewidth) + 1/2 tile width, since the entity's origin is the center.
     float tilex = (location.x * MapUtil.TILESIZE) + (MapUtil.TILESIZE / 2);
     float tiley = (location.y * MapUtil.TILESIZE) + (MapUtil.TILESIZE / 2);
-    float x = this.getX();
-    float y = this.getY();
+    float x = worldPos.x;
+    float y = worldPos.y;
     // Return the offset from the center
     return new Vector(tilex - x, tiley - y);
   }
@@ -333,31 +331,26 @@ public class Enemy extends Entity{
   }
 
 
-  /**
-   * This function offsets the enemies's location so they aren't in walls. Call after every update.
-   */
-  /** Putting this here for later when I try to fix things.
   public void offsetUpdate(Tile[][] tilemap) {
     // Check if any adjacent tiles are walls, and if were inside any of them. If so do an offset update.
-    Coordinate location = getLocation();
+    TileIndex location = getTileIndex();
     // Tile above
-    if(tilemap[location.x][location.y - 1].getID() == 1 && getTileOffset().getY() >= 0) {
-      translate(0, getTileOffset().getY());
+    if (tilemap[location.x][location.y - 1].getID() == 1 && getTileOffset().getY() >= 0) {
+      worldPos.y += getTileOffset().getY();
     }
     // Tile Below
-    if(tilemap[location.x][location.y + 1].getID() == 1 && getTileOffset().getY() <= 0) {
-      translate(0, getTileOffset().getY());
+    if (tilemap[location.x][location.y + 1].getID() == 1 && getTileOffset().getY() <= 0) {
+      worldPos.y += getTileOffset().getY();
     }
     // Tile Left
-    if(tilemap[location.x - 1][location.y].getID() == 1 && getTileOffset().getX() >= 0) {
-      translate(getTileOffset().getX(), 0 );
+    if (tilemap[location.x - 1][location.y].getID() == 1 && getTileOffset().getX() >= 0) {
+      worldPos.x += getTileOffset().getX();
     }
     // Tile Right
-    if(tilemap[location.x + 1][location.y].getID() == 1 && getTileOffset().getX() <= 0) {
-      translate(getTileOffset().getX(), 0 );
+    if (tilemap[location.x + 1][location.y].getID() == 1 && getTileOffset().getX() <= 0) {
+      worldPos.x += getTileOffset().getX();
     }
   }
-  **/
 
 
   /***

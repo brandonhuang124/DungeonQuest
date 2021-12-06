@@ -361,25 +361,28 @@ public class Player extends Entity {
   /**
    * This function offsets the player's location so they aren't in walls. Call after every update.
    */
-
   public void offsetUpdate(Tile[][] tilemap) {
     // Check if any adjacent tiles are walls, and if were inside any of them. If so do an offset update.
     TileIndex location = getTileIndex();
     // Tile above
     if (tilemap[location.x][location.y - 1].getID() == 1 && getTileOffset().getY() >= 0) {
       worldPos.y += getTileOffset().getY();
+      prevMoveVelocity.y += getTileOffset().getY();
     }
     // Tile Below
     if (tilemap[location.x][location.y + 1].getID() == 1 && getTileOffset().getY() <= 0) {
       worldPos.y += getTileOffset().getY();
+      prevMoveVelocity.y += getTileOffset().getY();
     }
     // Tile Left
     if (tilemap[location.x - 1][location.y].getID() == 1 && getTileOffset().getX() >= 0) {
       worldPos.x += getTileOffset().getX();
+      prevMoveVelocity.x += getTileOffset().getX();
     }
     // Tile Right
     if (tilemap[location.x + 1][location.y].getID() == 1 && getTileOffset().getX() <= 0) {
       worldPos.x += getTileOffset().getX();
+      prevMoveVelocity.x += getTileOffset().getX();
     }
   }
 

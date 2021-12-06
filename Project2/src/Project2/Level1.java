@@ -204,6 +204,7 @@ public class Level1 extends BasicGameState {
         for(Enemy enemy : enemyList) {
             enemy.makeMove(levelMap.currentTileMap, path, player, projectileList, delta);
             enemy.update(delta);
+            enemy.offsetUpdate(levelMap.currentTileMap);
             Coordinate enemyScreenPos = levelMap.convertWorldToScreen(enemy.worldPos);
             enemy.setX(enemyScreenPos.x);
             enemy.setY(enemyScreenPos.y);
