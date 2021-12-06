@@ -225,7 +225,6 @@ public class Player extends Entity {
       if(tilemap[location.x-1][location.y].getID() == 1) {
         Vector offset = getTileOffset();
         adjacencyCheck = true;
-        System.out.println(offset.getX() + " " + offset.getY());
         if(offset.getX() >= 0)
           return false;
       }
@@ -306,6 +305,8 @@ public class Player extends Entity {
       return true;
     return false;
   }
+
+  public void maxHeal() {health = maxhealth;}
 
   public int getCurrentHealth() { return health;}
 

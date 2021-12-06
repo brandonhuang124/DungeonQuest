@@ -102,6 +102,7 @@ public class DungeonGame extends StateBasedGame {
   public static final String MENU_FOUND_RSC = "Project2/Assets/menu/found.png";
 
   // Other
+  public static final String POWERUP_HEALTHPOTION_RSC = "Project2/Assets/powerups/healthPotion.png";
   public static final String PLAYER_ARROWTEST_RSC = "Project2/Assets/arrow.png";
   public static final String PLAYER_PROJECTILE_RSC = "Project2/Assets/projectile.png";
 
@@ -209,6 +210,7 @@ public class DungeonGame extends StateBasedGame {
     ResourceManager.loadImage(MENU_FOUND_RSC);
 
     // Other
+    ResourceManager.loadImage(POWERUP_HEALTHPOTION_RSC);
     ResourceManager.loadImage(PLAYER_ARROWTEST_RSC);
     ResourceManager.loadImage(PLAYER_PROJECTILE_RSC);
 

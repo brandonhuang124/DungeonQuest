@@ -67,7 +67,7 @@ public class MapUtil {
     }
 
     public static Coordinate convertTileToWorld(TileIndex tileIndex){
-        return new Coordinate(tileIndex.x * TILESIZE, tileIndex.y * TILESIZE);
+        return new Coordinate((tileIndex.x * TILESIZE) + (0.5f * TILESIZE), (tileIndex.y * TILESIZE) + (0.5f * TILESIZE));
     }
 
     public Coordinate convertTileToScreen(TileIndex tileIndex){

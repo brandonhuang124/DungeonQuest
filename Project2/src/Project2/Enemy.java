@@ -100,6 +100,7 @@ public class Enemy extends Entity{
   public void setWorldPos(TileIndex tileIndex) {
     worldPos = MapUtil.convertTileToWorld(tileIndex);
   }
+
   /**
    * This method is to be called before every enemy update. Contains all behaviors.
    * @param tilemap
@@ -145,9 +146,8 @@ public class Enemy extends Entity{
         Projectile newProjectile = new Projectile(getX(), getY(), 2, targetAngle, damage);
         newProjectile.worldPos = new Coordinate(worldPos.x, worldPos.y);
         projectileList.add(newProjectile);
-        System.out.println("Player in sight!");
         sleep = true;
-        sleeptimer = 500;
+        sleeptimer = 1000;
         stop();
         return;
       }

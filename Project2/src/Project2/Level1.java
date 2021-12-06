@@ -24,6 +24,7 @@ public class Level1 extends BasicGameState {
     Player player;
     LinkedList<Projectile> projectileList;
     LinkedList<Enemy> enemyList;
+    LinkedList<Powerup> powerupList;
     Vertex [][] path;
     MapUtil levelMap;
     int player1type, player2type;;
@@ -55,13 +56,15 @@ public class Level1 extends BasicGameState {
         levelMap.currentTileMap  = DungeonGame.getTileMap(levelMap.currentMapString,
                 MapUtil.LEVELWIDTH,MapUtil.LEVELWIDTH);
         projectileList = new LinkedList<Projectile>();
+        powerupList = new LinkedList<Powerup>();
+        powerupList.add(new Powerup(5,3,1));
         player = new Player( 0, 0, player1type);
         player.setWorldPos(new TileIndex(4,4));
         enemyList = new LinkedList<Enemy>();
         enemyList.add(new Enemy(10, 10, 2));
         enemyList.add(new Enemy(18, 18, 1));
         for(int i = 0; i < 10; i++) {
-          enemyList.add(new Enemy(10,i + 11,1));
+          enemyList.add(new Enemy(10,i + 11,2));
         }
 
         container.setSoundOn(true);
@@ -78,40 +81,44 @@ public class Level1 extends BasicGameState {
         for(Projectile p : projectileList) {
             p.render(g);
         }
+        // Render enemies
         for(Enemy enemy : enemyList) {
             enemy.render(g);
         }
-
+        // Render powerups
+        for(Powerup p : powerupList) {
+          p.render(g);
+        }
         player.render(g);
         player.weapon.render(g);
 
-      // Render HUD
-      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_BG_RSC), 0, 640);
-      if(player.getPlayerType() == 1)
-          g.drawImage(ResourceManager.getImage(DungeonGame.HUD_PARCHMENTRANGED_RSC), 20, 640);
-      else if(player.getPlayerType() == 2)
-          g.drawImage(ResourceManager.getImage(DungeonGame.HUD_PARCHMENTMELEE_RSC), 20, 640);
+        // Render HUD
+        g.drawImage(ResourceManager.getImage(DungeonGame.HUD_BG_RSC), 0, 640);
+        if(player.getPlayerType() == 1)
+            g.drawImage(ResourceManager.getImage(DungeonGame.HUD_PARCHMENTRANGED_RSC), 20, 640);
+        else if(player.getPlayerType() == 2)
+            g.drawImage(ResourceManager.getImage(DungeonGame.HUD_PARCHMENTMELEE_RSC), 20, 640);
 
-      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_P1_RSC), 5, 640);
-      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_DIVIDER_RSC), 276, 640);
+        g.drawImage(ResourceManager.getImage(DungeonGame.HUD_P1_RSC), 5, 640);
+        g.drawImage(ResourceManager.getImage(DungeonGame.HUD_DIVIDER_RSC), 276, 640);
 
-      // Render Left cap of health bar
-      if(player.getCurrentHealth() > 0)
-          g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARL_RSC), 152, 660);
-      else
-          g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARL_RSC), 152, 660);
-      // Render middle of bar
-      for(int i = 1; i < player.getMaxHealth(); i++) {
-          if(i <= player.getCurrentHealth())
-            g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBAR_RSC), 152 + (i*6), 660);
+        // Render Left cap of health bar
+        if(player.getCurrentHealth() > 0)
+            g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARL_RSC), 152, 660);
         else
-            g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBAR_RSC), 152 + (i*6), 660);
-      }
-      // Render Right cap of health bar
-      if(player.getCurrentHealth() == player.getMaxHealth())
-          g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARR_RSC), 152 + (player.getMaxHealth() * 6), 660);
-      else
-          g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC), 152 + (player.getMaxHealth() * 6), 660);
+            g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARL_RSC), 152, 660);
+        // Render middle of bar
+        for(int i = 1; i < player.getMaxHealth(); i++) {
+            if(i <= player.getCurrentHealth())
+              g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBAR_RSC), 152 + (i*6), 660);
+          else
+              g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBAR_RSC), 152 + (i*6), 660);
+        }
+        // Render Right cap of health bar
+        if(player.getCurrentHealth() == player.getMaxHealth())
+            g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARR_RSC), 152 + (player.getMaxHealth() * 6), 660);
+        else
+            g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC), 152 + (player.getMaxHealth() * 6), 660);
     }
 
     @Override
@@ -204,10 +211,22 @@ public class Level1 extends BasicGameState {
             enemy.setY(enemyScreenPos.y);
         }
 
+        // Update powerups
+        for(Powerup p : powerupList) {
+          Coordinate screenPos = levelMap.convertWorldToScreen(p.worldPos);
+          p.setX(screenPos.x);
+          p.setY(screenPos.y);
+        }
+
 
         // Collision check for projectiles
         for(Projectile projectile : projectileList) {
             projectile.collisionCheck(levelMap.currentTileMap, enemyList, player);
+        }
+
+        // Collision check for powerups
+        for(Powerup p : powerupList) {
+            p.playerCollision(player);
         }
 
         // Check if players have died.
@@ -217,6 +236,8 @@ public class Level1 extends BasicGameState {
 
         // Remove Projectiles that have collided with objects.
         projectileList.removeIf( (Projectile projectile) -> projectile.needsRemove());
+        // Remove grabbed powerups
+        powerupList.removeIf( (Powerup powerup) -> powerup.getRemoveMe());
         // Remove enemies that have died.
         enemyList.removeIf( (Enemy enemy) -> enemy.isDead());
     }
