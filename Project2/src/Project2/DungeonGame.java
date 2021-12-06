@@ -124,12 +124,14 @@ public class DungeonGame extends StateBasedGame {
     ScreenWidth = width;
 
 
+    /**
     try {
       client = new Client("localhost", 4999);
       System.out.println("Client created: " + client);
     } catch (Exception e) {
       e.printStackTrace();
     }
+    **/
 
     Entity.setCoarseGrainedCollisionBoundary(Entity.CIRCLE);
   }

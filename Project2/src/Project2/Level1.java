@@ -83,21 +83,12 @@ public class Level1 extends BasicGameState {
 
         // Render projectiles on the screen
         for(Projectile p : projectileList) {
-            Coordinate pScreenPos = levelMap.convertWorldToScreen(p.worldPos);
-            p.setX(pScreenPos.x);
-            p.setY(pScreenPos.y);
             p.render(g);
         }
         for(Enemy enemy : enemyList) {
-            Coordinate enemyScreenPos = levelMap.convertWorldToScreen(enemy.worldPos);
-            enemy.setX(enemyScreenPos.x);
-            enemy.setY(enemyScreenPos.y);
             enemy.render(g);
         }
 
-        Coordinate playerScreenPos = levelMap.convertWorldToScreen(player.worldPos);
-        player.setX(playerScreenPos.x);
-        player.setY(playerScreenPos.y);
         player.render(g);
         player.weapon.render(g);
 
@@ -140,135 +131,53 @@ public class Level1 extends BasicGameState {
         /*** CONTROLS SECTION ***/
         // Left click for attacking
         if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
-            System.out.println("Left Click pressed");
+            // System.out.println("Left Click pressed");
             Projectile newProjectile = player.fire(getPlayerMouseAngle(input));
             if(newProjectile != null)
                 projectileList.add(newProjectile);
-            for(Projectile p: projectileList) {
-                System.out.println(p);
-            }
         }
         // Check diagonals first
         // W and A for Up Left
         Direction direction = Direction.NONE;
         if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A)) {
             direction = Direction.UP_LEFT;
-            try {
-                dg.client.dataOutputStream.writeUTF("WA;" + (playerTile.x + (-0.71f * 0.25f)) + ";" + (playerTile.y + (-0.71f * 0.25f)) +  ";" + dg.client.playerID);
-                dg.client.dataOutputStream.flush();
-                if(dg.client.dataInputStream.readUTF().equals("A")) {
-                    player.moveUpLeft();
-                } else {
-                    System.out.println("Unable to perform action:  WA");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            player.moveUpLeft();
         }
         // W and D for Up Right
         else if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_D)) {
             direction = Direction.UP_RIGHT;
-            try {
-                dg.client.dataOutputStream.writeUTF("WD;" + (playerTile.x + (0.71f * 0.25f)) + ";" + (playerTile.y + (-0.71f * 0.25f)) +  ";" + dg.client.playerID);
-                dg.client.dataOutputStream.flush();
-                if(dg.client.dataInputStream.readUTF().equals("A")) {
-                    player.moveUpRight();
-                } else {
-                    System.out.println("Unable to perform action:  WD");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            player.moveUpRight();
         }
         // S and A for Down Left
         else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_A)) {
             direction = Direction.DOWN_LEFT;
-            try {
-                dg.client.dataOutputStream.writeUTF("SA;" + (playerTile.x + (-0.71f * 0.25f)) + ";" + (playerTile.y + (0.71f * 0.25f)) +  ";" + dg.client.playerID);
-                dg.client.dataOutputStream.flush();
-                if(dg.client.dataInputStream.readUTF().equals("A")) {
-                    player.moveDownLeft();
-                } else {
-                    System.out.println("Unable to perform action:  SA");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            player.moveDownLeft();
+
         }
         // S and D for Down Right
         else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_D)) {
             direction = Direction.DOWN_RIGHT;
-            try {
-                dg.client.dataOutputStream.writeUTF("SD;" + (playerTile.x + (0.71f * 0.25f)) + ";" + (playerTile.y + (0.71f * 0.25f)) +  ";" + dg.client.playerID);
-                dg.client.dataOutputStream.flush();
-                if(dg.client.dataInputStream.readUTF().equals("A")) {
-                    player.moveDownRight();
-                } else {
-                    System.out.println("Unable to perform action:  SD");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            player.moveDownRight();
         }
         // W for moving up
         else if(input.isKeyDown(Input.KEY_W)) {
             direction = Direction.UP;
-            try {
-                dg.client.dataOutputStream.writeUTF("W;" + playerTile.x + ";" + (playerTile.y - 0.25f )+  ";" + dg.client.playerID);
-                dg.client.dataOutputStream.flush();
-                if(dg.client.dataInputStream.readUTF().equals("A")) {
-                    player.moveUp();
-                } else {
-                    System.out.println("Unable to perform action:  W");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            player.moveUp();
         }
         // A for moving left
         else if(input.isKeyDown(Input.KEY_A)) {
             direction = Direction.LEFT;
-            try {
-                dg.client.dataOutputStream.writeUTF("A;" + (playerTile.x - 0.25f) + ";" + playerTile.y +  ";" + dg.client.playerID);
-                dg.client.dataOutputStream.flush();
-                if(dg.client.dataInputStream.readUTF().equals("A")) {
-                    player.moveLeft();
-                } else {
-                    System.out.println("Unable to perform action:  A");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            player.moveLeft();
         }
         // S for moving down
         else if(input.isKeyDown(Input.KEY_S)) {
             direction = Direction.DOWN;
-            try {
-                dg.client.dataOutputStream.writeUTF("S;" + playerTile.x + ";" + (playerTile.y + 0.25f) +  ";" + dg.client.playerID);
-                dg.client.dataOutputStream.flush();
-                if(dg.client.dataInputStream.readUTF().equals("A")) {
-                    player.moveDown();
-                } else {
-                    System.out.println("Unable to perform action:  S");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            player.moveDown();
         }
         // D for moving right
         else if(input.isKeyDown(Input.KEY_D)) {
             direction = Direction.RIGHT;
-            try {
-                dg.client.dataOutputStream.writeUTF("D;" + (playerTile.x + 0.25f) + ";" + playerTile.y +  ";" + dg.client.playerID);
-                dg.client.dataOutputStream.flush();
-                if(dg.client.dataInputStream.readUTF().equals("A")) {
-                    player.moveRight();
-                } else {
-                    System.out.println("Unable to perform action:  D");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            player.moveRight();
         }
         if(direction == Direction.NONE || !player.isMoveValid(direction,
                 player.getVelocity().scale(delta),levelMap)){
@@ -276,8 +185,12 @@ public class Level1 extends BasicGameState {
         }
 
         // Update the player model
+        Coordinate playerScreenPos = levelMap.convertWorldToScreen(player.worldPos);
+        player.setX(playerScreenPos.x);
+        player.setY(playerScreenPos.y);
         player.mouseRotate(getPlayerMouseAngle(input));
         player.update(delta);
+        System.out.println(player.worldPos.x + " " + player.worldPos.y);
 
 
         levelMap.updateCamera(player.prevMoveVelocity);
@@ -285,11 +198,17 @@ public class Level1 extends BasicGameState {
         // Update projectiles
         for(Projectile p : projectileList) {
             p.update(delta);
+            Coordinate pScreenPos = levelMap.convertWorldToScreen(p.worldPos);
+            p.setX(pScreenPos.x);
+            p.setY(pScreenPos.y);
         }
         // Update All enemies
         for(Enemy enemy : enemyList) {
             enemy.makeMove(levelMap.currentTileMap, path, player, projectileList, delta);
             enemy.update(delta);
+            Coordinate enemyScreenPos = levelMap.convertWorldToScreen(enemy.worldPos);
+            enemy.setX(enemyScreenPos.x);
+            enemy.setY(enemyScreenPos.y);
         }
 
 
