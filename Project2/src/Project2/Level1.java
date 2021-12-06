@@ -190,7 +190,8 @@ public class Level1 extends BasicGameState {
         player.setY(playerScreenPos.y);
         player.mouseRotate(getPlayerMouseAngle(input));
         player.update(delta);
-        System.out.println(player.worldPos.x + " " + player.worldPos.y);
+        player.offsetUpdate(levelMap.currentTileMap);
+        System.out.println(player.getTileOffset().getX() + " " + player.getTileOffset().getY());
 
 
         levelMap.updateCamera(player.prevMoveVelocity);
