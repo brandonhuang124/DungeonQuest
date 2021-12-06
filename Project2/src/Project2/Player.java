@@ -202,8 +202,6 @@ public class Player extends Entity {
 
 
   public boolean isMoveValid(Direction direction, Vector movement, MapUtil levelMap) {
-    Vector moveDirection = movement.unit();
-    // this is where the player would be if the move was successful
 
     TileIndex location = getTileIndex();
     Tile[][] tilemap = levelMap.currentTileMap;
@@ -227,6 +225,7 @@ public class Player extends Entity {
       if(tilemap[location.x-1][location.y].getID() == 1) {
         Vector offset = getTileOffset();
         adjacencyCheck = true;
+        System.out.println(offset.getX() + " " + offset.getY());
         if(offset.getX() >= 0)
           return false;
       }
