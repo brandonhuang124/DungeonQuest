@@ -33,7 +33,7 @@ public class Enemy extends Entity{
   private float speed;
   public int id;
   private int health, sleeptimer, damage;
-  private boolean isDead, sleep, faceRight;
+  private boolean isDead, sleep, faceRight, active;
   private double targetAngle;
   private Animation moveLeft, moveRight, idleLeft, idleRight, current;
   public Coordinate worldPos;
@@ -52,7 +52,7 @@ public class Enemy extends Entity{
     velocity = new Vector(0,0);
     speed = 0.15f;
     id = newid;
-    isDead = sleep = faceRight = false;
+    isDead = sleep = faceRight = active = false;
     sleeptimer = 0;
     // Set animations and attributes based on type:
     //  Melee
@@ -113,7 +113,17 @@ public class Enemy extends Entity{
    */
   public void makeMove(Tile[][] tilemap, Vertex[][] path1, Player player1,
                        ArrayList<Projectile> projectileList, int delta) {
-    // First check if were currently asleep due to actions such as attacking.
+    TileIndex location = MapUtil.convertWorldToTile(worldPos);
+    // First Check if the enemy was ever activated (by being in range of the player)
+    if(!active) {
+      // 240 is the range since thats about 16 * sqrt(2) * 10 or right past the edge of the screen (tile cost = 10)
+      if (path1[location.x][location.y].getDistance() <= 240) {
+        active = true;
+        return;
+      }
+      return;
+    }
+    // Now heck if were currently asleep due to actions such as attacking.
     if(sleep) {
       sleeptimer -= delta;
       if(sleeptimer <= 0)
@@ -123,7 +133,6 @@ public class Enemy extends Entity{
 
     // Get location and retrieve direction from the vertex map.
     TileIndex playerLocation = MapUtil.convertWorldToTile(player1.worldPos);
-    TileIndex location = MapUtil.convertWorldToTile(worldPos);
     int direction = path1[location.x][location.y].getDirection();
 
     // Attempt attacks depending on enemy type:

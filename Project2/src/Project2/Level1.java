@@ -65,9 +65,7 @@ public class Level1 extends BasicGameState {
         enemyList = new ArrayList<Enemy>();
         enemyList.add(new Enemy(10, 10, 2));
         enemyList.add(new Enemy(18, 18, 1));
-        for(int i = 0; i < 10; i++) {
-          enemyList.add(new Enemy(10,i + 11,2));
-        }
+        enemyList.add(new Enemy(26, 26, 1));
 
         container.setSoundOn(true);
     }
