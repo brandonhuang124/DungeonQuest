@@ -172,8 +172,9 @@ public class TestState extends BasicGameState {
     if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A)) {
       direction = Direction.UP_LEFT;
       try {
-        dg.client.dataOutputStream.writeUTF("WA;" + playerloc.x + ";" + playerloc.y);
-        if (dg.client.dataInputStream.readUTF().equals("A")) {
+        dg.client.dataOutputStream.writeUTF("WA;" + (playerloc.x + (-0.71f * 0.25f)) + ";" + (playerloc.y + (-0.71f * 0.25f)) +  ";" + dg.client.playerID);
+        dg.client.dataOutputStream.flush();
+        if(dg.client.dataInputStream.readUTF().equals("A")) {
           player.moveUpLeft();
         } else {
           System.out.println("Unable to perform action:  WA");
@@ -186,8 +187,9 @@ public class TestState extends BasicGameState {
     else if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_D)) {
       direction = Direction.UP_RIGHT;
       try {
-        dg.client.dataOutputStream.writeUTF("WD;" + playerloc.x + ";" + playerloc.y);
-        if (dg.client.dataInputStream.readUTF().equals("A")) {
+        dg.client.dataOutputStream.writeUTF("WD;" + (playerloc.x + (0.71f * 0.25f)) + ";" + (playerloc.y + (-0.71f * 0.25f)) +  ";" + dg.client.playerID);
+        dg.client.dataOutputStream.flush();
+        if(dg.client.dataInputStream.readUTF().equals("A")) {
           player.moveUpRight();
         } else {
           System.out.println("Unable to perform action:  WD");
@@ -200,8 +202,9 @@ public class TestState extends BasicGameState {
     else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_A)) {
       direction = Direction.DOWN_LEFT;
       try {
-        dg.client.dataOutputStream.writeUTF("SA;" + playerloc.x + ";" + playerloc.y);
-        if (dg.client.dataInputStream.readUTF().equals("A")) {
+        dg.client.dataOutputStream.writeUTF("SA;" + (playerloc.x + (-0.71f * 0.25f)) + ";" + (playerloc.y + (0.71f * 0.25f)) +  ";" + dg.client.playerID);
+        dg.client.dataOutputStream.flush();
+        if(dg.client.dataInputStream.readUTF().equals("A")) {
           player.moveDownLeft();
         } else {
           System.out.println("Unable to perform action:  SA");
@@ -214,8 +217,9 @@ public class TestState extends BasicGameState {
     else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_D)) {
       direction = Direction.DOWN_RIGHT;
       try {
-        dg.client.dataOutputStream.writeUTF("SD;" + playerloc.x + ";" + playerloc.y);
-        if (dg.client.dataInputStream.readUTF().equals("A")) {
+        dg.client.dataOutputStream.writeUTF("SD;" + (playerloc.x + (0.71f * 0.25f)) + ";" + (playerloc.y + (0.71f * 0.25f)) +  ";" + dg.client.playerID);
+        dg.client.dataOutputStream.flush();
+        if(dg.client.dataInputStream.readUTF().equals("A")) {
           player.moveDownRight();
         } else {
           System.out.println("Unable to perform action:  SD");
@@ -228,8 +232,9 @@ public class TestState extends BasicGameState {
     else if(input.isKeyDown(Input.KEY_W)) {
       direction = Direction.UP;
       try {
-        dg.client.dataOutputStream.writeUTF("W;" + playerloc.x + ";" + playerloc.y);
-        if (dg.client.dataInputStream.readUTF().equals("A")) {
+        dg.client.dataOutputStream.writeUTF("W;" + playerloc.x + ";" + (playerloc.y - 0.25f )+  ";" + dg.client.playerID);
+        dg.client.dataOutputStream.flush();
+        if(dg.client.dataInputStream.readUTF().equals("A")) {
           player.moveUp();
         } else {
           System.out.println("Unable to perform action:  W");
@@ -242,8 +247,9 @@ public class TestState extends BasicGameState {
     else if(input.isKeyDown(Input.KEY_A)) {
       direction = Direction.LEFT;
       try {
-        dg.client.dataOutputStream.writeUTF("A;" + playerloc.x + ";" + playerloc.y);
-        if (dg.client.dataInputStream.readUTF().equals("A")) {
+        dg.client.dataOutputStream.writeUTF("A;" + (playerloc.x - 0.25f) + ";" + playerloc.y +  ";" + dg.client.playerID);
+        dg.client.dataOutputStream.flush();
+        if(dg.client.dataInputStream.readUTF().equals("A")) {
           player.moveLeft();
         } else {
           System.out.println("Unable to perform action:  A");
@@ -256,8 +262,9 @@ public class TestState extends BasicGameState {
     else if(input.isKeyDown(Input.KEY_S)) {
       direction = Direction.DOWN;
       try {
-        dg.client.dataOutputStream.writeUTF("S;" + playerloc.x + ";" + playerloc.y);
-        if (dg.client.dataInputStream.readUTF().equals("A")) {
+        dg.client.dataOutputStream.writeUTF("S;" + playerloc.x + ";" + (playerloc.y + 0.25f) +  ";" + dg.client.playerID);
+        dg.client.dataOutputStream.flush();
+        if(dg.client.dataInputStream.readUTF().equals("A")) {
           player.moveDown();
         } else {
           System.out.println("Unable to perform action:  S");
@@ -270,8 +277,9 @@ public class TestState extends BasicGameState {
     else if(input.isKeyDown(Input.KEY_D)) {
       direction = Direction.RIGHT;
       try {
-        dg.client.dataOutputStream.writeUTF("D;" + playerloc.x + ";" + playerloc.y);
-        if (dg.client.dataInputStream.readUTF().equals("A")) {
+        dg.client.dataOutputStream.writeUTF("D;" + (playerloc.x + 0.25f) + ";" + playerloc.y +  ";" + dg.client.playerID);
+        dg.client.dataOutputStream.flush();
+        if(dg.client.dataInputStream.readUTF().equals("A")) {
           player.moveRight();
         } else {
           System.out.println("Unable to perform action:  D");

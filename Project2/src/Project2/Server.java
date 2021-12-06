@@ -1,8 +1,6 @@
 package Project2;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -38,6 +36,8 @@ public class Server {
                 else if(numPlayers == 2) {
                     player2 = clientHandler;
                 }
+
+                System.out.println("Starting ClientHandler Thread for Player #" + numPlayers);
                 Thread thread = new Thread(clientHandler);
                 thread.start();
             }
@@ -54,6 +54,7 @@ public class Server {
         private String[] token;
         private DataInputStream dataInputStream;
         private DataOutputStream dataOutputStream;
+        private BufferedReader bufferedReader;
         private int playerID;
 
         public ClientHandler(Socket socket, int id) {
@@ -62,6 +63,7 @@ public class Server {
             try {
                 dataInputStream = new DataInputStream(socket.getInputStream());
                 dataOutputStream = new DataOutputStream(socket.getOutputStream());
+//                bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             } catch (IOException e) {
                 System.out.println("IOException from ClientHandler constructor");
                 e.printStackTrace();
@@ -71,11 +73,15 @@ public class Server {
         @Override
         public void run() {
             try {
+//                System.out.println("Check 1");
                 dataOutputStream.writeInt(playerID);
                 dataOutputStream.flush();
-
+//                System.out.println("Check 2");
                 while(true) {
+//                    System.out.println("Check 3");
                     string = dataInputStream.readUTF();
+//                    string = bufferedReader.readLine();
+//                    System.out.println("Check 4");
                     System.out.println("Reading from Client: " + string);
                     token = string.split(";");
 
@@ -84,38 +90,47 @@ public class Server {
                         case "WA" -> {
                             System.out.println("Writing Ack: WA");
                             dataOutputStream.writeUTF("A");
+                            dataOutputStream.flush();
                         }
                         case "WD" -> {
                             System.out.println("Writing Ack: WD");
                             dataOutputStream.writeUTF("A");
+                            dataOutputStream.flush();
                         }
                         case "SA" -> {
                             System.out.println("Writing Ack: SA");
                             dataOutputStream.writeUTF("A");
+                            dataOutputStream.flush();
                         }
                         case "SD" -> {
                             System.out.println("Writing Ack: SD");
                             dataOutputStream.writeUTF("A");
+                            dataOutputStream.flush();
                         }
                         case "W" -> {
                             System.out.println("Writing Ack: W");
                             dataOutputStream.writeUTF("A");
+                            dataOutputStream.flush();
                         }
                         case "A" -> {
                             System.out.println("Writing Ack: A");
                             dataOutputStream.writeUTF("A");
+                            dataOutputStream.flush();
                         }
                         case "S" -> {
                             System.out.println("Writing Ack: S");
                             dataOutputStream.writeUTF("A");
+                            dataOutputStream.flush();
                         }
                         case "D" -> {
                             System.out.println("Writing Ack: D");
                             dataOutputStream.writeUTF("A");
+                            dataOutputStream.flush();
                         }
                         default -> {
                             System.out.println("Writing Err");
                             dataOutputStream.writeUTF("E");
+                            dataOutputStream.flush();
                         }
                     }
 //                    if(token[0] != null) {
