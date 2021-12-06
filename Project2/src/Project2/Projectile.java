@@ -5,6 +5,7 @@ import jig.ResourceManager;
 import jig.Vector;
 
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 
@@ -70,7 +71,7 @@ public class Projectile extends Entity {
    * @param tilemap
    *  The tilemap representing the layout of the map.
    */
-  public void collisionCheck(Tile[][] tilemap, LinkedList<Enemy> enemyList, Player player) {
+  public void collisionCheck(Tile[][] tilemap, ArrayList<Enemy> enemyList, Player player) {
     TileIndex location = MapUtil.convertWorldToTile(worldPos);
     if(location.x < 0 || location.y < 0 || location.x >= 60 || location.y >=60){
       removeMe = true;

@@ -11,6 +11,7 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 /***
@@ -23,8 +24,8 @@ import java.util.LinkedList;
 
 public class TestState extends BasicGameState {
   Player player;
-  LinkedList<Projectile> projectileList;
-  LinkedList<Enemy> enemyList;
+  ArrayList<Projectile> projectileList;
+  ArrayList<Enemy> enemyList;
   Tile tileMap[][];
   Vertex [][] path;
   int levelWidth, levelHeight, player1type, player2type;;
@@ -51,8 +52,8 @@ public class TestState extends BasicGameState {
     if(player1type == 0)
       player1type = 1;
     player1Dead = player2Dead = gameover = false;
-    projectileList = new LinkedList<Projectile>();
-    enemyList = new LinkedList<Enemy>();
+    projectileList = new ArrayList<Projectile>();
+    enemyList = new ArrayList<Enemy>();
     enemyList.add(new Enemy(MapUtil.TILESIZE * 18, MapUtil.TILESIZE * 5, 2));
     enemyList.add(new Enemy(MapUtil.TILESIZE * 15, MapUtil.TILESIZE * 6, 1));
     player = new Player((MapUtil.TILESIZE * 4) + (0.5f * MapUtil.TILESIZE),

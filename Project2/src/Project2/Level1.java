@@ -11,7 +11,9 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Random;
 
 /***
  * Description:
@@ -22,9 +24,9 @@ import java.util.LinkedList;
  */
 public class Level1 extends BasicGameState {
     Player player;
-    LinkedList<Projectile> projectileList;
-    LinkedList<Enemy> enemyList;
-    LinkedList<Powerup> powerupList;
+    ArrayList<Projectile> projectileList;
+    ArrayList<Enemy> enemyList;
+    ArrayList<Powerup> powerupList;
     Vertex [][] path;
     MapUtil levelMap;
     int player1type, player2type;;
@@ -55,12 +57,12 @@ public class Level1 extends BasicGameState {
         // keeping the string to matrix method in DungeonGame
         levelMap.currentTileMap  = DungeonGame.getTileMap(levelMap.currentMapString,
                 MapUtil.LEVELWIDTH,MapUtil.LEVELWIDTH);
-        projectileList = new LinkedList<Projectile>();
-        powerupList = new LinkedList<Powerup>();
+        projectileList = new ArrayList<Projectile>();
+        powerupList = new ArrayList<Powerup>();
         powerupList.add(new Powerup(5,3,1));
         player = new Player( 0, 0, player1type);
         player.setWorldPos(new TileIndex(4,4));
-        enemyList = new LinkedList<Enemy>();
+        enemyList = new ArrayList<Enemy>();
         enemyList.add(new Enemy(10, 10, 2));
         enemyList.add(new Enemy(18, 18, 1));
         for(int i = 0; i < 10; i++) {
@@ -239,7 +241,16 @@ public class Level1 extends BasicGameState {
         // Remove grabbed powerups
         powerupList.removeIf( (Powerup powerup) -> powerup.getRemoveMe());
         // Remove enemies that have died.
-        enemyList.removeIf( (Enemy enemy) -> enemy.isDead());
+        enemyList.removeIf( (Enemy enemy) -> {
+          if(enemy.isDead()) {
+            // 1 in 9 chance a healing potion will spawn under the dead enemy.
+            if(new Random().nextInt(8) == 0){
+              TileIndex location = enemy.getLocation();
+              powerupList.add(new Powerup(location.x, location.y, 1));
+            }
+          }
+          return enemy.isDead();
+        });
     }
 
   public void setPlayerType(int id) {

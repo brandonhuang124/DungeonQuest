@@ -5,6 +5,7 @@ import jig.ResourceManager;
 import jig.Vector;
 import org.newdawn.slick.Animation;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 /***
@@ -111,7 +112,7 @@ public class Enemy extends Entity{
    *  Player object representing player 1.
    */
   public void makeMove(Tile[][] tilemap, Vertex[][] path1, Player player1,
-                       LinkedList<Projectile> projectileList, int delta) {
+                       ArrayList<Projectile> projectileList, int delta) {
     // First check if were currently asleep due to actions such as attacking.
     if(sleep) {
       sleeptimer -= delta;
