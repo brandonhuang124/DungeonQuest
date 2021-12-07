@@ -147,7 +147,7 @@ public class TestState extends BasicGameState {
 
     // Methods called at the start of every update for usage in the loop
     TileIndex playerloc = player.getTileIndex();
-    path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,levelMap);
+    path = DungeonGame.getDijkstras(playerloc.x,playerloc.y,levelMap, path);
 
     // Check if gameover occured.
     if(gameover) {

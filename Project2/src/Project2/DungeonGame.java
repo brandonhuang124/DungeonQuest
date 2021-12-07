@@ -273,16 +273,53 @@ public class DungeonGame extends StateBasedGame {
    * enemies in the game. Only works for 10x10 maps currently
    * Note: If different maps sizes are ever used, this function needs to be modified.
    */
-  public static Vertex[][] getDijkstras(int sourcex, int sourcey, MapUtil levelMap) {
+  public static Vertex[][] getDijkstras(int sourcex, int sourcey, MapUtil levelMap, Vertex[][] oldPath) {
     int width = MapUtil.LEVELWIDTH;
     int height = MapUtil.LEVELHEIGHT;
-
-    Vertex path[][] = new Vertex[width][height];
+    int leftBound, rightBound, bottomBound, topBound;
+    Vertex path[][];
+    // We need to flood the whole board if the oldPath doesn't exist.
+    if(oldPath == null){
+      path = new Vertex[width][height];
+      leftBound = bottomBound = 0;
+      rightBound = width;
+      topBound = height;
+    }
+    // Otherwise we just need to flood a 26 x 26 area around the source to reduce the amount of calls needed.
+    else {
+      path = oldPath;
+      // Check if were near the borders when setting bounds.
+      if(sourcex <= 13) {
+        leftBound = 0;
+        rightBound = 26;
+      }
+      else if(sourcex >= 47) {
+        leftBound = 34;
+        rightBound = 60;
+      }
+      else {
+        leftBound = sourcex - 13;
+        rightBound = sourcex + 13;
+      }
+      // Now set the vertical boundaries.
+      if(sourcey <= 13) {
+        bottomBound = 0;
+        topBound = 26;
+      }
+      else if(sourcey >= 47) {
+        bottomBound = 34;
+        topBound = 60;
+      }
+      else {
+        bottomBound = sourcey - 13;
+        topBound = sourcey + 13;
+      }
+    }
     boolean seen[][] = new boolean[width][height];
 
     // Intialize the path and seen arrays
-    for(int x = 0; x < width; x++) {
-      for(int y = 0; y < height; y++) {
+    for(int x = leftBound; x < rightBound; x++) {
+      for(int y = bottomBound; y < topBound; y++) {
         path[x][y] = new Vertex(levelMap.currentTileMap[x][y].getCost());
         seen[x][y] = false;
       }
@@ -292,9 +329,9 @@ public class DungeonGame extends StateBasedGame {
     path[sourcex][sourcey].setDistance(0);
 
     // Keep going until all nodes are seen
-    while(hasUnseenNodes(seen, width , height)) {
+    while(hasUnseenNodes(seen, rightBound, topBound, leftBound, bottomBound)) {
       // Get the node with the current shortest distance
-      TileIndex current = shortestDistance(path, seen, width, height);
+      TileIndex current = shortestDistance(path, seen, rightBound, topBound, leftBound, bottomBound);
       int x = current.x;
       int y = current.y;
       // Mark the current node as seen.
@@ -379,9 +416,9 @@ public class DungeonGame extends StateBasedGame {
    *  true if there are unseen nodes
    *  false if there aren't
    */
-  private static boolean hasUnseenNodes(boolean seen[][], int width, int height) {
-    for (int x = 0; x < width; x++) {
-      for (int y = 0; y < height; y++) {
+  private static boolean hasUnseenNodes(boolean seen[][], int width, int height, int leftBound, int bottomBound) {
+    for (int x = leftBound; x < width; x++) {
+      for (int y = bottomBound; y < height; y++) {
         if (!seen[x][y]) {
           // System.out.println("found a node x:" + x + " y:" + y);
           return true;
@@ -400,12 +437,12 @@ public class DungeonGame extends StateBasedGame {
    * @return
    *  Coordinate of the node in the vertex which has the lowest distance and is unseen.
    */
-  private static TileIndex shortestDistance (Vertex graph[][], boolean seen[][], int width, int height) {
+  private static TileIndex shortestDistance (Vertex graph[][], boolean seen[][], int width, int height, int leftBound, int bottomBound) {
     TileIndex shortest = new TileIndex(0,0);
     double distance = 100000000;
     // Iterate through the graph and find the right node.
-    for(int x = 0; x < width; x++) {
-      for(int y = 0; y < height; y++) {
+    for(int x = leftBound; x < width; x++) {
+      for(int y = bottomBound; y < height; y++) {
         double newDistance = graph[x][y].getDistance();
         if(newDistance < distance && !seen[x][y]) {
           distance = newDistance;

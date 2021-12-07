@@ -45,7 +45,7 @@ public class Level1 extends BasicGameState {
 
     @Override
     public void enter(GameContainer container, StateBasedGame game) {
-        path2 = null;
+        path = path2 = null;
         if(player1type == 0)
           player1type = 1;
         player1Dead = player2Dead = gameover = false;
@@ -167,10 +167,10 @@ public class Level1 extends BasicGameState {
 
         Input input = container.getInput();
         TileIndex playerTile = levelMap.convertWorldToTile(player.worldPos);
-        path = DungeonGame.getDijkstras(playerTile.x,playerTile.y, levelMap);
+        path = DungeonGame.getDijkstras(playerTile.x,playerTile.y, levelMap, path);
         if(twoPlayer) {
           TileIndex player2Tile = levelMap.convertWorldToTile(player2.worldPos);
-          path2 = DungeonGame.getDijkstras(player2Tile.x, player2Tile.y, levelMap);
+          path2 = DungeonGame.getDijkstras(player2Tile.x, player2Tile.y, levelMap, path2);
         }
 
         /*** CONTROLS SECTION ***/
