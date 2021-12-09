@@ -375,6 +375,13 @@ public class Level1 extends BasicGameState {
           }
           return enemy.isDead();
         });
+
+        try {
+        dg.client.dataOutputStream.writeUTF(get2PData());
+        dg.client.dataOutputStream.flush();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
 
   public void setPlayerType(int id) {
@@ -387,6 +394,50 @@ public class Level1 extends BasicGameState {
       player2type = 2;
     else
       player2type = 1;
+  }
+
+  public String get2PData() {
+    String data = "";
+    // Step 1: get player data
+    // p1 data
+    data = data.concat("P1;");
+    data = data.concat(player.getPlayerData());
+    // p2 data
+    data = data.concat("P2;");
+    //data = data.concat(player2.getPlayerData());
+    // Step 2: build all enemy data
+    data = data.concat("ENEMYLISTSTART;");
+    for(Enemy e : enemyList)
+      data = data.concat(e.getEnemyData());
+    data = data.concat("ENEMYLISTEND;");
+    // Step 3: build all projectile data
+    data = data.concat("PROJLISTSTART;");
+    for(Projectile p : projectileList)
+      data = data.concat(p.getData());
+    data = data.concat("PROJLISTEND;");
+    // Step 4: build powerup data
+    data = data.concat("POWERUPLISTSTART;");
+    for(Powerup p : powerupList)
+      data = data.concat(p.getData());
+    data = data.concat("POWERUPLISTEND;");
+
+    // Step 5: Send HUD information
+    data = data.concat("HUDSTART;");
+    // Send both players healths and max healths across
+    //data = data.concat(player.getCurrentHealth() + ";" + player.getMaxHealth() + ";" + player2.getCurrentHealth() + ";"
+    //+ player2.getMaxHealth() + ";");
+    data = data.concat("HUDEND");
+
+    // Step 6: Send special instructions
+    data = data.concat("INSTRUCTIONSSTART;");
+    // Send a token if the level was completed
+    // Send a token if a player quits
+    // Send a token if a player dies
+    // Send a token if a gameover occurs
+    // Put other stuff here if necessary
+
+    data = data.concat("INSTRUCTIONSEND");
+    return data;
   }
 
     public double getPlayerMouseAngle(Input input) {

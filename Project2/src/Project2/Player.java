@@ -20,9 +20,15 @@ import org.newdawn.slick.Animation;
 public class Player extends Entity {
   private static final String TAG = "Player -";
 
+  public static int MOVELEFT = 1;
+  public static int MOVERIGHT = 2;
+  public static int IDLELEFT = 3;
+  public static int IDLERIGHT = 4;
+
   private Vector velocity;
   private float speed;
   private int damage, maxhealth, health, attackCooldownTimer, attackCooldown, playerType;
+  private double weaponAngle;
   private boolean faceRight, attackReady;
   private Animation moveLeft, moveRight, idleLeft, idleRight, current;
   public Weapon weapon;
@@ -413,6 +419,36 @@ public class Player extends Entity {
    *  The absolute angle to rotate to.
    */
   public void mouseRotate(final double theta) {
+    weaponAngle = theta;
     weapon.setRotation(theta);
+  }
+
+  /***
+   * This function builds a string to send to the dummy client second player during online play. The string is in
+   * the format: 'PLAYERTYPE;PLAYERXPOS;PLAYERYPOS;WEAPONANGLE;CURRENTANIMATIONID;'
+   * @return
+   * String to send across for 2P game.
+   */
+  public String getPlayerData() {
+    String data = "";
+    // Start with an identifier of which player this is
+    data = data.concat(playerType + ";");
+    // Next send positional data
+    data = data.concat(worldPos.x + ";" + worldPos.y + ";");
+    // Now attach the angle of the weapon
+    data = data.concat(weaponAngle + ";");
+    // Now send which animation is playing
+    int animID = 0;
+    if(current == moveLeft)
+      animID = MOVELEFT;
+    if(current == moveRight)
+      animID = MOVERIGHT;
+    if(current == idleLeft)
+      animID = IDLELEFT;
+    if(current == idleRight)
+      animID = IDLERIGHT;
+    data = data.concat(animID + ";");
+
+    return data;
   }
 }

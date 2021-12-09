@@ -507,4 +507,31 @@ public class Enemy extends Entity{
     }
     return true;
   }
+
+  /***
+   * This function builds a string to send to the dummy client second player during online play. The string is in
+   * the format: 'ENEMYTYPE;ENEMYXPOS;ENEMYYPOS;CURRENTANIMATIONID;'
+   * @return
+   * String to send across for 2P game.
+   */
+  public String getEnemyData() {
+    String data = "";
+    // Start with an identifier of which enemy this is
+    data = data.concat(id + ";");
+    // Next send positional data
+    data = data.concat(worldPos.x + ";" + worldPos.y + ";");
+    // Now send which animation is playing
+    int animID = 0;
+    if(current == moveLeft)
+      animID = Player.MOVELEFT;
+    if(current == moveRight)
+      animID = Player.MOVERIGHT;
+    if(current == idleLeft)
+      animID = Player.IDLELEFT;
+    if(current == idleRight)
+      animID = Player.IDLERIGHT;
+    data = data.concat(animID + ";");
+
+    return data;
+  }
 }

@@ -22,6 +22,7 @@ public class Projectile extends Entity {
   private Vector velocity;
   private boolean removeMe;
   private int slashTimer;
+  private double rotationAngle;
   int id, damage;
   Coordinate worldPos;
 
@@ -41,6 +42,7 @@ public class Projectile extends Entity {
     super(x,y);
     id = type;
     damage = damageAmount;
+    rotationAngle = angle;
     // If ranged player projectile
     if(id == 1) {
       speed = 1f;
@@ -129,4 +131,21 @@ public class Projectile extends Entity {
   public boolean needsRemove() {return removeMe;}
 
   public int getID() { return id;}
+
+  /***
+   * This function builds a string to send to the dummy client second player during online play. The string is in
+   * the format: 'PROJECTILETYPE;PROJECTILEXPOS;PROJECTILEYPOS;PROJECTILEANGLE;'
+   * @return
+   * String to send across for 2P game.
+   */
+  public String getData() {
+    String data = "";
+    // Identifier for what projectile this is
+    data = data.concat(id + ";");
+    // Positional data
+    data = data.concat(worldPos.x + ";" + worldPos.y + ";");
+    // Angle of projectile
+    data = data.concat(rotationAngle + ";");
+    return data;
+  }
 }

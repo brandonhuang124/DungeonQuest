@@ -114,7 +114,7 @@ public class DungeonGame extends StateBasedGame {
   public final int ScreenWidth;
   public final int ScreenHeight;
 
-  Client client;
+  public static Client client;
   /**
    * Create a new state based game
    *
@@ -124,17 +124,6 @@ public class DungeonGame extends StateBasedGame {
     super(title);
     ScreenHeight = height;
     ScreenWidth = width;
-
-
-    /**
-    try {
-      client = new Client("localhost", 4999);
-      System.out.println("Client created: " + client);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    **/
-
     Entity.setCoarseGrainedCollisionBoundary(Entity.CIRCLE);
   }
 
