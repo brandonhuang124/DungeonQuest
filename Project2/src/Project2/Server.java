@@ -1,18 +1,19 @@
 package Project2;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
     private ServerSocket serverSocket;
-    private int numPlayers;
+    private int numPlayers, threadPlayer;
     private ClientHandler player1;
     private ClientHandler player2;
 
     public Server() {
         System.out.println("---Server---");
-        numPlayers = 0;
+        numPlayers = threadPlayer = 0;
         try {
             serverSocket = new ServerSocket(4999);
         } catch (IOException e) {
@@ -63,7 +64,6 @@ public class Server {
             try {
                 dataInputStream = new DataInputStream(socket.getInputStream());
                 dataOutputStream = new DataOutputStream(socket.getOutputStream());
-//                bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             } catch (IOException e) {
                 System.out.println("IOException from ClientHandler constructor");
                 e.printStackTrace();
@@ -73,71 +73,21 @@ public class Server {
         @Override
         public void run() {
             try {
-//                System.out.println("Check 1");
                 dataOutputStream.writeInt(playerID);
                 dataOutputStream.flush();
-//                System.out.println("Check 2");
                 while(true) {
-//                    System.out.println("Check 3");
                     string = dataInputStream.readUTF();
-//                    string = bufferedReader.readLine();
-//                    System.out.println("Check 4");
                     System.out.println("Reading from Client: " + string);
                     token = string.split(";");
+                    if(playerID == 1) {
+                      // Were the thread handling player 1
 
-                    // Need to check action conditions here
-                    switch (token[0]) {
-                        case "WA" -> {
-                            System.out.println("Writing Ack: WA");
-                            dataOutputStream.writeUTF("A");
-                            dataOutputStream.flush();
-                        }
-                        case "WD" -> {
-                            System.out.println("Writing Ack: WD");
-                            dataOutputStream.writeUTF("A");
-                            dataOutputStream.flush();
-                        }
-                        case "SA" -> {
-                            System.out.println("Writing Ack: SA");
-                            dataOutputStream.writeUTF("A");
-                            dataOutputStream.flush();
-                        }
-                        case "SD" -> {
-                            System.out.println("Writing Ack: SD");
-                            dataOutputStream.writeUTF("A");
-                            dataOutputStream.flush();
-                        }
-                        case "W" -> {
-                            System.out.println("Writing Ack: W");
-                            dataOutputStream.writeUTF("A");
-                            dataOutputStream.flush();
-                        }
-                        case "A" -> {
-                            System.out.println("Writing Ack: A");
-                            dataOutputStream.writeUTF("A");
-                            dataOutputStream.flush();
-                        }
-                        case "S" -> {
-                            System.out.println("Writing Ack: S");
-                            dataOutputStream.writeUTF("A");
-                            dataOutputStream.flush();
-                        }
-                        case "D" -> {
-                            System.out.println("Writing Ack: D");
-                            dataOutputStream.writeUTF("A");
-                            dataOutputStream.flush();
-                        }
-                        default -> {
-                            System.out.println("Writing Err");
-                            dataOutputStream.writeUTF("E");
-                            dataOutputStream.flush();
-                        }
                     }
-//                    if(token[0] != null) {
-//                        System.out.println("Writing to Client: A");
-//                        dataOutputStream.writeUTF("A");
-//                    }
-
+                    else if(playerID == 2) {
+                      // Were the thread handling player 2
+                      player1.dataOutputStream.writeUTF(string);
+                      player1.dataOutputStream.flush();
+                    }
                 }
             } catch (IOException e) {
                 System.out.println("IOException from run() in ClientHandler");

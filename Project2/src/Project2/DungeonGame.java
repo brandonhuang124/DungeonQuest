@@ -33,6 +33,7 @@ public class DungeonGame extends StateBasedGame {
   public static final int TESTSTATE = 1;
   public static final int LEVEL1 = 2;
   public static final int MENUSTATE = 3;
+  public static final int DUMMYSTATE = 4;
 
   // Important parameters
   public static final int SCALE = 1;
@@ -114,7 +115,7 @@ public class DungeonGame extends StateBasedGame {
   public final int ScreenWidth;
   public final int ScreenHeight;
 
-  Client client;
+  public static Client client;
   /**
    * Create a new state based game
    *
@@ -124,17 +125,6 @@ public class DungeonGame extends StateBasedGame {
     super(title);
     ScreenHeight = height;
     ScreenWidth = width;
-
-
-    /**
-    try {
-      client = new Client("localhost", 4999);
-      System.out.println("Client created: " + client);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    **/
-
     Entity.setCoarseGrainedCollisionBoundary(Entity.CIRCLE);
   }
 
@@ -145,6 +135,7 @@ public class DungeonGame extends StateBasedGame {
     //addState(new TestState());
     addState(new Level1());
     addState(new MenuState());
+    addState(new DummyState());
     /*** RESOURCE LOADING ***/
     // Player
     ResourceManager.loadImage(PLAYER_RANGEDARROW1_RSC);

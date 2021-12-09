@@ -51,4 +51,18 @@ public class Powerup extends Entity {
   public TileIndex getLocation() { return location; }
 
   public boolean getRemoveMe() { return removeMe; }
+
+  /***
+   * Function to get render data to send to the second player in 2P mode.
+   * In the format: 'TYPE;XPOS;YPOS'
+   * @return
+   * A string to be sent to the dummy client for rendering.
+   */
+  public String getData() {
+    String data = "";
+    data.concat(id + ";");
+    data.concat(worldPos.x + ";" + worldPos.y + ";");
+
+    return data;
+  }
 }

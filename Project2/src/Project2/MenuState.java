@@ -9,12 +9,16 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import javax.naming.spi.ResolveResult;
+import java.io.IOException;
 import java.util.LinkedList;
 
 public class MenuState extends BasicGameState {
 
   private int select, timer, phase;
   private boolean selected, arrowBlink, playerFound, singleplayer;
+
+  /********** PUT ADDRESS OF SERVER INTHIS VARIABLE WHEN RUNNING **********/
+  private String serverAddress = "192.168.0.107";
 
   @Override
   public int getID() {
@@ -164,6 +168,20 @@ public class MenuState extends BasicGameState {
         else if(select == 4) {
           System.out.println("4 Selected");
           phase = 5;
+          // If were joining a game, we need to open a connection and tell the server were P2
+          try {
+            phase = 3;
+            DungeonGame.client = new Client(serverAddress, 4999);
+            System.out.println("Client created: " + DungeonGame.client);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+          try {
+            DungeonGame.client.dataOutputStream.writeUTF("P2CLIENT;");
+            DungeonGame.client.dataOutputStream.flush();
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
         }
       }
     }
@@ -189,8 +207,23 @@ public class MenuState extends BasicGameState {
         else if(select == 2) {
           System.out.println("Melee Selected");
           ((Level1)game.getState(DungeonGame.LEVEL1)).setPlayerType(2);
-          if(!singleplayer)
-            phase = 3;
+          if(!singleplayer) {
+            // If were in multiplayer, wee need to open a connection to the server and tell them were player1
+            try {
+              phase = 3;
+              DungeonGame.client = new Client(serverAddress, 4999);
+              System.out.println("Client created: " + DungeonGame.client);
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+            try {
+              DungeonGame.client.dataOutputStream.writeUTF("P1CLIENT;");
+              DungeonGame.client.dataOutputStream.flush();
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+          }
+
           else {
             System.out.println("Start game now");
             ((Level1)game.getState(DungeonGame.LEVEL1)).set2Player(false);
@@ -200,8 +233,21 @@ public class MenuState extends BasicGameState {
         else if(select == 3) {
           System.out.println("Ranged Selected");
           ((Level1)game.getState(DungeonGame.LEVEL1)).setPlayerType(1);
-          if(!singleplayer)
-            phase = 3;
+          if(!singleplayer) {
+            try {
+              phase = 3;
+              DungeonGame.client = new Client(serverAddress, 4999);
+              System.out.println("Client created: " + DungeonGame.client);
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+            try {
+              DungeonGame.client.dataOutputStream.writeUTF("P1CLIENT;");
+              DungeonGame.client.dataOutputStream.flush();
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+          }
           else {
             System.out.println("Start Game Now");
             ((Level1)game.getState(DungeonGame.LEVEL1)).set2Player(false);
@@ -264,6 +310,7 @@ public class MenuState extends BasicGameState {
     // Join game Phase
     else if(phase == 5) {
       // Do stuff here
+      game.enterState(DungeonGame.DUMMYSTATE);
       if(25 < mousex && mousex < 221 && 645 < mousey && mousey < 713)
         select = 1;
       else
