@@ -307,6 +307,7 @@ public class MenuState extends BasicGameState {
     // Join game Phase
     else if(phase == 5) {
       // Do stuff here
+      game.enterState(DungeonGame.DUMMYSTATE);
       if(25 < mousex && mousex < 221 && 645 < mousey && mousey < 713)
         select = 1;
       else

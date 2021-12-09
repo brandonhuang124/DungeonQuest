@@ -63,7 +63,6 @@ public class Server {
             try {
                 dataInputStream = new DataInputStream(socket.getInputStream());
                 dataOutputStream = new DataOutputStream(socket.getOutputStream());
-//                bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             } catch (IOException e) {
                 System.out.println("IOException from ClientHandler constructor");
                 e.printStackTrace();
@@ -77,25 +76,16 @@ public class Server {
                 dataOutputStream.flush();
                 while(true) {
                     string = dataInputStream.readUTF();
-//                    string = bufferedReader.readLine();
-//                    System.out.println("Check 4");
                     System.out.println("Reading from Client: " + string);
                     token = string.split(";");
-                    // Here we check and assign which player this thread is handling
-                    if(threadPlayer == 0) {
-                      if(token[0] == "P1CLIENT")
-                        threadPlayer = 1;
-                      else if(token[0] == "P2CLIENT")
-                        threadPlayer = 2;
-                      else
-                        threadPlayer = 0;
+                    if(playerID == 1) {
+                      // Were the thread handling player 1
+
                     }
-
-//                    if(token[0] != null) {
-//                        System.out.println("Writing to Client: A");
-//                        dataOutputStream.writeUTF("A");
-//                    }
-
+                    else if(playerID == 2) {
+                      // Were the thread handling player 2
+                      player1.dataOutputStream.writeUTF(string);
+                    }
                 }
             } catch (IOException e) {
                 System.out.println("IOException from run() in ClientHandler");

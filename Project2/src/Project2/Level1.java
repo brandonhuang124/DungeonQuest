@@ -164,13 +164,28 @@ public class Level1 extends BasicGameState {
     @Override
     public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
         DungeonGame dg = (DungeonGame)game;
+        String p2data;
+        String[] p2dataToken;
 
         Input input = container.getInput();
         TileIndex playerTile = levelMap.convertWorldToTile(player.worldPos);
         path = DungeonGame.getDijkstras(playerTile.x,playerTile.y, levelMap, path);
+        // Things to do when were in 2 player mode
         if(twoPlayer) {
+          // Set tile and path for p2
           TileIndex player2Tile = levelMap.convertWorldToTile(player2.worldPos);
           path2 = DungeonGame.getDijkstras(player2Tile.x, player2Tile.y, levelMap, path2);
+          // Read controls for p2
+          try {
+            while(true) {
+              p2data = DungeonGame.client.dataInputStream.readUTF();
+              System.out.println("Reading from Server: " + p2data);
+              p2dataToken = p2data.split(";");
+            }
+          } catch (IOException e) {
+            System.out.println("IOException from run() in ClientHandler");
+            e.printStackTrace();
+          }
         }
 
         /*** CONTROLS SECTION ***/

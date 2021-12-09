@@ -33,6 +33,7 @@ public class DungeonGame extends StateBasedGame {
   public static final int TESTSTATE = 1;
   public static final int LEVEL1 = 2;
   public static final int MENUSTATE = 3;
+  public static final int DUMMYSTATE = 4;
 
   // Important parameters
   public static final int SCALE = 1;
@@ -134,6 +135,7 @@ public class DungeonGame extends StateBasedGame {
     //addState(new TestState());
     addState(new Level1());
     addState(new MenuState());
+    addState(new DummyState());
     /*** RESOURCE LOADING ***/
     // Player
     ResourceManager.loadImage(PLAYER_RANGEDARROW1_RSC);
