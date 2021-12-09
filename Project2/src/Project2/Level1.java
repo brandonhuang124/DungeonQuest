@@ -165,11 +165,12 @@ public class Level1 extends BasicGameState {
     public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
         DungeonGame dg = (DungeonGame)game;
         String p2data;
-        String[] p2dataToken;
+        String[] p2dataToken = null;
 
         Input input = container.getInput();
         TileIndex playerTile = levelMap.convertWorldToTile(player.worldPos);
         path = DungeonGame.getDijkstras(playerTile.x,playerTile.y, levelMap, path);
+
         // Things to do when were in 2 player mode
         if(twoPlayer) {
           // Set tile and path for p2
@@ -177,11 +178,10 @@ public class Level1 extends BasicGameState {
           path2 = DungeonGame.getDijkstras(player2Tile.x, player2Tile.y, levelMap, path2);
           // Read controls for p2
           try {
-            while(true) {
               p2data = DungeonGame.client.dataInputStream.readUTF();
               System.out.println("Reading from Server: " + p2data);
               p2dataToken = p2data.split(";");
-            }
+              System.out.println(p2dataToken[0]);
           } catch (IOException e) {
             System.out.println("IOException from run() in ClientHandler");
             e.printStackTrace();
@@ -244,7 +244,65 @@ public class Level1 extends BasicGameState {
         }
 
       /*** EXTRA CONTROLS SECTION FOR TESTING WITH TWO PLAYERS ***/
-        if(twoPlayer) {
+        if(twoPlayer && p2dataToken.length > 1) {
+          System.out.println(p2dataToken[1]);
+          /*** NETWORK CONTROLS ***/
+          // Left click for attacking
+          if(p2dataToken[0].equals("1")) {
+            Projectile newProjectile = player2.fire(getPlayer2MouseAngle(input));
+            if(newProjectile != null) {
+              projectileList.add(newProjectile);
+            }
+          }
+          // Check diagonals first
+          // W and A for Up Left
+          if(p2dataToken[1].equals("WA") && player2.isMoveValid(Direction.UP_LEFT,
+              player2.getVelocity().scale(delta),levelMap)) {
+            player2.moveUpLeft();
+          }
+          // W and D for Up Right
+          else if(p2dataToken[1].equals("WD") && player2.isMoveValid(Direction.UP_RIGHT,
+              player2.getVelocity().scale(delta),levelMap)) {
+            player2.moveUpRight();
+          }
+          // S and A for Down Left
+          else if(p2dataToken[1].equals("SA") && player2.isMoveValid(Direction.DOWN_LEFT,
+              player2.getVelocity().scale(delta),levelMap)) {
+            player2.moveDownLeft();
+
+          }
+          // S and D for Down Right
+          else if(p2dataToken[1].equals("SD") && player2.isMoveValid(Direction.DOWN_RIGHT,
+              player2.getVelocity().scale(delta),levelMap)) {
+            player2.moveDownRight();
+          }
+          // W for moving up
+          else if(p2dataToken[1].equals("W") && player2.isMoveValid(Direction.UP, player2.getVelocity().scale(delta),
+              levelMap)) {
+            player2.moveUp();
+          }
+          // A for moving left
+          else if(p2dataToken[1].equals("A") && player2.isMoveValid(Direction.LEFT, player2.getVelocity().scale(delta),
+              levelMap)) {
+            player2.moveLeft();
+          }
+          // S for moving down
+          else if(p2dataToken[1].equals("S") && player2.isMoveValid(Direction.DOWN, player2.getVelocity().scale(delta),
+              levelMap)) {
+            player2.moveDown();
+          }
+          // D for moving right
+          else if(p2dataToken[1].equals("D") && player2.isMoveValid(Direction.RIGHT, player2.getVelocity().scale(delta),
+              levelMap)) {
+            player2.moveRight();
+          }
+          // Other wise were just gonna stop moving.
+          else {
+            player2.stop();
+          }
+
+
+          /*** LOCAL CONTROLS ***/
           // Left click for attacking
           if(input.isMousePressed(Input.MOUSE_RIGHT_BUTTON)) {
             // System.out.println("Left Click pressed");
@@ -298,7 +356,7 @@ public class Level1 extends BasicGameState {
           }
           // Other wise were just gonna stop moving.
           else {
-            player2.stop();
+            //player2.stop();
           }
         }
 

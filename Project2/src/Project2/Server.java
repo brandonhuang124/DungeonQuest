@@ -1,6 +1,7 @@
 package Project2;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -85,6 +86,7 @@ public class Server {
                     else if(playerID == 2) {
                       // Were the thread handling player 2
                       player1.dataOutputStream.writeUTF(string);
+                      player1.dataOutputStream.flush();
                     }
                 }
             } catch (IOException e) {

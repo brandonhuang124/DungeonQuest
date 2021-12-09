@@ -17,6 +17,9 @@ public class MenuState extends BasicGameState {
   private int select, timer, phase;
   private boolean selected, arrowBlink, playerFound, singleplayer;
 
+  /********** PUT ADDRESS OF SERVER INTHIS VARIABLE WHEN RUNNING **********/
+  private String serverAddress = "192.168.0.107";
+
   @Override
   public int getID() {
     return 3;
@@ -168,7 +171,7 @@ public class MenuState extends BasicGameState {
           // If were joining a game, we need to open a connection and tell the server were P2
           try {
             phase = 3;
-            DungeonGame.client = new Client("localhost", 4999);
+            DungeonGame.client = new Client(serverAddress, 4999);
             System.out.println("Client created: " + DungeonGame.client);
           } catch (Exception e) {
             e.printStackTrace();
@@ -208,7 +211,7 @@ public class MenuState extends BasicGameState {
             // If were in multiplayer, wee need to open a connection to the server and tell them were player1
             try {
               phase = 3;
-              DungeonGame.client = new Client("localhost", 4999);
+              DungeonGame.client = new Client(serverAddress, 4999);
               System.out.println("Client created: " + DungeonGame.client);
             } catch (Exception e) {
               e.printStackTrace();
@@ -233,7 +236,7 @@ public class MenuState extends BasicGameState {
           if(!singleplayer) {
             try {
               phase = 3;
-              DungeonGame.client = new Client("localhost", 4999);
+              DungeonGame.client = new Client(serverAddress, 4999);
               System.out.println("Client created: " + DungeonGame.client);
             } catch (Exception e) {
               e.printStackTrace();
