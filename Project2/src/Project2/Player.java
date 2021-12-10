@@ -55,6 +55,7 @@ public class Player extends Entity {
     velocity = new Vector(0,0);
     playerType = id;
     speed = 0.25f;
+    worldPos = new Coordinate(x,y);
 
 
     // Ranged player assignments
