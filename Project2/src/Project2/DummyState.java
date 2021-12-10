@@ -8,8 +8,12 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class DummyState extends BasicGameState {
+  MapUtil levelMap;
+  Player meleePlayer, rangedPlayer;
+
   @Override
   public int getID() {
     return 4;
@@ -21,7 +25,26 @@ public class DummyState extends BasicGameState {
   }
 
   @Override
+  public void enter(GameContainer container, StateBasedGame game) {
+    // parse the CSV map file, throw exception in case of IO error:
+    try {
+      levelMap.loadLevelMap(1);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    meleePlayer = new Player(0,0, 2);
+    rangedPlayer = new Player(0,0,1);
+    // keeping the string to matrix method in DungeonGame
+    levelMap.currentTileMap  = DungeonGame.getTileMap(levelMap.currentMapString,
+        MapUtil.LEVELWIDTH,MapUtil.LEVELWIDTH);
+
+    container.setSoundOn(true);
+
+  }
+
+  @Override
   public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
+    levelMap.renderMapByCamera(g);
 
   }
 
@@ -30,7 +53,17 @@ public class DummyState extends BasicGameState {
     // Important calls at the beginning of each update
     Input input = container.getInput();
     String data;
+    String[] dataToken = null;
     // Read render data from client
+    try {
+      data = DungeonGame.client.dataInputStream.readUTF();
+      dataToken = data.split(";");
+      for(int i = 0; i < dataToken.length; i++)
+        System.out.println(dataToken[i]);
+    } catch (IOException e) {
+      System.out.println("IOException from run() in ClientHandler");
+      e.printStackTrace();
+    }
 
     /*** CONTROLS SECTION ***/
     data = "";
@@ -86,5 +119,9 @@ public class DummyState extends BasicGameState {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  private void parseRenderData(String[] token) {
+
   }
 }

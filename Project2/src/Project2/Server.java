@@ -81,7 +81,8 @@ public class Server {
                     token = string.split(";");
                     if(playerID == 1) {
                       // Were the thread handling player 1
-
+                      player2.dataOutputStream.writeUTF(string);
+                      player2.dataOutputStream.flush();
                     }
                     else if(playerID == 2) {
                       // Were the thread handling player 2

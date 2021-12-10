@@ -449,12 +449,15 @@ public class Level1 extends BasicGameState {
           return enemy.isDead();
         });
 
-        try {
-        dg.client.dataOutputStream.writeUTF(get2PData());
-        dg.client.dataOutputStream.flush();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+        // Send data to p2 if were in two player mode
+        if(twoPlayer) {
+          try {
+            dg.client.dataOutputStream.writeUTF(get2PData());
+            dg.client.dataOutputStream.flush();
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        }
     }
 
   public void setPlayerType(int id) {
