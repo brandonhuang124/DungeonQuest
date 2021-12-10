@@ -257,8 +257,8 @@ public class DummyState extends BasicGameState {
         myId = 2;
       }
       else {
-        meleePlayer = new Player(Float.valueOf(token[2]), Float.valueOf(token[3]), 1);
-        rangedPlayer = new Player(Float.valueOf(token[8]), Float.valueOf(token[9]), 2);
+        meleePlayer = new Player(Float.valueOf(token[2]), Float.valueOf(token[3]), 2);
+        rangedPlayer = new Player(Float.valueOf(token[8]), Float.valueOf(token[9]), 1);
         myId = 1;
       }
     }
