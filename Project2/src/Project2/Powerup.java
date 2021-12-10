@@ -60,8 +60,8 @@ public class Powerup extends Entity {
    */
   public String getData() {
     String data = "";
-    data.concat(id + ";");
-    data.concat(worldPos.x + ";" + worldPos.y + ";");
+    data = data.concat(id + ";");
+    data = data.concat(worldPos.x + ";" + worldPos.y + ";");
 
     return data;
   }

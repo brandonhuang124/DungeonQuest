@@ -67,10 +67,7 @@ public class Level1 extends BasicGameState {
           player2.setWorldPos(new TileIndex(4,5));
         }
         player.setWorldPos(new TileIndex(4,4));
-        enemyList = new ArrayList<Enemy>();
-        enemyList.add(new Enemy(10, 10, 2));
-        enemyList.add(new Enemy(18, 18, 1));
-        enemyList.add(new Enemy(26, 26, 1));
+        enemyList = buildEnemyList(1);
 
         container.setSoundOn(true);
     }
@@ -249,7 +246,7 @@ public class Level1 extends BasicGameState {
           /*** NETWORK CONTROLS ***/
           // Left click for attacking
           if(p2dataToken[0].equals("1")) {
-            Projectile newProjectile = player2.fire(getPlayer2MouseAngle(input));
+            Projectile newProjectile = player2.fire(Double.valueOf(p2dataToken[2]));
             if(newProjectile != null) {
               projectileList.add(newProjectile);
             }
@@ -277,22 +274,26 @@ public class Level1 extends BasicGameState {
             player2.moveDownRight();
           }
           // W for moving up
-          else if(p2dataToken[1].equals("W") && player2.isMoveValid(Direction.UP, player2.getVelocity().scale(delta),
+          else if((p2dataToken[1].equals("W") || p2dataToken[1].equals("WA") || p2dataToken[1].equals("WD")) &&
+              player2.isMoveValid(Direction.UP, player2.getVelocity().scale(delta),
               levelMap)) {
             player2.moveUp();
           }
           // A for moving left
-          else if(p2dataToken[1].equals("A") && player2.isMoveValid(Direction.LEFT, player2.getVelocity().scale(delta),
+          else if((p2dataToken[1].equals("A") || p2dataToken[1].equals("WA") || p2dataToken[1].equals("SA")) &&
+              player2.isMoveValid(Direction.LEFT, player2.getVelocity().scale(delta),
               levelMap)) {
             player2.moveLeft();
           }
           // S for moving down
-          else if(p2dataToken[1].equals("S") && player2.isMoveValid(Direction.DOWN, player2.getVelocity().scale(delta),
+          else if((p2dataToken[1].equals("S") || p2dataToken[1].equals("SD") || p2dataToken[1].equals("SA")) &&
+              player2.isMoveValid(Direction.DOWN, player2.getVelocity().scale(delta),
               levelMap)) {
             player2.moveDown();
           }
           // D for moving right
-          else if(p2dataToken[1].equals("D") && player2.isMoveValid(Direction.RIGHT, player2.getVelocity().scale(delta),
+          else if((p2dataToken[1].equals("D") || p2dataToken[1].equals("WD") || p2dataToken[1].equals("SD")) &&
+              player2.isMoveValid(Direction.RIGHT, player2.getVelocity().scale(delta),
               levelMap)) {
             player2.moveRight();
           }
@@ -306,7 +307,7 @@ public class Level1 extends BasicGameState {
           // Left click for attacking
           if(input.isMousePressed(Input.MOUSE_RIGHT_BUTTON)) {
             // System.out.println("Left Click pressed");
-            Projectile newProjectile = player2.fire(getPlayer2MouseAngle(input));
+            Projectile newProjectile = player2.fire(Double.valueOf(p2dataToken[2]));
             if(newProjectile != null) {
               System.out.println("ahh");
               projectileList.add(newProjectile);
@@ -373,7 +374,8 @@ public class Level1 extends BasicGameState {
           Coordinate player2ScreenPos = levelMap.convertWorldToScreen(player2.worldPos);
           player2.setX(player2ScreenPos.x);
           player2.setY(player2ScreenPos.y);
-          player2.mouseRotate(getPlayer2MouseAngle(input));
+          if(p2dataToken.length > 1)
+              player2.mouseRotate(Double.valueOf(p2dataToken[2]));
           player2.update(delta);
           player2.offsetUpdate(levelMap.currentTileMap);
         }
@@ -433,6 +435,16 @@ public class Level1 extends BasicGameState {
           }
         }
 
+        // Send data to p2 if were in two player mode
+        if(twoPlayer) {
+            try {
+                dg.client.dataOutputStream.writeUTF(get2PData());
+                dg.client.dataOutputStream.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         // Remove Projectiles that have collided with objects.
         projectileList.removeIf( (Projectile projectile) -> projectile.needsRemove());
         // Remove grabbed powerups
@@ -448,13 +460,6 @@ public class Level1 extends BasicGameState {
           }
           return enemy.isDead();
         });
-
-        try {
-        dg.client.dataOutputStream.writeUTF(get2PData());
-        dg.client.dataOutputStream.flush();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
     }
 
   public void setPlayerType(int id) {
@@ -477,7 +482,7 @@ public class Level1 extends BasicGameState {
     data = data.concat(player.getPlayerData());
     // p2 data
     data = data.concat("P2;");
-    //data = data.concat(player2.getPlayerData());
+    data = data.concat(player2.getPlayerData());
     // Step 2: build all enemy data
     data = data.concat("ENEMYLISTSTART;");
     for(Enemy e : enemyList)
@@ -497,8 +502,8 @@ public class Level1 extends BasicGameState {
     // Step 5: Send HUD information
     data = data.concat("HUDSTART;");
     // Send both players healths and max healths across
-    //data = data.concat(player.getCurrentHealth() + ";" + player.getMaxHealth() + ";" + player2.getCurrentHealth() + ";"
-    //+ player2.getMaxHealth() + ";");
+    data = data.concat(player.getCurrentHealth() + ";" + player.getMaxHealth() + ";" + player2.getCurrentHealth() + ";"
+    + player2.getMaxHealth() + ";");
     data = data.concat("HUDEND");
 
     // Step 6: Send special instructions
@@ -522,12 +527,22 @@ public class Level1 extends BasicGameState {
         return angleVector.getRotation();
     }
 
-    public double getPlayer2MouseAngle(Input input) {
-      float mousex = input.getMouseX();
-      float mousey = input.getMouseY();
-      float playerx = player2.getX();
-      float playery = player2.getY();
-      Vector angleVector = new Vector(mousex - playerx, mousey - playery);
-      return angleVector.getRotation();
+    /***
+     * Static method to be called when setting enemies for levels. BUILD HERE WHEN SETTING ENEMIES SO THAT PLAYER 2
+     * CAN ACCESS THIS METHOD AND BUILD AN IDENTICAL ENEMY LIST.
+     * @param level
+     *  Id of the level from which we build the list of enemies.
+     * @return
+     *  An ArrayList of enemies to be used in either P1 state or in P2's dummy state. Each one should be using an
+     *  identical list.
+     */
+    public static ArrayList<Enemy> buildEnemyList(int level) {
+        ArrayList<Enemy> enemyList = new ArrayList<Enemy>();
+        if(level == 1) {
+            enemyList.add(new Enemy(10, 10, 2));
+            enemyList.add(new Enemy(18, 18, 1));
+            enemyList.add(new Enemy(26, 26, 1));
+        }
+        return enemyList;
     }
 }

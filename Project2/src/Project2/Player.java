@@ -48,7 +48,6 @@ public class Player extends Entity {
    */
   public Player(final float x, final float y, int id) {
     super(x,y);
-
     weapon = new Weapon(x,y,id);
     damage = 10;
     maxhealth = 10;
@@ -56,6 +55,7 @@ public class Player extends Entity {
     velocity = new Vector(0,0);
     playerType = id;
     speed = 0.25f;
+    worldPos = new Coordinate(x,y);
 
 
     // Ranged player assignments
@@ -450,5 +450,33 @@ public class Player extends Entity {
     data = data.concat(animID + ";");
 
     return data;
+  }
+
+  /***
+   * Special function for setting the animation of the player character when reading render data for p2. Only use in
+   * this situation
+   *
+   * @param id
+   *  ID of the animation to play. Use the static ids from Player:
+   *    Player.MOVE_LEFT, Player.MOVE_RIGHT, etc.
+   */
+  public void setAnimation(int id) {
+    removeAnimation(current);
+    if(id == Player.MOVELEFT) {
+      addAnimation(moveLeft);
+      current = moveLeft;
+    }
+    else if(id == Player.MOVERIGHT) {
+      addAnimation(moveRight);
+      current = moveRight;
+    }
+    else if(id == Player.IDLELEFT) {
+      addAnimation(idleLeft);
+      current = idleLeft;
+    }
+    else if(id == Player.IDLERIGHT) {
+      addAnimation(idleRight);
+      current = idleRight;
+    }
   }
 }

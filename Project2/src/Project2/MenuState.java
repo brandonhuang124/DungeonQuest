@@ -170,7 +170,6 @@ public class MenuState extends BasicGameState {
           phase = 5;
           // If were joining a game, we need to open a connection and tell the server were P2
           try {
-            phase = 3;
             DungeonGame.client = new Client(serverAddress, 4999);
             System.out.println("Client created: " + DungeonGame.client);
           } catch (Exception e) {

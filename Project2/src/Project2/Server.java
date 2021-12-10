@@ -57,13 +57,19 @@ public class Server {
         private DataOutputStream dataOutputStream;
         private BufferedReader bufferedReader;
         private int playerID;
+        private boolean gameStart;
 
         public ClientHandler(Socket socket, int id) {
+            gameStart = false;
             this.socket = socket;
             playerID = id;
             try {
                 dataInputStream = new DataInputStream(socket.getInputStream());
                 dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                if(id == 2) {
+                  gameStart = true;
+                  player1.gameStart = true;
+                }
             } catch (IOException e) {
                 System.out.println("IOException from ClientHandler constructor");
                 e.printStackTrace();
@@ -79,11 +85,12 @@ public class Server {
                     string = dataInputStream.readUTF();
                     System.out.println("Reading from Client: " + string);
                     token = string.split(";");
-                    if(playerID == 1) {
+                    if(playerID == 1 && gameStart) {
                       // Were the thread handling player 1
-
+                      player2.dataOutputStream.writeUTF(string);
+                      player2.dataOutputStream.flush();
                     }
-                    else if(playerID == 2) {
+                    else if(playerID == 2 && gameStart) {
                       // Were the thread handling player 2
                       player1.dataOutputStream.writeUTF(string);
                       player1.dataOutputStream.flush();
