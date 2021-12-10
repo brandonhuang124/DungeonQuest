@@ -274,22 +274,26 @@ public class Level1 extends BasicGameState {
             player2.moveDownRight();
           }
           // W for moving up
-          else if(p2dataToken[1].equals("W") && player2.isMoveValid(Direction.UP, player2.getVelocity().scale(delta),
+          else if((p2dataToken[1].equals("W") || p2dataToken[1].equals("WA") || p2dataToken[1].equals("WD")) &&
+              player2.isMoveValid(Direction.UP, player2.getVelocity().scale(delta),
               levelMap)) {
             player2.moveUp();
           }
           // A for moving left
-          else if(p2dataToken[1].equals("A") && player2.isMoveValid(Direction.LEFT, player2.getVelocity().scale(delta),
+          else if((p2dataToken[1].equals("A") || p2dataToken[1].equals("WA") || p2dataToken[1].equals("SA")) &&
+              player2.isMoveValid(Direction.LEFT, player2.getVelocity().scale(delta),
               levelMap)) {
             player2.moveLeft();
           }
           // S for moving down
-          else if(p2dataToken[1].equals("S") && player2.isMoveValid(Direction.DOWN, player2.getVelocity().scale(delta),
+          else if((p2dataToken[1].equals("S") || p2dataToken[1].equals("SD") || p2dataToken[1].equals("SA")) &&
+              player2.isMoveValid(Direction.DOWN, player2.getVelocity().scale(delta),
               levelMap)) {
             player2.moveDown();
           }
           // D for moving right
-          else if(p2dataToken[1].equals("D") && player2.isMoveValid(Direction.RIGHT, player2.getVelocity().scale(delta),
+          else if((p2dataToken[1].equals("D") || p2dataToken[1].equals("WD") || p2dataToken[1].equals("SD")) &&
+              player2.isMoveValid(Direction.RIGHT, player2.getVelocity().scale(delta),
               levelMap)) {
             player2.moveRight();
           }
