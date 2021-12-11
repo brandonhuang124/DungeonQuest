@@ -1,72 +1,57 @@
 package Project2;
 
+import org.lwjgl.Sys;
+
 import java.io.*;
+import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
-public class Client extends Thread{
+public class Client {
     private Socket socket;
-    private DataInputStream dataInputStream;
-    private DataOutputStream dataOutputStream;
-    public Scanner scanner = new Scanner(System.in);
-    String userInput;
+    public DataInputStream dataInputStream;
+    public DataOutputStream dataOutputStream;
+    public PrintWriter printWriter;
+//    private ClientThread clientThread;
+    public int playerID;
 
-    public Client(String address, int port) throws IOException {
+    public String inputString;
+
+    public Client(String address, int port) {
+        System.out.println("---Client---");
         try {
             socket = new Socket(address, port);
-            if (socket == null) {
-                System.out.println("Failed to connect to " + address + ":" + port);
-            } else {
-                System.out.println("Connection to " + address + " established");
-            }
-
             dataInputStream = new DataInputStream(socket.getInputStream());
-            dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            dataOutputStream = new DataOutputStream((socket.getOutputStream()));
+            printWriter = new PrintWriter(socket.getOutputStream(), true);
+            playerID = dataInputStream.readInt();
+            System.out.println("Connected to server as Player #" + playerID);
 
-            ClientThread clientThread = new ClientThread(socket);
-            clientThread.start();
-
-//            do {
-//                if(userInput.equals("exit")) {
-//                    break;
-//                }
-//            } while(!userInput.equals("exit"));
-
-        } catch (IOException e) {
-            dataInputStream.close();
-            dataOutputStream.close();
-            socket.close();
+//            clientThread = new ClientThread(socket, dataInputStream, dataOutputStream);
+//            clientThread.start();
+        } catch (Exception e) {
+            System.out.println("Exception in Client constructor");
             e.printStackTrace();
         }
     }
 
-    private static class ClientThread extends Thread implements Runnable {
-        private final BufferedReader input;
-
-        public ClientThread(Socket socket) throws IOException {
-            this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        }
-
-        @Override
-        public void run() {
-//            try {
-//                while(true) {
-//                    String response = input.readLine();
-//                    System.out.println(response);
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
+//    private class ClientThread extends Thread {
+//        private Socket socket;
+//        private DataInputStream dataInputStream;
+//        private DataOutputStream dataOutputStream;
 //
-//            try {
-//                input.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-        }
-    }
-
-    public static void main(String[] args) throws IOException {
-        Client client = new Client("localhost", 4999);
-    }
+//        public ClientThread(Socket socket, DataInputStream in, DataOutputStream out) {
+//            this.socket = socket;
+//            this.dataInputStream = in;
+//            this.dataOutputStream = out;
+//        }
+//
+//        @Override
+//        public void run() {
+//
+//        }
+//    }
 }

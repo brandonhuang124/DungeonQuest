@@ -44,7 +44,6 @@ public class StartState extends BasicGameState {
     Input input = container.getInput();
     DungeonGame rg = (DungeonGame)game;
 
-    rg.enterState(DungeonGame.TESTSTATE);
-
+    rg.enterState(DungeonGame.MENUSTATE);
   }
 }
