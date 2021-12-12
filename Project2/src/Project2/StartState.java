@@ -1,5 +1,5 @@
 package Project2;
-
+//TODO removing this state for menu?
 import org.newdawn.slick.*;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
@@ -44,7 +44,6 @@ public class StartState extends BasicGameState {
     Input input = container.getInput();
     DungeonGame rg = (DungeonGame)game;
 
-    rg.enterState(DungeonGame.TESTSTATE);
-
+    rg.enterState(DungeonGame.MENUSTATE);
   }
 }
