@@ -14,7 +14,7 @@ public class MapUtil {
     private final String TAG = "MapUtil -";
     Boolean debug = true;
     //Path to the level 60x60 array:
-    private final String level1Data = "C:\\Users\\bobth\\Desktop\\Online Class\\Fall2021\\CS 447 Game Design\\Final Project\\Project2\\src\\Project2\\Data\\LevelOneMap_2.csv";
+    private final String level1Data = "Project2/src/Project2/Data/LevelOneMap_2.csv";
     public static final int TILESIZE = 32;
     public static final int SCREENWIDTH = 20;
     public static final int SCREENHEIGHT = 20;
