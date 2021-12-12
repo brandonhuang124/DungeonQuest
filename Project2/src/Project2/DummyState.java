@@ -178,7 +178,7 @@ public class DummyState extends BasicGameState {
     /*** CONTROLS SECTION ***/
     data = "";
     // Left click for attacking: Send 1 for yes we attacked, and 0 for no we didn't
-    if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON))
+    if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON))
       data = data.concat("1;");
     else
       data = data.concat("0;");
