@@ -24,10 +24,10 @@ public class MapUtil {
     public static LevelName levelName;
 
     //assigning id's for tiles with a name to avoid confusion:
-    private final int floorTile = 0;
-    private final int wallTile = 1;
-    private final int wallTileWithTorch = 2;
-    private final int exitDoorGoal = 6;
+    private static final int floorTile = 0;
+    private static final int wallTile = 1;
+    private static final int wallTileWithTorch = 2;
+    private static final int exitDoorGoal = 6;
 
 
 
@@ -98,6 +98,10 @@ public class MapUtil {
         int tileValue = currentTileMap[tileIndex.x][tileIndex.y].getID();
         // return to true if the tile is not blank and not the door tile:
         return (tileValue > 0 && tileValue != 6);
+    }
+    public static Boolean hasCollision(int tileValue){
+        // return to true if the tile is not blank and not the door tile:
+        return (tileValue == wallTile || tileValue == wallTileWithTorch);
     }
     // allowing for a vector from world to tile:
     public static TileIndex convertWorldToTile(Vector worldPos){

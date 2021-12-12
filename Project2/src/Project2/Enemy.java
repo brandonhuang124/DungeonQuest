@@ -38,6 +38,12 @@ public class Enemy extends Entity{
   private Animation moveLeft, moveRight, idleLeft, idleRight, current;
   public Coordinate worldPos;
 
+  //assigning id's for tiles with a name to avoid confusion:
+  private final int floorTile = 0;
+  private final int wallTile = 1;
+  private final int wallTileWithTorch = 2;
+  private final int exitDoorGoal = 6;
+
   /***
    * Constructor, prepares default stats and Images/anmiations
    * @param x
@@ -446,19 +452,19 @@ public class Enemy extends Entity{
     // Check if any adjacent tiles are walls, and if were inside any of them. If so do an offset update.
     TileIndex location = getTileIndex();
     // Tile above
-    if (tilemap[location.x][location.y - 1].getID() == 1 && getTileOffset().getY() >= 0) {
+    if (MapUtil.hasCollision(tilemap[location.x][location.y - 1].getID()) && getTileOffset().getY() >= 0) {
       worldPos.y += getTileOffset().getY();
     }
     // Tile Below
-    if (tilemap[location.x][location.y + 1].getID() == 1 && getTileOffset().getY() <= 0) {
+    if (MapUtil.hasCollision(tilemap[location.x][location.y + 1].getID())  && getTileOffset().getY() <= 0) {
       worldPos.y += getTileOffset().getY();
     }
     // Tile Left
-    if (tilemap[location.x - 1][location.y].getID() == 1 && getTileOffset().getX() >= 0) {
+    if (MapUtil.hasCollision(tilemap[location.x - 1][location.y].getID()) && getTileOffset().getX() >= 0) {
       worldPos.x += getTileOffset().getX();
     }
     // Tile Right
-    if (tilemap[location.x + 1][location.y].getID() == 1 && getTileOffset().getX() <= 0) {
+    if (MapUtil.hasCollision( tilemap[location.x + 1][location.y].getID()) && getTileOffset().getX() <= 0) {
       worldPos.x += getTileOffset().getX();
     }
   }
@@ -488,7 +494,7 @@ public class Enemy extends Entity{
       while(enemyx > playerx) {
         TileIndex currentLocation = MapUtil.convertWorldToTile(new Coordinate(enemyx,enemyy));
         // Check if were in a wall
-        if(tilemap[currentLocation.x][currentLocation.y].getID() == 1) {
+        if(MapUtil.hasCollision(tilemap[currentLocation.x][currentLocation.y].getID())) {
           return false;
         }
         // If no collisions, traverse further down the line.
@@ -501,7 +507,7 @@ public class Enemy extends Entity{
       while(enemyx < playerx) {
         TileIndex currentLocation = MapUtil.convertWorldToTile(new Coordinate(enemyx,enemyy));
         // Check if were in a wall
-        if(tilemap[currentLocation.x][currentLocation.y].getID() == 1) {
+        if(MapUtil.hasCollision(tilemap[currentLocation.x][currentLocation.y].getID())) {
           return false;
         }
         // If no collisions, traverse further down the line.
@@ -584,8 +590,8 @@ public class Enemy extends Entity{
     }
     if(MapUtil.levelName == LevelName.TWO) {
       enemyList.add(new Enemy(10, 10, 2));
-      enemyList.add(new Enemy(18, 18, 1));
-      enemyList.add(new Enemy(26, 26, 1));
+      enemyList.add(new Enemy(18, 20, 1));
+      enemyList.add(new Enemy(26, 40, 1));
     }
     if(MapUtil.levelName == LevelName.THREE) {
       enemyList.add(new Enemy(10, 10, 2));
