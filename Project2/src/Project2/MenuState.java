@@ -11,6 +11,7 @@ import org.newdawn.slick.state.StateBasedGame;
 import javax.naming.spi.ResolveResult;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.function.DoubleUnaryOperator;
 
 public class MenuState extends BasicGameState {
 
@@ -259,8 +260,6 @@ public class MenuState extends BasicGameState {
 
     // Game searching phase
     else if(phase == 3) {
-      if(input.isKeyPressed(Input.KEY_SPACE))
-        playerFound = true;
       // If we've found a player
       if(playerFound) {
         // We can press the start button here
@@ -302,6 +301,9 @@ public class MenuState extends BasicGameState {
           string = DungeonGame.client.dataInputStream.readUTF();
           System.out.println("Read from Sever" + string);
           token = string.split(";");
+          // Also send the server an acknowledgement
+          DungeonGame.client.dataOutputStream.writeUTF("A;");
+          DungeonGame.client.dataOutputStream.flush();
         } catch(IOException e) { e.printStackTrace();}
 
         // Check mouse positions and click status.
@@ -340,7 +342,6 @@ public class MenuState extends BasicGameState {
 
     // Join game Phase
     else if(phase == 5) {
-      // Do stuff here
       String string = null;
       String[] token = null;
       // Read from the server to find the status of the game search
@@ -348,6 +349,9 @@ public class MenuState extends BasicGameState {
         string = DungeonGame.client.dataInputStream.readUTF();
         System.out.println("Read from Sever" + string);
         token = string.split(";");
+        // Tell the server we got it
+        DungeonGame.client.dataOutputStream.writeUTF("A;");
+        DungeonGame.client.dataOutputStream.flush();
       } catch(IOException e) { e.printStackTrace();}
 
       // Use mouse position to find what were hovered over.
