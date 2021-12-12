@@ -40,7 +40,7 @@ public class DummyState extends BasicGameState {
     // parse the CSV map file, throw exception in case of IO error:
     firstData = true;
     try {
-      levelMap.loadLevelMap(1);
+      levelMap.loadLevelMap();
     } catch (IOException e) {
       e.printStackTrace();
     }

@@ -15,6 +15,7 @@ public class MapUtil {
     Boolean debug = true;
     //Path to the level 60x60 array:
     private final String level1Data = "Project2/src/Project2/Data/LevelOneMap_2.csv";
+    private final String level2Data = "Project2/src/Project2/Data/LevelTwoMap.csv";
     public static final int TILESIZE = 32;
     public static final int SCREENWIDTH = 20;
     public static final int SCREENHEIGHT = 20;
@@ -22,8 +23,6 @@ public class MapUtil {
     public static final int LEVELHEIGHT = 60;
     private LevelName levelName;
 
-    String level2Data = "";
-    String level3Data = "";
 
 
     Tile[][] currentTileMap;
@@ -33,7 +32,7 @@ public class MapUtil {
 
 
     String currentMapString;
-    // returns the levelname of type LevelName, can be LevelName.ONE, LevelName.START, etc.
+    // returns the level name of type LevelName, can be LevelName.ONE, LevelName.START, etc.
     public LevelName getCurrentLevel(){
         return levelName;
     }
@@ -42,15 +41,15 @@ public class MapUtil {
         this.levelName = name;
     }
     // could be refactored to take a levelName in dungeon game
-    public void loadLevelMap(int level) throws IOException {
-        switch (level) {
-            case 1:
+    public void loadLevelMap() throws IOException {
+        switch (levelName) {
+            case ONE:
                 currentMapString = readLevelCSV(level1Data);
                 break;
-            case 2:
-                //TODO level2 map
+            case TWO:
+                currentMapString = readLevelCSV(level2Data);
                 break;
-            case 3:
+            case THREE:
                 //TODO level3 map
                 break;
             default:
@@ -122,6 +121,35 @@ public class MapUtil {
         }
     }
 
+    private void renderCollisionTileObjects( Tile renderTile, float renderX, float renderY, Graphics g ){
+        switch(levelName){
+            case ONE -> { // render based on LEVEL ONE assets:
+                if (renderTile.getID() == 1) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP_WALL_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+                }
+
+            }
+            case TWO -> { // render based on LEVEL TWO assets:
+
+            }
+        }
+    }
+    private void renderBlankTileObjects( Tile renderTile,  float renderX, float renderY, Graphics g){
+        switch(levelName){
+            case ONE -> { // render based on LEVEL ONE assets:
+                if (renderTile.getID() == 0) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP_FLOOR_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+
+                }
+            }
+            case TWO -> { // render based on LEVEL TWO assets:
+
+            }
+        }
+    }
+
 
     public void renderMapByCamera(Graphics g) {
         TileIndex currentTile = convertWorldToTile(cameraPos);
@@ -133,23 +161,15 @@ public class MapUtil {
             int currentY = currentTile.y;
             for (float renderY = (-cameraOffset.y); renderY < maxHeight; renderY += TILESIZE, currentY++) {
                 Tile renderTile = currentTileMap[currentTile.x][currentY];
-                // Floor tile
-                if (renderTile.getID() == 0) {
-                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP_FLOOR_RSC).getScaledCopy(DungeonGame.SCALE),
-                            renderX, renderY);
-                }
-                // Wall tile
-                else if (renderTile.getID() == 1) {
-                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP_WALL_RSC).getScaledCopy(DungeonGame.SCALE),
-                            renderX, renderY);
-                }
+                renderBlankTileObjects(renderTile, renderX, renderY, g);
+                renderCollisionTileObjects(renderTile, renderX, renderY, g);
             }
         }
     }
 
 
     private String readLevelCSV(String MapData) throws IOException {
-        File file = new File(level1Data);
+        File file = new File(MapData);
         BufferedReader br = new BufferedReader(new FileReader(file));
         String map = "";
         String st;

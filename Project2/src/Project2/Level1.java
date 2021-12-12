@@ -39,8 +39,10 @@ public class Level1 extends BasicGameState {
 
     @Override
     public void init(GameContainer container, StateBasedGame game) throws SlickException {
-        player1type = player2type = 0;
         levelMap = new MapUtil();
+        levelMap.setLevelName(LevelName.ONE);
+        player1type = player2type = 0;
+
     }
 
     @Override
@@ -51,7 +53,7 @@ public class Level1 extends BasicGameState {
         player1Dead = player2Dead = gameover = false;
         // parse the CSV map file, throw exception in case of IO error:
         try {
-            levelMap.loadLevelMap(1);
+            levelMap.loadLevelMap();
         } catch (IOException e) {
             e.printStackTrace();
         }
