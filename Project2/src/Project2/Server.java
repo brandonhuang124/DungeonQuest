@@ -10,9 +10,11 @@ public class Server {
     private int numPlayers, threadPlayer;
     private ClientHandler player1;
     private ClientHandler player2;
+    boolean hasPlayer1, hasPlayer2;
 
     public Server() {
         System.out.println("---Server---");
+        hasPlayer1 = hasPlayer2 = false;
         numPlayers = threadPlayer = 0;
         try {
             serverSocket = new ServerSocket(4999);
@@ -25,22 +27,22 @@ public class Server {
     public void acceptConnections() {
         try {
             System.out.println("Waiting for connections...");
-            while(numPlayers < 2) {
+            while(!hasPlayer1 || !hasPlayer2) {
                 Socket socket = serverSocket.accept();
-                numPlayers++;
-                System.out.println("Player #" + numPlayers + " has connected");
-                ClientHandler clientHandler = new ClientHandler(socket, numPlayers);
-
-                if(numPlayers == 1) {
-                    player1 = clientHandler;
-                }
-                else if(numPlayers == 2) {
-                    player2 = clientHandler;
-                }
-
-                System.out.println("Starting ClientHandler Thread for Player #" + numPlayers);
+                System.out.println("Player #" + 1 + " has connected");
+                ClientHandler clientHandler = new ClientHandler(socket, 1);
+                player1 = clientHandler;
+                System.out.println("Starting ClientHandler Thread for Player #" + 1);
                 Thread thread = new Thread(clientHandler);
                 thread.start();
+
+                Socket socket2 = serverSocket.accept();
+                System.out.println("Player #" + 2 + " has connected");
+                ClientHandler clientHandler2 = new ClientHandler(socket2, 2);
+                player2 = clientHandler2;
+                System.out.println("Starting ClientHandler Thread for Player #" + 2);
+                Thread thread2 = new Thread(clientHandler2);
+                thread2.start();
             }
             System.out.println("Max player connections reached");
         } catch (Exception e) {
@@ -55,14 +57,14 @@ public class Server {
         private String[] token;
         private DataInputStream dataInputStream;
         private DataOutputStream dataOutputStream;
-        private BufferedReader bufferedReader;
-        private int playerID;
+        private int playerID, phase;
         private boolean gameStart;
 
         public ClientHandler(Socket socket, int id) {
             gameStart = false;
             this.socket = socket;
             playerID = id;
+            phase = 1;
             try {
                 dataInputStream = new DataInputStream(socket.getInputStream());
                 dataOutputStream = new DataOutputStream(socket.getOutputStream());
@@ -81,20 +83,112 @@ public class Server {
             try {
                 dataOutputStream.writeInt(playerID);
                 dataOutputStream.flush();
-                while(true) {
+                // Phase 1, we need to get the identity of the the player conected, and check if their slot it full
+                if(phase == 1) {
+                  System.out.println("Phase 1, Get Identity");
+                  string = dataInputStream.readUTF();
+                  System.out.println("Reading from Client: " + string);
+                  token = string.split(";");
+                  if(token[0].equals("Player1")) {
+                    // Were the "smart" client.
+                    // Check if we already have a player 1:
+                    if(hasPlayer1) {
+                      System.out.println("We already have a player1");
+                      dataOutputStream.writeUTF("Error;1");
+                      dataOutputStream.flush();
+                      dataOutputStream.close();
+                      dataInputStream.close();
+                      socket.close();
+                      return;
+                    }
+                    player1 = this;
+                    playerID = 1;
+                    hasPlayer1 = true;
+                    phase = 2;
+                  }
+                  else if(token[0].equals("Player2")) {
+                    // Were the "dumb Client"
+                    // Check if we already have a player 2:
+                    if(hasPlayer2) {
+                      System.out.println("We already have a player1");
+                      dataOutputStream.writeUTF("Error;1");
+                      dataOutputStream.flush();
+                      dataOutputStream.close();
+                      dataInputStream.close();
+                      socket.close();
+                      return;
+                    }
+                    player2 = this;
+                    playerID = 2;
+                    hasPlayer2 = true;
+                    phase = 2;
+                  }
+                }
+                // Phase 2: We're good to go and connected, but we need to wait for the second player
+                if(phase == 2) {
+                  System.out.println("Phase 2: Wait for other player");
+                  // Keep sending wait messages until both players are connected
+                  while(!hasPlayer1 || !hasPlayer2) {
+                    dataOutputStream.writeUTF("WAIT;Waiting for other player...;");
+                    dataOutputStream.flush();
+                  }
+                  // We break out once both players are connected and we move to Phase 3,
+                  phase = 3;
+                }
+                // Phase 3: Both players are connected, and we need to wait for the signal from player 1.
+                if(phase == 3) {
+                  System.out.println("Phase 3: Wait for signal from P1");
+                  // If were player 1 we need to quickly tell the client we found another player and we're waiting for the signal
+                  if(playerID == 1) {
+                    dataOutputStream.writeUTF("FOUND;Player2Connected;");
+                    dataOutputStream.flush();
+                  }
+                  while(!gameStart) {
+                    // If were handling player 1, We need to read for the signal
+                    if(playerID == 1) {
+                      string = dataInputStream.readUTF();
+                      System.out.println("Reading from Client: " + string);
+                      token = string.split(";");
+                      if(token[0].equals("START")); {
+                        gameStart = true;
+                        player2.gameStart = true;
+                        dataOutputStream.writeUTF("START;Acknowledged gameStart;");
+                        dataOutputStream.flush();
+                        phase = 4;
+                      }
+                    }
+                    // If were handling player 2, We need to wait for the signal.
+                    else if(playerID == 2) {
+                      dataOutputStream.writeUTF("WAIT;Waiting for P1 to start;");
+                      dataOutputStream.flush();
+                    }
+                  }
+                  // Once we break the loop when p1 gives the signal, p2 needs to tell the client we're starting
+                  if(playerID == 2) {
+                    dataOutputStream.writeUTF("START;Player1 Started Game;");
+                    dataOutputStream.flush();
+                    phase = 4;
+                  }
+
+                }
+
+                // Phase 4, The game has started and were just exchanging data regularly now.
+                if(phase == 4) {
+                  while(true) {
                     string = dataInputStream.readUTF();
                     System.out.println("Reading from Client: " + string);
                     token = string.split(";");
-                    if(playerID == 1 && gameStart) {
+                    if(playerID == 1) {
                       // Were the thread handling player 1
                       player2.dataOutputStream.writeUTF(string);
                       player2.dataOutputStream.flush();
                     }
-                    else if(playerID == 2 && gameStart) {
+                    else if(playerID == 2) {
                       // Were the thread handling player 2
                       player1.dataOutputStream.writeUTF(string);
                       player1.dataOutputStream.flush();
                     }
+                  }
                 }
             } catch (IOException e) {
                 System.out.println("IOException from run() in ClientHandler");

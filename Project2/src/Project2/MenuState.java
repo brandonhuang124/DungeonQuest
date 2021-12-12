@@ -176,7 +176,7 @@ public class MenuState extends BasicGameState {
             e.printStackTrace();
           }
           try {
-            DungeonGame.client.dataOutputStream.writeUTF("P2CLIENT;");
+            DungeonGame.client.dataOutputStream.writeUTF("Player2;");
             DungeonGame.client.dataOutputStream.flush();
           } catch (IOException e) {
             e.printStackTrace();
@@ -216,7 +216,7 @@ public class MenuState extends BasicGameState {
               e.printStackTrace();
             }
             try {
-              DungeonGame.client.dataOutputStream.writeUTF("P1CLIENT;");
+              DungeonGame.client.dataOutputStream.writeUTF("Player1;");
               DungeonGame.client.dataOutputStream.flush();
             } catch (IOException e) {
               e.printStackTrace();
@@ -241,7 +241,7 @@ public class MenuState extends BasicGameState {
               e.printStackTrace();
             }
             try {
-              DungeonGame.client.dataOutputStream.writeUTF("P1CLIENT;");
+              DungeonGame.client.dataOutputStream.writeUTF("Player1;");
               DungeonGame.client.dataOutputStream.flush();
             } catch (IOException e) {
               e.printStackTrace();
@@ -261,6 +261,7 @@ public class MenuState extends BasicGameState {
     else if(phase == 3) {
       if(input.isKeyPressed(Input.KEY_SPACE))
         playerFound = true;
+      // If we've found a player
       if(playerFound) {
         // We can press the start button here
         if(222 < mousex && mousex < 418 && 440 < mousey && mousey < 508)
@@ -271,13 +272,39 @@ public class MenuState extends BasicGameState {
         if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
           if(select == 1) {
             System.out.println("Start the game now");
+            // Now we gotta tell the server we're gonna start the game.
+            try {
+              DungeonGame.client.dataOutputStream.writeUTF("START;");
+              DungeonGame.client.dataOutputStream.flush();
+            } catch(IOException e) { e.printStackTrace();}
+
+            // Read the acknowledgement for timing reasons
+            String string = null;
+            String[] token = null;
+            try {
+              string = DungeonGame.client.dataInputStream.readUTF();
+              System.out.println("Read from Sever" + string);
+              token = string.split(";");
+            } catch(IOException e) { e.printStackTrace();}
+
+            // Now we can actually start
             ((Level1)game.getState(DungeonGame.LEVEL1)).set2Player(true);
             game.enterState(DungeonGame.LEVEL1);
           }
         }
       }
+      // If were waiting for the player,
       else {
-        // Backing out is still an option.
+        String string = null;
+        String[] token = null;
+        // First read from the server to find if we've found another.
+        try {
+          string = DungeonGame.client.dataInputStream.readUTF();
+          System.out.println("Read from Sever" + string);
+          token = string.split(";");
+        } catch(IOException e) { e.printStackTrace();}
+
+        // Check mouse positions and click status.
         if(25 < mousex && mousex < 221 && 645 < mousey && mousey < 713)
           select = 1;
         else
@@ -287,6 +314,11 @@ public class MenuState extends BasicGameState {
           if(select == 1) {
             phase = 1;
           }
+        }
+
+        // Check if the server told us we found another lpayer
+        if(token[0].equals("FOUND")) {
+          playerFound = true;
         }
       }
     }
@@ -309,16 +341,29 @@ public class MenuState extends BasicGameState {
     // Join game Phase
     else if(phase == 5) {
       // Do stuff here
-      game.enterState(DungeonGame.DUMMYSTATE);
+      String string = null;
+      String[] token = null;
+      // Read from the server to find the status of the game search
+      try {
+        string = DungeonGame.client.dataInputStream.readUTF();
+        System.out.println("Read from Sever" + string);
+        token = string.split(";");
+      } catch(IOException e) { e.printStackTrace();}
+
+      // Use mouse position to find what were hovered over.
       if(25 < mousex && mousex < 221 && 645 < mousey && mousey < 713)
         select = 1;
       else
         select = 0;
-
+      // Check if we clicked
       if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
         if(select == 1) {
           phase = 1;
         }
+      }
+      // Check if the server told us were starting.
+      if(token != null && token[0].equals("START")) {
+        game.enterState(DungeonGame.DUMMYSTATE);
       }
     }
   }
