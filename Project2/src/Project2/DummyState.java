@@ -29,18 +29,19 @@ public class DummyState extends BasicGameState {
   @Override
   public void init(GameContainer container, StateBasedGame game) throws SlickException {
     levelMap = new MapUtil();
+    MapUtil.setLevelName(LevelName.NONEORTEST);
   }
 
   @Override
   public void enter(GameContainer container, StateBasedGame game) {
     p1Health = p1MaxHealth = p2Health = p2MaxHealth = 0;
     meleePlayer = rangedPlayer = null;
-    enemyList = Level1.buildEnemyList(1);
+    enemyList = Enemy.buildEnemyList();
     dummyList = new ArrayList<DummyObject>();
     // parse the CSV map file, throw exception in case of IO error:
     firstData = true;
     try {
-      levelMap.loadLevelMap(1);
+      levelMap.loadLevelMap();
     } catch (IOException e) {
       e.printStackTrace();
     }

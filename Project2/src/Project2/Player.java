@@ -217,7 +217,7 @@ public class Player extends Entity {
     // Down
     if(direction == Direction.DOWN_LEFT || direction == Direction.DOWN || direction == Direction.DOWN_RIGHT) {
       // Check if the tile left is a wall
-      if(tilemap[location.x][location.y+1].getID() == 1) {
+      if(MapUtil.hasCollision(tilemap[location.x][location.y+1].getID())) {
         // If it is, we need to check were not too far into the tile where we will go into the wall.
         Vector offset = getTileOffset();
         adjacencyCheck = true;
@@ -228,7 +228,7 @@ public class Player extends Entity {
     // Left
     // ** Process for checking is similar to above, but directions and tiles checked are changed.
     if (direction == Direction.LEFT || direction == Direction.DOWN_LEFT || direction == Direction.UP_RIGHT) {
-      if(tilemap[location.x-1][location.y].getID() == 1) {
+      if(MapUtil.hasCollision(tilemap[location.x-1][location.y].getID())) {
         Vector offset = getTileOffset();
         adjacencyCheck = true;
         if(offset.getX() >= 0)
@@ -237,7 +237,7 @@ public class Player extends Entity {
     }
     // Right
     if (direction == Direction.RIGHT || direction == Direction.UP_RIGHT || direction == Direction.DOWN_LEFT) {
-      if(tilemap[location.x+1][location.y].getID() == 1) {
+      if(MapUtil.hasCollision(tilemap[location.x+1][location.y].getID())) {
         Vector offset = getTileOffset();
         adjacencyCheck = true;
         if(offset.getX() <= 0)
@@ -246,7 +246,7 @@ public class Player extends Entity {
     }
     // Up
     if (direction == Direction.UP || direction == Direction.UP_LEFT || direction == Direction.UP_RIGHT) {
-      if(tilemap[location.x][location.y-1].getID() == 1) {
+      if(MapUtil.hasCollision(tilemap[location.x][location.y-1].getID())) {
         Vector offset = getTileOffset();
         adjacencyCheck = true;
         if(offset.getY() >= 0)
@@ -260,7 +260,7 @@ public class Player extends Entity {
     if(!adjacencyCheck) {
       // Up Right
       if (direction == Direction.UP_RIGHT) {
-        if (tilemap[location.x + 1][location.y - 1].getID() == 1) {
+        if (MapUtil.hasCollision(tilemap[location.x + 1][location.y - 1].getID())) {
           Vector offset = getTileOffset();
           if (offset.getY() >= 0 || offset.getX() <= 0)
             return false;
@@ -268,7 +268,7 @@ public class Player extends Entity {
       }
       // Up Left
       else if (direction == Direction.UP_LEFT) {
-        if (tilemap[location.x - 1][location.y - 1].getID() == 1) {
+        if (MapUtil.hasCollision(tilemap[location.x - 1][location.y - 1].getID())) {
           Vector offset = getTileOffset();
           if (offset.getY() >= 0 || offset.getX() >= 0)
             return false;
@@ -276,7 +276,7 @@ public class Player extends Entity {
       }
       // Down Right
       else if (direction == Direction.DOWN_RIGHT) {
-        if (tilemap[location.x + 1][location.y + 1].getID() == 1) {
+        if (MapUtil.hasCollision(tilemap[location.x + 1][location.y + 1].getID())) {
           Vector offset = getTileOffset();
           if (offset.getY() <= 0 || offset.getX() <= 0)
             return false;
@@ -284,7 +284,7 @@ public class Player extends Entity {
       }
       // Down Left
       else if (direction == Direction.DOWN_LEFT) {
-        if (tilemap[location.x - 1][location.y + 1].getID() == 1) {
+        if (MapUtil.hasCollision(tilemap[location.x - 1][location.y + 1].getID())) {
           Vector offset = getTileOffset();
           if (offset.getY() <= 0 || offset.getX() >= 0) {
             return false;
@@ -372,22 +372,22 @@ public class Player extends Entity {
     // Check if any adjacent tiles are walls, and if were inside any of them. If so do an offset update.
     TileIndex location = getTileIndex();
     // Tile above
-    if (tilemap[location.x][location.y - 1].getID() == 1 && getTileOffset().getY() >= 0) {
+    if (MapUtil.hasCollision(tilemap[location.x][location.y - 1].getID()) && getTileOffset().getY() >= 0) {
       worldPos.y += getTileOffset().getY();
       prevMoveVelocity.y += getTileOffset().getY();
     }
     // Tile Below
-    if (tilemap[location.x][location.y + 1].getID() == 1 && getTileOffset().getY() <= 0) {
+    if (MapUtil.hasCollision(tilemap[location.x][location.y + 1].getID()) && getTileOffset().getY() <= 0) {
       worldPos.y += getTileOffset().getY();
       prevMoveVelocity.y += getTileOffset().getY();
     }
     // Tile Left
-    if (tilemap[location.x - 1][location.y].getID() == 1 && getTileOffset().getX() >= 0) {
+    if (MapUtil.hasCollision(tilemap[location.x - 1][location.y].getID()) && getTileOffset().getX() >= 0) {
       worldPos.x += getTileOffset().getX();
       prevMoveVelocity.x += getTileOffset().getX();
     }
     // Tile Right
-    if (tilemap[location.x + 1][location.y].getID() == 1 && getTileOffset().getX() <= 0) {
+    if (MapUtil.hasCollision(tilemap[location.x + 1][location.y].getID()) && getTileOffset().getX() <= 0) {
       worldPos.x += getTileOffset().getX();
       prevMoveVelocity.x += getTileOffset().getX();
     }

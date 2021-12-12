@@ -3,6 +3,8 @@ package Project2;
 import jig.Entity;
 import jig.ResourceManager;
 
+import java.util.ArrayList;
+
 public class Powerup extends Entity {
   TileIndex location;
   private boolean removeMe;
@@ -64,5 +66,22 @@ public class Powerup extends Entity {
     data = data.concat(worldPos.x + ";" + worldPos.y + ";");
 
     return data;
+  }
+  public static ArrayList<Powerup> buildPowerUpList() {
+    ArrayList<Powerup> powerUpList = new ArrayList<Powerup>();
+    if(MapUtil.levelName == LevelName.TWO) {
+      powerUpList.add(new Powerup(19, 4, 1));
+      powerUpList.add(new Powerup(49, 31, 1));
+      powerUpList.add(new Powerup(18, 40, 1));
+      powerUpList.add(new Powerup(12, 40, 1));
+      powerUpList.add(new Powerup(54, 42, 1));
+      powerUpList.add(new Powerup(6,  57, 1));
+    }
+    if(MapUtil.levelName == LevelName.THREE) {
+      powerUpList.add(new Powerup(10, 15, 1));
+      powerUpList.add(new Powerup(20, 20, 1));
+      powerUpList.add(new Powerup(40, 26, 1));
+    }
+    return powerUpList;
   }
 }

@@ -22,7 +22,7 @@ public class MenuState extends BasicGameState {
 
   @Override
   public int getID() {
-    return 3;
+    return DungeonGame.MENUSTATE;
   }
 
   @Override
@@ -32,6 +32,7 @@ public class MenuState extends BasicGameState {
 
   @Override
   public void enter(GameContainer container, StateBasedGame game) {
+    MapUtil.setLevelName(LevelName.MENU);
     container.setSoundOn(true);
     selected = playerFound = singleplayer = false;
     arrowBlink = true;
@@ -205,7 +206,7 @@ public class MenuState extends BasicGameState {
         }
         else if(select == 2) {
           System.out.println("Melee Selected");
-          ((Level1)game.getState(DungeonGame.LEVEL1)).setPlayerType(2);
+          ((Level2)game.getState(DungeonGame.LEVEL2)).setPlayerType(2);
           if(!singleplayer) {
             // If were in multiplayer, wee need to open a connection to the server and tell them were player1
             try {
@@ -225,13 +226,13 @@ public class MenuState extends BasicGameState {
 
           else {
             System.out.println("Start game now");
-            ((Level1)game.getState(DungeonGame.LEVEL1)).set2Player(false);
-            game.enterState(DungeonGame.LEVEL1);
+            ((Level2)game.getState(DungeonGame.LEVEL2)).set2Player(false);
+            game.enterState(DungeonGame.LEVEL2);
           }
         }
         else if(select == 3) {
           System.out.println("Ranged Selected");
-          ((Level1)game.getState(DungeonGame.LEVEL1)).setPlayerType(1);
+          ((Level2)game.getState(DungeonGame.LEVEL2)).setPlayerType(1);
           if(!singleplayer) {
             try {
               phase = 3;
@@ -249,8 +250,8 @@ public class MenuState extends BasicGameState {
           }
           else {
             System.out.println("Start Game Now");
-            ((Level1)game.getState(DungeonGame.LEVEL1)).set2Player(false);
-            game.enterState(DungeonGame.LEVEL1);
+            ((Level2)game.getState(DungeonGame.LEVEL2)).set2Player(false);
+            game.enterState(DungeonGame.LEVEL2);
           }
         }
       }
@@ -271,8 +272,8 @@ public class MenuState extends BasicGameState {
         if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
           if(select == 1) {
             System.out.println("Start the game now");
-            ((Level1)game.getState(DungeonGame.LEVEL1)).set2Player(true);
-            game.enterState(DungeonGame.LEVEL1);
+            ((Level2)game.getState(DungeonGame.LEVEL2)).set2Player(true);
+            game.enterState(DungeonGame.LEVEL2);
           }
         }
       }

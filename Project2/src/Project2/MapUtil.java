@@ -15,15 +15,20 @@ public class MapUtil {
     Boolean debug = true;
     //Path to the level 60x60 array:
     private final String level1Data = "Project2/src/Project2/Data/LevelOneMap_2.csv";
+    private final String level2Data = "Project2/src/Project2/Data/LevelTwoMap.csv";
     public static final int TILESIZE = 32;
     public static final int SCREENWIDTH = 20;
     public static final int SCREENHEIGHT = 20;
     public static final int LEVELWIDTH = 60;
     public static final int LEVELHEIGHT = 60;
+    public static LevelName levelName;
 
+    //assigning id's for tiles with a name to avoid confusion:
+    private static final int floorTile = 0;
+    private static final int wallTile = 1;
+    private static final int wallTileWithTorch = 2;
+    private static final int exitDoorGoal = 6;
 
-    String level2Data = "";
-    String level3Data = "";
 
 
     Tile[][] currentTileMap;
@@ -33,21 +38,34 @@ public class MapUtil {
 
 
     String currentMapString;
-
-
-    public void loadLevelMap(int level) throws IOException {
-        switch (level) {
-            case 1:
+    // returns the level name of type LevelName, can be LevelName.ONE, LevelName.START, etc.
+    public LevelName getCurrentLevel(){
+        return levelName;
+    }
+    // mostly used in changing states within dungeon game:
+    public static void setLevelName(LevelName name){
+        levelName = name;
+    }
+    // loads the map csv based off the level name:
+    public void loadLevelMap() throws IOException {
+        switch (levelName) {
+            case MENU:
+                System.out.println(TAG + " Menu state");
+                break;
+            case ONE:
                 currentMapString = readLevelCSV(level1Data);
                 break;
-            case 2:
-                //TODO level2 map
+            case TWO:
+                currentMapString = readLevelCSV(level2Data);
                 break;
-            case 3:
+            case THREE:
                 //TODO level3 map
                 break;
+            case GAMEOVER:
+                System.out.println(TAG + " GameOver state");
+                break;
             default:
-                System.out.print(TAG + "Level not found ");
+                System.out.print(TAG + "error: Level and state not found or listed ");
                 break;
         }
     }
@@ -75,29 +93,35 @@ public class MapUtil {
         return convertWorldToScreen(worldPos);
     }
 
+    // a very handy method for handling collision checks for a tile index:
     public Boolean hasCollision(TileIndex tileIndex){
         int tileValue = currentTileMap[tileIndex.x][tileIndex.y].getID();
-        return tileValue == 1;
+        // return to true if the tile is not blank and not the door tile:
+        return (tileValue > 0 && tileValue != 6);
     }
-
+    public static Boolean hasCollision(int tileValue){
+        // return to true if the tile is not blank and not the door tile:
+        return (tileValue == wallTile || tileValue == wallTileWithTorch);
+    }
+    // allowing for a vector from world to tile:
     public static TileIndex convertWorldToTile(Vector worldPos){
         return new TileIndex((int)Math.floor(worldPos.getX() / TILESIZE), (int)Math.floor(worldPos.getY() / TILESIZE));
     }
-
+    // converting from world to tile:
     public static TileIndex convertWorldToTile(Coordinate worldPos){
         return new TileIndex((int)Math.floor(worldPos.x / TILESIZE), (int)Math.floor(worldPos.y / TILESIZE));
     }
-
+    // convert screen to tile if needed:
     public TileIndex convertScreenToTile(Coordinate screenPos){
         Coordinate worldPos = convertScreenToWorld(screenPos);
         return convertWorldToTile(worldPos);
     }
-
+    // offset of the camera can be in between and partially on tiles:
     public Coordinate getCameraTileOffset() {
         Coordinate cameraTilePos = new Coordinate(cameraPos.x % TILESIZE, cameraPos.y % TILESIZE);
         return cameraTilePos;
     }
-
+    // scroll our camera based on independent player movement:
     public void updateCamera(Coordinate deltaMove) {
         cameraPos.x = deltaMove.x - (0.5f * SCREENWIDTH * TILESIZE);
         cameraPos.y = deltaMove.y - (0.5f * SCREENHEIGHT * TILESIZE);
@@ -113,6 +137,53 @@ public class MapUtil {
         }
     }
 
+    private void renderCollisionTileObjects( Tile renderTile, float renderX, float renderY, Graphics g ){
+        switch(levelName){
+            case ONE -> { // render based on LEVEL ONE assets:
+                if (renderTile.getID() == wallTile) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP_WALL_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+                }
+
+            }
+            case TWO -> { // render based on LEVEL TWO assets:
+                if (renderTile.getID() ==   wallTile) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP2_WALL_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+                }
+                if (renderTile.getID() == wallTileWithTorch) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP2_WALL_WITH_TORCH_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+                }
+                if (renderTile.getID() == exitDoorGoal) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP2_DOOR_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+                }
+
+            }
+        }
+    }
+    private void renderBlankTileObjects( Tile renderTile,  float renderX, float renderY, Graphics g){
+        switch(levelName){
+            case ONE -> { // render based on LEVEL ONE assets:
+                if (renderTile.getID() == floorTile) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP_FLOOR_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+
+                }
+            }
+            case TWO -> { // render based on LEVEL TWO assets:
+                if (renderTile.getID() == floorTile) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP2_FLOOR_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+
+                }
+
+            }
+        }
+    }
+
+
     public void renderMapByCamera(Graphics g) {
         TileIndex currentTile = convertWorldToTile(cameraPos);
         Coordinate cameraOffset = getCameraTileOffset();
@@ -123,23 +194,15 @@ public class MapUtil {
             int currentY = currentTile.y;
             for (float renderY = (-cameraOffset.y); renderY < maxHeight; renderY += TILESIZE, currentY++) {
                 Tile renderTile = currentTileMap[currentTile.x][currentY];
-                // Floor tile
-                if (renderTile.getID() == 0) {
-                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP_FLOOR_RSC).getScaledCopy(DungeonGame.SCALE),
-                            renderX, renderY);
-                }
-                // Wall tile
-                else if (renderTile.getID() == 1) {
-                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP_WALL_RSC).getScaledCopy(DungeonGame.SCALE),
-                            renderX, renderY);
-                }
+                renderBlankTileObjects(renderTile, renderX, renderY, g);
+                renderCollisionTileObjects(renderTile, renderX, renderY, g);
             }
         }
     }
 
 
     private String readLevelCSV(String MapData) throws IOException {
-        File file = new File(level1Data);
+        File file = new File(MapData);
         BufferedReader br = new BufferedReader(new FileReader(file));
         String map = "";
         String st;

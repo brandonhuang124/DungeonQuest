@@ -21,7 +21,7 @@ public class Tile {
       cost = 10;
     }
     /*** Wall tile ***/
-    if(id == 1) {
+    if(id == 1 || id == 2) {
       cost = 100000;
     }
   }

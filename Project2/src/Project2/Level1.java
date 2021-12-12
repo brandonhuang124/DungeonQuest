@@ -39,19 +39,21 @@ public class Level1 extends BasicGameState {
 
     @Override
     public void init(GameContainer container, StateBasedGame game) throws SlickException {
-        player1type = player2type = 0;
         levelMap = new MapUtil();
+        player1type = player2type = 0;
     }
 
     @Override
     public void enter(GameContainer container, StateBasedGame game) {
+        // set the state id to the level in maputil to determine which map to render:
+        MapUtil.setLevelName(LevelName.ONE);
         path = path2 = null;
         if(player1type == 0)
           player1type = 1;
         player1Dead = player2Dead = gameover = false;
         // parse the CSV map file, throw exception in case of IO error:
         try {
-            levelMap.loadLevelMap(1);
+            levelMap.loadLevelMap();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -67,7 +69,7 @@ public class Level1 extends BasicGameState {
           player2.setWorldPos(new TileIndex(4,5));
         }
         player.setWorldPos(new TileIndex(4,4));
-        enemyList = buildEnemyList(1);
+        enemyList = Enemy.buildEnemyList();
 
         container.setSoundOn(true);
     }
@@ -527,22 +529,5 @@ public class Level1 extends BasicGameState {
         return angleVector.getRotation();
     }
 
-    /***
-     * Static method to be called when setting enemies for levels. BUILD HERE WHEN SETTING ENEMIES SO THAT PLAYER 2
-     * CAN ACCESS THIS METHOD AND BUILD AN IDENTICAL ENEMY LIST.
-     * @param level
-     *  Id of the level from which we build the list of enemies.
-     * @return
-     *  An ArrayList of enemies to be used in either P1 state or in P2's dummy state. Each one should be using an
-     *  identical list.
-     */
-    public static ArrayList<Enemy> buildEnemyList(int level) {
-        ArrayList<Enemy> enemyList = new ArrayList<Enemy>();
-        if(level == 1) {
-            enemyList.add(new Enemy(10, 10, 2));
-            enemyList.add(new Enemy(18, 18, 1));
-            enemyList.add(new Enemy(26, 26, 1));
-        }
-        return enemyList;
-    }
+
 }
