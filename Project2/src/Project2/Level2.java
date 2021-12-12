@@ -62,7 +62,7 @@ public class Level2 extends BasicGameState {
                 MapUtil.LEVELWIDTH,MapUtil.LEVELWIDTH);
         projectileList = new ArrayList<Projectile>();
         powerupList = new ArrayList<Powerup>();
-        powerupList.add(new Powerup(5,3,1));
+
         player = new Player( 0, 0, player1type);
         if(twoPlayer) {
             player2 = new Player(0,0, player2type);
@@ -70,6 +70,7 @@ public class Level2 extends BasicGameState {
         }
         player.setWorldPos(new TileIndex(4,4));
         enemyList = Enemy.buildEnemyList();
+        powerupList = Powerup.buildPowerUpList();
 
         container.setSoundOn(true);
     }

@@ -590,8 +590,14 @@ public class Enemy extends Entity{
     }
     if(MapUtil.levelName == LevelName.TWO) {
       enemyList.add(new Enemy(10, 10, 2));
-      enemyList.add(new Enemy(18, 20, 1));
-      enemyList.add(new Enemy(26, 40, 1));
+      enemyList.add(new Enemy(7,  37, 1));
+      enemyList.add(new Enemy(27, 30, 2));
+      enemyList.add(new Enemy(37, 22, 1));
+      enemyList.add(new Enemy(39, 17, 1));
+      enemyList.add(new Enemy(13, 40, 1));
+      enemyList.add(new Enemy(54, 47, 1));
+      enemyList.add(new Enemy(22, 57, 2));
+      enemyList.add(new Enemy(52, 57, 2));
     }
     if(MapUtil.levelName == LevelName.THREE) {
       enemyList.add(new Enemy(10, 10, 2));
