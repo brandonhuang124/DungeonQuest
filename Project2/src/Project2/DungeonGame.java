@@ -35,7 +35,7 @@ public class DungeonGame extends StateBasedGame {
   public static final int LEVEL2 = 5;
   public static final int MENUSTATE = 3;
   public static final int DUMMYSTATE = 4;
-
+  public static final int GAMEOVER = 6;
   // Important parameters
   public static final int SCALE = 1;
 
@@ -108,9 +108,14 @@ public class DungeonGame extends StateBasedGame {
   public static final String PLAYER_ARROWTEST_RSC = "Project2/Assets/arrow.png";
   public static final String PLAYER_PROJECTILE_RSC = "Project2/Assets/projectile.png";
 
-  // Map
+  // Map - LEVEL 1:
   public static final String MAP_WALL_RSC = "Project2/Assets/level1/wall.png";
   public static final String MAP_FLOOR_RSC = "Project2/Assets/level1/floor.png";
+  // Map - LEVEL 2:
+  public static final String MAP2_WALL_RSC = "Project2/Assets/level2/wall2.png";
+  public static final String MAP2_FLOOR_RSC = "Project2/Assets/level2/floor2.png";
+  public static final String MAP2_WALL_WITH_TORCH_RSC = "Project2/Assets/level2/wall2_torch.png";
+  public static final String MAP2_DOOR_RSC = "Project2/Assets/level2/door2.png";
 
   // Parameters
   public final int ScreenWidth;
@@ -138,6 +143,7 @@ public class DungeonGame extends StateBasedGame {
     addState(new MenuState());
     addState(new DummyState());
     addState(new Level2());
+    addState(new GameOver());
     /*** RESOURCE LOADING ***/
     // Player
     ResourceManager.loadImage(PLAYER_RANGEDARROW1_RSC);
@@ -207,9 +213,16 @@ public class DungeonGame extends StateBasedGame {
     ResourceManager.loadImage(PLAYER_ARROWTEST_RSC);
     ResourceManager.loadImage(PLAYER_PROJECTILE_RSC);
 
-    // Map
+    // Map - level 1
     ResourceManager.loadImage(MAP_FLOOR_RSC);
     ResourceManager.loadImage(MAP_WALL_RSC);
+
+    // Map - level 2
+    ResourceManager.loadImage(MAP2_FLOOR_RSC);
+    ResourceManager.loadImage(MAP2_WALL_RSC);
+    ResourceManager.loadImage(MAP2_WALL_WITH_TORCH_RSC);
+    ResourceManager.loadImage(MAP2_DOOR_RSC);
+
   }
 
   public static void main(String[] args) {

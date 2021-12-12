@@ -566,4 +566,37 @@ public class Enemy extends Entity{
       current = idleRight;
     }
   }
+
+  /***
+   * Static method to be called when setting enemies for levels. BUILD HERE WHEN SETTING ENEMIES SO THAT PLAYER 2
+   * CAN ACCESS THIS METHOD AND BUILD AN IDENTICAL ENEMY LIST.
+   *  Id of the level from which we build the list of enemies we can get from MapUtil.
+   * @return
+   *  An ArrayList of enemies to be used in either P1 state or in P2's dummy state. Each one should be using an
+   *  identical list.
+   */
+  public static ArrayList<Enemy> buildEnemyList() {
+    ArrayList<Enemy> enemyList = new ArrayList<Enemy>();
+    if(MapUtil.levelName == LevelName.ONE) {
+      enemyList.add(new Enemy(10, 10, 2));
+      enemyList.add(new Enemy(18, 18, 1));
+      enemyList.add(new Enemy(26, 26, 1));
+    }
+    if(MapUtil.levelName == LevelName.TWO) {
+      enemyList.add(new Enemy(10, 10, 2));
+      enemyList.add(new Enemy(18, 18, 1));
+      enemyList.add(new Enemy(26, 26, 1));
+    }
+    if(MapUtil.levelName == LevelName.THREE) {
+      enemyList.add(new Enemy(10, 10, 2));
+      enemyList.add(new Enemy(18, 18, 1));
+      enemyList.add(new Enemy(26, 26, 1));
+    }
+    if(MapUtil.levelName == LevelName.NONEORTEST) {
+      enemyList.add(new Enemy(10, 10, 2));
+      enemyList.add(new Enemy(18, 18, 1));
+      enemyList.add(new Enemy(26, 26, 1));
+    }
+    return enemyList;
+  }
 }

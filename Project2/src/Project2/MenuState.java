@@ -22,7 +22,7 @@ public class MenuState extends BasicGameState {
 
   @Override
   public int getID() {
-    return 3;
+    return DungeonGame.MENUSTATE;
   }
 
   @Override
@@ -32,6 +32,7 @@ public class MenuState extends BasicGameState {
 
   @Override
   public void enter(GameContainer container, StateBasedGame game) {
+    MapUtil.setLevelName(LevelName.MENU);
     container.setSoundOn(true);
     selected = playerFound = singleplayer = false;
     arrowBlink = true;

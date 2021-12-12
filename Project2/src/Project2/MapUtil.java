@@ -21,7 +21,13 @@ public class MapUtil {
     public static final int SCREENHEIGHT = 20;
     public static final int LEVELWIDTH = 60;
     public static final int LEVELHEIGHT = 60;
-    private LevelName levelName;
+    public static LevelName levelName;
+
+    //assigning id's for tiles with a name to avoid confusion:
+    private final int floorTile = 0;
+    private final int wallTile = 1;
+    private final int wallTileWithTorch = 2;
+    private final int exitDoorGoal = 6;
 
 
 
@@ -37,12 +43,15 @@ public class MapUtil {
         return levelName;
     }
     // mostly used in changing states within dungeon game:
-    public void setLevelName(LevelName name){
-        this.levelName = name;
+    public static void setLevelName(LevelName name){
+        levelName = name;
     }
-    // could be refactored to take a levelName in dungeon game
+    // loads the map csv based off the level name:
     public void loadLevelMap() throws IOException {
         switch (levelName) {
+            case MENU:
+                System.out.println(TAG + " Menu state");
+                break;
             case ONE:
                 currentMapString = readLevelCSV(level1Data);
                 break;
@@ -51,6 +60,9 @@ public class MapUtil {
                 break;
             case THREE:
                 //TODO level3 map
+                break;
+            case GAMEOVER:
+                System.out.println(TAG + " GameOver state");
                 break;
             default:
                 System.out.print(TAG + "error: Level and state not found or listed ");
@@ -124,13 +136,25 @@ public class MapUtil {
     private void renderCollisionTileObjects( Tile renderTile, float renderX, float renderY, Graphics g ){
         switch(levelName){
             case ONE -> { // render based on LEVEL ONE assets:
-                if (renderTile.getID() == 1) {
+                if (renderTile.getID() == wallTile) {
                     g.drawImage(ResourceManager.getImage(DungeonGame.MAP_WALL_RSC).getScaledCopy(DungeonGame.SCALE),
                             renderX, renderY);
                 }
 
             }
             case TWO -> { // render based on LEVEL TWO assets:
+                if (renderTile.getID() ==   wallTile) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP2_WALL_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+                }
+                if (renderTile.getID() == wallTileWithTorch) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP2_WALL_WITH_TORCH_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+                }
+                if (renderTile.getID() == exitDoorGoal) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP2_DOOR_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+                }
 
             }
         }
@@ -138,13 +162,18 @@ public class MapUtil {
     private void renderBlankTileObjects( Tile renderTile,  float renderX, float renderY, Graphics g){
         switch(levelName){
             case ONE -> { // render based on LEVEL ONE assets:
-                if (renderTile.getID() == 0) {
+                if (renderTile.getID() == floorTile) {
                     g.drawImage(ResourceManager.getImage(DungeonGame.MAP_FLOOR_RSC).getScaledCopy(DungeonGame.SCALE),
                             renderX, renderY);
 
                 }
             }
             case TWO -> { // render based on LEVEL TWO assets:
+                if (renderTile.getID() == floorTile) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP2_FLOOR_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+
+                }
 
             }
         }

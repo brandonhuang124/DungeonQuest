@@ -13,6 +13,7 @@ import org.newdawn.slick.state.StateBasedGame;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Map;
 
 /***
  * Description:
@@ -42,6 +43,7 @@ public class TestState extends BasicGameState {
   public void init(GameContainer container, StateBasedGame game) throws SlickException {
     player1type = player2type = 0;
     twoPlayer = false;
+    MapUtil.setLevelName(LevelName.NONEORTEST);
   }
 
   @Override
