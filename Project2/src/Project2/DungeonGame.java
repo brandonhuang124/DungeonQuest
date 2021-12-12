@@ -32,6 +32,7 @@ public class DungeonGame extends StateBasedGame {
   public static final int STARTUPSTATE = 0;
   public static final int TESTSTATE = 1;
   public static final int LEVEL1 = 2;
+  public static final int LEVEL2 = 5;
   public static final int MENUSTATE = 3;
   public static final int DUMMYSTATE = 4;
 
@@ -108,8 +109,8 @@ public class DungeonGame extends StateBasedGame {
   public static final String PLAYER_PROJECTILE_RSC = "Project2/Assets/projectile.png";
 
   // Map
-  public static final String MAP_WALL_RSC = "Project2/Assets/wall.png";
-  public static final String MAP_FLOOR_RSC = "Project2/Assets/floor.png";
+  public static final String MAP_WALL_RSC = "Project2/Assets/level1/wall.png";
+  public static final String MAP_FLOOR_RSC = "Project2/Assets/level1/floor.png";
 
   // Parameters
   public final int ScreenWidth;
@@ -136,6 +137,7 @@ public class DungeonGame extends StateBasedGame {
     addState(new Level1());
     addState(new MenuState());
     addState(new DummyState());
+    addState(new Level2());
     /*** RESOURCE LOADING ***/
     // Player
     ResourceManager.loadImage(PLAYER_RANGEDARROW1_RSC);

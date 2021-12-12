@@ -20,7 +20,7 @@ public class MapUtil {
     public static final int SCREENHEIGHT = 20;
     public static final int LEVELWIDTH = 60;
     public static final int LEVELHEIGHT = 60;
-
+    private LevelName levelName;
 
     String level2Data = "";
     String level3Data = "";
@@ -33,8 +33,15 @@ public class MapUtil {
 
 
     String currentMapString;
-
-
+    // returns the levelname of type LevelName, can be LevelName.ONE, LevelName.START, etc.
+    public LevelName getCurrentLevel(){
+        return levelName;
+    }
+    // mostly used in changing states within dungeon game:
+    public void setLevelName(LevelName name){
+        this.levelName = name;
+    }
+    // could be refactored to take a levelName in dungeon game
     public void loadLevelMap(int level) throws IOException {
         switch (level) {
             case 1:
@@ -47,7 +54,7 @@ public class MapUtil {
                 //TODO level3 map
                 break;
             default:
-                System.out.print(TAG + "Level not found ");
+                System.out.print(TAG + "error: Level and state not found or listed ");
                 break;
         }
     }
@@ -75,29 +82,31 @@ public class MapUtil {
         return convertWorldToScreen(worldPos);
     }
 
+    // a very handy method for handling collision checks for a tile index:
     public Boolean hasCollision(TileIndex tileIndex){
         int tileValue = currentTileMap[tileIndex.x][tileIndex.y].getID();
-        return tileValue == 1;
+        // return to true if the tile is not blank and not the door tile:
+        return (tileValue > 0 && tileValue != 6);
     }
-
+    // allowing for a vector from world to tile:
     public static TileIndex convertWorldToTile(Vector worldPos){
         return new TileIndex((int)Math.floor(worldPos.getX() / TILESIZE), (int)Math.floor(worldPos.getY() / TILESIZE));
     }
-
+    // converting from world to tile:
     public static TileIndex convertWorldToTile(Coordinate worldPos){
         return new TileIndex((int)Math.floor(worldPos.x / TILESIZE), (int)Math.floor(worldPos.y / TILESIZE));
     }
-
+    // convert screen to tile if needed:
     public TileIndex convertScreenToTile(Coordinate screenPos){
         Coordinate worldPos = convertScreenToWorld(screenPos);
         return convertWorldToTile(worldPos);
     }
-
+    // offset of the camera can be in between and partially on tiles:
     public Coordinate getCameraTileOffset() {
         Coordinate cameraTilePos = new Coordinate(cameraPos.x % TILESIZE, cameraPos.y % TILESIZE);
         return cameraTilePos;
     }
-
+    // scroll our camera based on independent player movement:
     public void updateCamera(Coordinate deltaMove) {
         cameraPos.x = deltaMove.x - (0.5f * SCREENWIDTH * TILESIZE);
         cameraPos.y = deltaMove.y - (0.5f * SCREENHEIGHT * TILESIZE);
@@ -112,6 +121,7 @@ public class MapUtil {
             cameraPos.y = maxCameraPos.y;
         }
     }
+
 
     public void renderMapByCamera(Graphics g) {
         TileIndex currentTile = convertWorldToTile(cameraPos);
