@@ -534,17 +534,6 @@ public class Level1 extends BasicGameState {
             player2type = 1;
     }
 
-    public void setPlayerType(int id) {
-        player1type = id;
-    }
-
-    public void set2Player(boolean status) {
-        twoPlayer = status;
-        if(player1type == 1)
-            player2type = 2;
-        else
-            player2type = 1;
-    }
 
     public String get2PData() {
         String data = "";

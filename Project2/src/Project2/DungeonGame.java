@@ -122,6 +122,8 @@ public class DungeonGame extends StateBasedGame {
   public static final String MAP2_WALL_WITH_TORCH_RSC = "Project2/Assets/level2/wall2_torch.png";
   public static final String MAP2_DOOR_RSC = "Project2/Assets/level2/door2.png";
 
+  public static final String KEY_RSC = "Project2/Assets/key.png";
+
   // Parameters
   public final int ScreenWidth;
   public final int ScreenHeight;

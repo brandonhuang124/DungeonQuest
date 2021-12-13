@@ -56,6 +56,7 @@ public class Player extends Entity {
     playerType = id;
     speed = 0.25f;
     worldPos = new Coordinate(x,y);
+    hasTheKey = false;
     selfRevive = false;
     invincible = false;
     doubleStrength = false;
