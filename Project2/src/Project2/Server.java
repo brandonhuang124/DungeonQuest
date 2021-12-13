@@ -9,10 +9,11 @@ public class Server {
     private ServerSocket serverSocket;
     private volatile ClientHandler player1;
     private volatile ClientHandler player2;
+    private volatile ClientHandler previouslyConnected;
     volatile boolean  hasPlayer1, hasPlayer2;
 
     public Server() {
-        player1 = player2 = null;
+        player1 = player2 = previouslyConnected = null;
         System.out.println("---Server---");
         hasPlayer1 = hasPlayer2 = false;
         try {
@@ -26,49 +27,23 @@ public class Server {
     public void acceptConnections() {
         try {
             System.out.println("Waiting for connections...");
-            while(!hasPlayer1 || !hasPlayer2) {
-                Socket socket, socket2;
-                ClientHandler clientHandler = player1;
-                ClientHandler clientHandler2 = player2;
-                if(!hasPlayer1) {
-                  socket = serverSocket.accept();
-                  System.out.println("Player #" + 1 + " has connected");
-                  clientHandler = new ClientHandler(socket, 1);
-                  if(player1 == null)
-                    player1 = clientHandler;
-                  else
-                    player2 = clientHandler;
-                  System.out.println("Starting ClientHandler Thread for Player #" + 1);
-                  Thread thread = new Thread(clientHandler);
-                  thread.start();
+            while(true) {
+                Socket socket;
+                socket = serverSocket.accept();
+                ClientHandler newClient = new ClientHandler(socket,1);
+                Thread thread = new Thread(newClient);
+                thread.start();
+                while(newClient.infoWait);
+                if(newClient.playerID == 1 && newClient.keep)
+                  player1 = newClient;
+                else if(newClient.playerID == 2 && newClient.keep)
+                  player2 = newClient;
+                if(player1 != null && player2 != null) {
+                  player1.partner = player2;
+                  player2.partner = player1;
                 }
-
-                if(!hasPlayer2) {
-                  socket2 = serverSocket.accept();
-                  System.out.println("Player #" + 2 + " has connected");
-                  clientHandler2 = new ClientHandler(socket2, 2);
-                  if(player2 == null)
-                    player2 = clientHandler;
-                  else
-                    player1 = clientHandler;
-                  System.out.println("Starting ClientHandler Thread for Player #" + 2);
-                  Thread thread2 = new Thread(clientHandler2);
-                  thread2.start();
-                }
-
-                // After a pass, we need to set the player's partners
-                if(clientHandler != null)
-                  clientHandler.partner = clientHandler2;
-                if(clientHandler2 != null)
-                  clientHandler2.partner = clientHandler;
-
-                // Each pass we need to reset players that we "don't have"
-                if(!hasPlayer1)
-                  player1 = null;
-                if(!hasPlayer2)
-                  player2 = null;
             }
-            System.out.println("Max player connections reached");
+            //System.out.println("Max player connections reached");
         } catch (Exception e) {
             System.out.println("Exception from acceptConnections()");
             e.printStackTrace();
@@ -107,10 +82,12 @@ public class Server {
         private int playerID, phase;
         private boolean gameStart;
         public volatile ClientHandler partner;
+        public volatile boolean infoWait, keep;
 
         public ClientHandler(Socket socket, int id) {
             partner = null;
             gameStart = false;
+            infoWait = keep = true;
             this.socket = socket;
             playerID = id;
             phase = 1;
@@ -144,6 +121,7 @@ public class Server {
                       dataOutputStream.close();
                       dataInputStream.close();
                       socket.close();
+                      infoWait = keep = false;
                       return;
                     }
                     playerID = 1;
@@ -160,6 +138,7 @@ public class Server {
                       dataOutputStream.close();
                       dataInputStream.close();
                       socket.close();
+                      infoWait = keep = false;
                       return;
                     }
                     playerID = 2;
@@ -169,6 +148,7 @@ public class Server {
                 }
                 // Phase 2: We're good to go and connected, but we need to wait for the second player
                 if(phase == 2) {
+                  infoWait = false;
                   if(player1 == player2)
                     System.out.println("Players are the same uh oh");
                   System.out.println("Phase 2: Wait for other player" + playerID);

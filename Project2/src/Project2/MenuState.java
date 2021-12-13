@@ -333,6 +333,10 @@ public class MenuState extends BasicGameState {
         if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
           if(select == 1) {
             phase = 1;
+            // If we back out, we need to close connections
+            DungeonGame.client.disconnect();
+            DungeonGame.client = null;
+            return;
           }
         }
 
@@ -386,6 +390,10 @@ public class MenuState extends BasicGameState {
       if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
         if(select == 1) {
           phase = 1;
+          // If we back out, we need to close connections
+          DungeonGame.client.disconnect();
+          DungeonGame.client = null;
+          return;
         }
       }
       // Check if the server told us were starting.
