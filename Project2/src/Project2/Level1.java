@@ -168,6 +168,16 @@ public class Level1 extends BasicGameState {
                 g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARR_RSC), 152 + (player2.getMaxHealth() * 6) + player2HudOffset, 660);
             else
                 g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC), 152 + (player2.getMaxHealth() * 6) + player2HudOffset, 660);
+
+            if(player2.getSelfRevive()) {
+                g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_SELFREVIVE_RSC), 152 + player2HudOffset, 700);
+            }
+            if(player2.getInvincible()) {
+                g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_INVINCIBILITY_RSC), 172 + player2HudOffset, 700);
+            }
+            if(player2.getDoubleStrength()) {
+                g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_DOUBLESTRENGTH_RSC), 192 + player2HudOffset, 700);
+            }
         }
     }
 
@@ -479,10 +489,10 @@ public class Level1 extends BasicGameState {
         enemyList.removeIf( (Enemy enemy) -> {
             if(enemy.isDead()) {
                 // 1 in 9 chance a healing potion will spawn under the dead enemy.
-                if(new Random().nextInt(9) == 0){
+//                if(new Random().nextInt(9) == 0){
                     TileIndex location = enemy.getLocation();
                     powerupList.add(new Powerup(location.x, location.y, new Random().nextInt(4)+1));
-                }
+//                }
             }
             return enemy.isDead();
         });
@@ -529,7 +539,8 @@ public class Level1 extends BasicGameState {
         data = data.concat("HUDSTART;");
         // Send both players healths and max healths across
         data = data.concat(player.getCurrentHealth() + ";" + player.getMaxHealth() + ";" + player2.getCurrentHealth() + ";"
-                + player2.getMaxHealth() + ";");
+                + player2.getMaxHealth() + ";" + player.getSelfRevive() + ";" + player.getInvincible() + ";" + player.getDoubleStrength() + ";"
+                + player2.getSelfRevive() + ";" + player2.getInvincible() + ";" + player2.getDoubleStrength() + ";");
         data = data.concat("HUDEND");
 
         // Step 6: Send special instructions
@@ -569,15 +580,15 @@ public class Level1 extends BasicGameState {
             enemyList.add(new Enemy(18, 18, 1));
             enemyList.add(new Enemy(26, 26, 1));
             enemyList.add(new Enemy(30, 30, 1));
-//            enemyList.add(new Enemy(34, 34, 1));
-//            enemyList.add(new Enemy(38, 38, 1));
-//            enemyList.add(new Enemy(30, 30, 1));
-//            enemyList.add(new Enemy(18, 18, 1));
-//            enemyList.add(new Enemy(26, 26, 1));
-//            enemyList.add(new Enemy(30, 30, 1));
-//            enemyList.add(new Enemy(34, 34, 1));
-//            enemyList.add(new Enemy(38, 38, 1));
-//            enemyList.add(new Enemy(30, 30, 1));
+            enemyList.add(new Enemy(34, 34, 1));
+            enemyList.add(new Enemy(38, 38, 1));
+            enemyList.add(new Enemy(30, 30, 1));
+            enemyList.add(new Enemy(18, 18, 1));
+            enemyList.add(new Enemy(26, 26, 1));
+            enemyList.add(new Enemy(30, 30, 1));
+            enemyList.add(new Enemy(34, 34, 1));
+            enemyList.add(new Enemy(38, 38, 1));
+            enemyList.add(new Enemy(30, 30, 1));
         }
         return enemyList;
     }

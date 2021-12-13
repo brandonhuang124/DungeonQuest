@@ -39,6 +39,15 @@ public class DummyObject extends Entity {
             if(id == 1) {
                 addImage(ResourceManager.getImage(DungeonGame.POWERUP_HEALTHPOTION_RSC));
             }
+            if(id == 2) {
+                addImage(ResourceManager.getImage(DungeonGame.POWERUP_SELFREVIVE_RSC));
+            }
+            if(id == 3) {
+                addImage(ResourceManager.getImage(DungeonGame.POWERUP_INVINCIBILITY_RSC));
+            }
+            if(id == 4) {
+                addImage(ResourceManager.getImage(DungeonGame.POWERUP_DOUBLESTRENGTH_RSC));
+            }
         }
         worldPos = new Coordinate(x,y);
         setRotation(angle);
