@@ -233,6 +233,9 @@ public class DungeonGame extends StateBasedGame {
     ResourceManager.loadImage(MAP2_WALL_WITH_TORCH_RSC);
     ResourceManager.loadImage(MAP2_DOOR_RSC);
 
+    //KEY
+    ResourceManager.loadImage(KEY_RSC);
+
   }
 
   public static void main(String[] args) {

@@ -12,7 +12,7 @@ import org.newdawn.slick.state.StateBasedGame;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
 
@@ -28,11 +28,12 @@ public class Level1 extends BasicGameState {
     ArrayList<Projectile> projectileList;
     ArrayList<Enemy> enemyList;
     ArrayList<Powerup> powerupList;
-    Vertex [][] path, path2;
+    Vertex[][] path, path2;
     MapUtil levelMap;
     Timer timer;
     int player1type, player2type;
     boolean player1Dead, player2Dead, gameover, twoPlayer;
+    Key key;
 
     @Override
     public int getID() {
@@ -51,7 +52,7 @@ public class Level1 extends BasicGameState {
         // set the state id to the level in maputil to determine which map to render:
         MapUtil.setLevelName(LevelName.ONE);
         path = path2 = null;
-        if(player1type == 0)
+        if (player1type == 0)
             player1type = 1;
         player1Dead = player2Dead = gameover = false;
         // parse the CSV map file, throw exception in case of IO error:
@@ -61,17 +62,17 @@ public class Level1 extends BasicGameState {
             e.printStackTrace();
         }
         // keeping the string to matrix method in DungeonGame
-        levelMap.currentTileMap  = DungeonGame.getTileMap(levelMap.currentMapString,
-                MapUtil.LEVELWIDTH,MapUtil.LEVELWIDTH);
+        levelMap.currentTileMap = DungeonGame.getTileMap(levelMap.currentMapString,
+                MapUtil.LEVELWIDTH, MapUtil.LEVELWIDTH);
         projectileList = new ArrayList<Projectile>();
         powerupList = new ArrayList<Powerup>();
-        powerupList.add(new Powerup(5,3,1));
-        player = new Player( 0, 0, player1type);
-        if(twoPlayer) {
-            player2 = new Player(0,0, player2type);
-            player2.setWorldPos(new TileIndex(4,5));
+        powerupList.add(new Powerup(5, 3, 1));
+        player = new Player(0, 0, player1type);
+        if (twoPlayer) {
+            player2 = new Player(0, 0, player2type);
+            player2.setWorldPos(new TileIndex(4, 5));
         }
-        player.setWorldPos(new TileIndex(4,4));
+        player.setWorldPos(new TileIndex(4, 4));
         enemyList = Enemy.buildEnemyList();
 
         container.setSoundOn(true);
@@ -79,56 +80,56 @@ public class Level1 extends BasicGameState {
 
     @Override
     public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
-        DungeonGame dg = (DungeonGame)game;
+        DungeonGame dg = (DungeonGame) game;
 
         // Render tiles
         levelMap.renderMapByCamera(g);
 
         // Render projectiles on the screen
-        for(Projectile p : projectileList) {
+        for (Projectile p : projectileList) {
             p.render(g);
         }
         // Render enemies
-        for(Enemy enemy : enemyList) {
+        for (Enemy enemy : enemyList) {
             enemy.render(g);
         }
         // Render powerups
-        for(Powerup p : powerupList) {
+        for (Powerup p : powerupList) {
             p.render(g);
         }
         player.render(g);
         player.weapon.render(g);
 
         // If were in two player
-        if(twoPlayer) {
+        if (twoPlayer) {
             player2.render(g);
             player2.weapon.render(g);
         }
 
         // Render HUD
         g.drawImage(ResourceManager.getImage(DungeonGame.HUD_BG_RSC), 0, 640);
-        if(player.getPlayerType() == 1)
+        if (player.getPlayerType() == 1)
             g.drawImage(ResourceManager.getImage(DungeonGame.HUD_PARCHMENTRANGED_RSC), 20, 640);
-        else if(player.getPlayerType() == 2)
+        else if (player.getPlayerType() == 2)
             g.drawImage(ResourceManager.getImage(DungeonGame.HUD_PARCHMENTMELEE_RSC), 20, 640);
 
         g.drawImage(ResourceManager.getImage(DungeonGame.HUD_P1_RSC), 5, 640);
         g.drawImage(ResourceManager.getImage(DungeonGame.HUD_DIVIDER_RSC), 276, 640);
 
         // Render Left cap of health bar
-        if(player.getCurrentHealth() > 0)
+        if (player.getCurrentHealth() > 0)
             g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARL_RSC), 152, 660);
         else
             g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARL_RSC), 152, 660);
         // Render middle of bar
-        for(int i = 1; i < player.getMaxHealth(); i++) {
-            if(i <= player.getCurrentHealth())
-                g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBAR_RSC), 152 + (i*6), 660);
+        for (int i = 1; i < player.getMaxHealth(); i++) {
+            if (i <= player.getCurrentHealth())
+                g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBAR_RSC), 152 + (i * 6), 660);
             else
-                g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBAR_RSC), 152 + (i*6), 660);
+                g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBAR_RSC), 152 + (i * 6), 660);
         }
         // Render Right cap of health bar
-        if(player.getCurrentHealth() == player.getMaxHealth())
+        if (player.getCurrentHealth() == player.getMaxHealth())
             g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARR_RSC), 152 + (player.getMaxHealth() * 6), 660);
         else
             g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC), 152 + (player.getMaxHealth() * 6), 660);
@@ -144,47 +145,74 @@ public class Level1 extends BasicGameState {
         }
 
         // Now if were in two player, render the second players HUD
-        if(twoPlayer) {
+        if (twoPlayer) {
             float player2HudOffset = 342;
-            if(player2.getPlayerType() == 1)
+            if (player2.getPlayerType() == 1)
                 g.drawImage(ResourceManager.getImage(DungeonGame.HUD_PARCHMENTRANGED_RSC), 20 + player2HudOffset, 640);
-            else if(player2.getPlayerType() == 2)
+            else if (player2.getPlayerType() == 2)
                 g.drawImage(ResourceManager.getImage(DungeonGame.HUD_PARCHMENTMELEE_RSC), 20 + player2HudOffset, 640);
 
             g.drawImage(ResourceManager.getImage(DungeonGame.HUD_P2_RSC), 5 + player2HudOffset, 640);
 
             // Render Left cap of health bar
-            if(player2.getCurrentHealth() > 0)
+            if (player2.getCurrentHealth() > 0)
                 g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARL_RSC), 152 + player2HudOffset, 660);
             else
                 g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARL_RSC), 152 + player2HudOffset, 660);
             // Render middle of bar
-            for(int i = 1; i < player2.getMaxHealth(); i++) {
-                if(i <= player2.getCurrentHealth())
-                    g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBAR_RSC), 152 + (i*6) + player2HudOffset, 660);
+            for (int i = 1; i < player2.getMaxHealth(); i++) {
+                if (i <= player2.getCurrentHealth())
+                    g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBAR_RSC), 152 + (i * 6) + player2HudOffset, 660);
                 else
-                    g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBAR_RSC), 152 + (i*6) + player2HudOffset, 660);
+                    g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBAR_RSC), 152 + (i * 6) + player2HudOffset, 660);
             }
             // Render Right cap of health bar
-            if(player2.getCurrentHealth() == player2.getMaxHealth())
+            if (player2.getCurrentHealth() == player2.getMaxHealth())
                 g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARR_RSC), 152 + (player2.getMaxHealth() * 6) + player2HudOffset, 660);
             else
                 g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC), 152 + (player2.getMaxHealth() * 6) + player2HudOffset, 660);
         }
+        if (enemyList.isEmpty()) {
+            key.render(g);
+        }
     }
+
 
     @Override
     public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
-        DungeonGame dg = (DungeonGame)game;
+        DungeonGame dg = (DungeonGame) game;
         String p2data;
         String[] p2dataToken = null;
+        TileIndex keyLocation = null;
+        if (!enemyList.isEmpty()) {
+            // only gets the location if there is one enemy left on the map:
+            keyLocation = getKeyPositionWhenLastEnemyStands();
+        } else { // assume we got the location if list is empty with a null check just in case:
+            if (keyLocation != null) {
+                key = new Key(keyLocation.x, keyLocation.y);
+            }
+        }
+        if (key != null) {
+            if (key.playerCollision(player.getTileIndex())) {
+                player.hasTheKey = true;
+                key = null;
+            }
+            if (twoPlayer) {
+                if (key.playerCollision(player2.getTileIndex())) {
+                    // take the key off the map if the player grabs it:
+                    // java handles the garbage collection here
+                    player2.hasTheKey = true;
+                    key = null;
+                }
+            }
+        }
 
         Input input = container.getInput();
         TileIndex playerTile = levelMap.convertWorldToTile(player.worldPos);
-        path = DungeonGame.getDijkstras(playerTile.x,playerTile.y, levelMap, path);
+        path = DungeonGame.getDijkstras(playerTile.x, playerTile.y, levelMap, path);
 
         // Things to do when were in 2 player mode
-        if(twoPlayer) {
+        if (twoPlayer) {
             // Set tile and path for p2
             TileIndex player2Tile = levelMap.convertWorldToTile(player2.worldPos);
             path2 = DungeonGame.getDijkstras(player2Tile.x, player2Tile.y, levelMap, path2);
@@ -202,51 +230,51 @@ public class Level1 extends BasicGameState {
 
         /*** CONTROLS SECTION ***/
         // Left click for attacking
-        if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+        if (input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
             // System.out.println("Left Click pressed");
             Projectile newProjectile = player.fire(getPlayerMouseAngle(input));
-            if(newProjectile != null)
+            if (newProjectile != null)
                 projectileList.add(newProjectile);
         }
         // Check diagonals first
         // W and A for Up Left
-        if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(Direction.UP_LEFT,
-                player.getVelocity().scale(delta),levelMap)) {
+        if (input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(Direction.UP_LEFT,
+                player.getVelocity().scale(delta), levelMap)) {
             player.moveUpLeft();
         }
         // W and D for Up Right
-        else if(input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(Direction.UP_RIGHT,
-                player.getVelocity().scale(delta),levelMap)) {
+        else if (input.isKeyDown(Input.KEY_W) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(Direction.UP_RIGHT,
+                player.getVelocity().scale(delta), levelMap)) {
             player.moveUpRight();
         }
         // S and A for Down Left
-        else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(Direction.DOWN_LEFT,
-                player.getVelocity().scale(delta),levelMap)) {
+        else if (input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_A) && player.isMoveValid(Direction.DOWN_LEFT,
+                player.getVelocity().scale(delta), levelMap)) {
             player.moveDownLeft();
 
         }
         // S and D for Down Right
-        else if(input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(Direction.DOWN_RIGHT,
-                player.getVelocity().scale(delta),levelMap)) {
+        else if (input.isKeyDown(Input.KEY_S) && input.isKeyDown(Input.KEY_D) && player.isMoveValid(Direction.DOWN_RIGHT,
+                player.getVelocity().scale(delta), levelMap)) {
             player.moveDownRight();
         }
         // W for moving up
-        else if(input.isKeyDown(Input.KEY_W) && player.isMoveValid(Direction.UP, player.getVelocity().scale(delta),
+        else if (input.isKeyDown(Input.KEY_W) && player.isMoveValid(Direction.UP, player.getVelocity().scale(delta),
                 levelMap)) {
             player.moveUp();
         }
         // A for moving left
-        else if(input.isKeyDown(Input.KEY_A) && player.isMoveValid(Direction.LEFT, player.getVelocity().scale(delta),
+        else if (input.isKeyDown(Input.KEY_A) && player.isMoveValid(Direction.LEFT, player.getVelocity().scale(delta),
                 levelMap)) {
             player.moveLeft();
         }
         // S for moving down
-        else if(input.isKeyDown(Input.KEY_S) && player.isMoveValid(Direction.DOWN, player.getVelocity().scale(delta),
+        else if (input.isKeyDown(Input.KEY_S) && player.isMoveValid(Direction.DOWN, player.getVelocity().scale(delta),
                 levelMap)) {
             player.moveDown();
         }
         // D for moving right
-        else if(input.isKeyDown(Input.KEY_D) && player.isMoveValid(Direction.RIGHT, player.getVelocity().scale(delta),
+        else if (input.isKeyDown(Input.KEY_D) && player.isMoveValid(Direction.RIGHT, player.getVelocity().scale(delta),
                 levelMap)) {
             player.moveRight();
         }
@@ -256,58 +284,58 @@ public class Level1 extends BasicGameState {
         }
 
         /*** EXTRA CONTROLS SECTION FOR TESTING WITH TWO PLAYERS ***/
-        if(twoPlayer && p2dataToken.length > 1) {
+        if (twoPlayer && p2dataToken.length > 1) {
             System.out.println(p2dataToken[1]);
             /*** NETWORK CONTROLS ***/
             // Left click for attacking
-            if(p2dataToken[0].equals("1")) {
+            if (p2dataToken[0].equals("1")) {
                 Projectile newProjectile = player2.fire(Double.valueOf(p2dataToken[2]));
-                if(newProjectile != null) {
+                if (newProjectile != null) {
                     projectileList.add(newProjectile);
                 }
             }
             // Check diagonals first
             // W and A for Up Left
-            if(p2dataToken[1].equals("WA") && player2.isMoveValid(Direction.UP_LEFT,
-                    player2.getVelocity().scale(delta),levelMap)) {
+            if (p2dataToken[1].equals("WA") && player2.isMoveValid(Direction.UP_LEFT,
+                    player2.getVelocity().scale(delta), levelMap)) {
                 player2.moveUpLeft();
             }
             // W and D for Up Right
-            else if(p2dataToken[1].equals("WD") && player2.isMoveValid(Direction.UP_RIGHT,
-                    player2.getVelocity().scale(delta),levelMap)) {
+            else if (p2dataToken[1].equals("WD") && player2.isMoveValid(Direction.UP_RIGHT,
+                    player2.getVelocity().scale(delta), levelMap)) {
                 player2.moveUpRight();
             }
             // S and A for Down Left
-            else if(p2dataToken[1].equals("SA") && player2.isMoveValid(Direction.DOWN_LEFT,
-                    player2.getVelocity().scale(delta),levelMap)) {
+            else if (p2dataToken[1].equals("SA") && player2.isMoveValid(Direction.DOWN_LEFT,
+                    player2.getVelocity().scale(delta), levelMap)) {
                 player2.moveDownLeft();
 
             }
             // S and D for Down Right
-            else if(p2dataToken[1].equals("SD") && player2.isMoveValid(Direction.DOWN_RIGHT,
-                    player2.getVelocity().scale(delta),levelMap)) {
+            else if (p2dataToken[1].equals("SD") && player2.isMoveValid(Direction.DOWN_RIGHT,
+                    player2.getVelocity().scale(delta), levelMap)) {
                 player2.moveDownRight();
             }
             // W for moving up
-            else if((p2dataToken[1].equals("W") || p2dataToken[1].equals("WA") || p2dataToken[1].equals("WD")) &&
+            else if ((p2dataToken[1].equals("W") || p2dataToken[1].equals("WA") || p2dataToken[1].equals("WD")) &&
                     player2.isMoveValid(Direction.UP, player2.getVelocity().scale(delta),
                             levelMap)) {
                 player2.moveUp();
             }
             // A for moving left
-            else if((p2dataToken[1].equals("A") || p2dataToken[1].equals("WA") || p2dataToken[1].equals("SA")) &&
+            else if ((p2dataToken[1].equals("A") || p2dataToken[1].equals("WA") || p2dataToken[1].equals("SA")) &&
                     player2.isMoveValid(Direction.LEFT, player2.getVelocity().scale(delta),
                             levelMap)) {
                 player2.moveLeft();
             }
             // S for moving down
-            else if((p2dataToken[1].equals("S") || p2dataToken[1].equals("SD") || p2dataToken[1].equals("SA")) &&
+            else if ((p2dataToken[1].equals("S") || p2dataToken[1].equals("SD") || p2dataToken[1].equals("SA")) &&
                     player2.isMoveValid(Direction.DOWN, player2.getVelocity().scale(delta),
                             levelMap)) {
                 player2.moveDown();
             }
             // D for moving right
-            else if((p2dataToken[1].equals("D") || p2dataToken[1].equals("WD") || p2dataToken[1].equals("SD")) &&
+            else if ((p2dataToken[1].equals("D") || p2dataToken[1].equals("WD") || p2dataToken[1].equals("SD")) &&
                     player2.isMoveValid(Direction.RIGHT, player2.getVelocity().scale(delta),
                             levelMap)) {
                 player2.moveRight();
@@ -320,53 +348,53 @@ public class Level1 extends BasicGameState {
 
             /*** LOCAL CONTROLS ***/
             // Left click for attacking
-            if(input.isMousePressed(Input.MOUSE_RIGHT_BUTTON)) {
+            if (input.isMousePressed(Input.MOUSE_RIGHT_BUTTON)) {
                 // System.out.println("Left Click pressed");
                 Projectile newProjectile = player2.fire(Double.valueOf(p2dataToken[2]));
-                if(newProjectile != null) {
+                if (newProjectile != null) {
                     System.out.println("ahh");
                     projectileList.add(newProjectile);
                 }
             }
             // Check diagonals first
             // W and A for Up Left
-            if(input.isKeyDown(Input.KEY_UP) && input.isKeyDown(Input.KEY_LEFT) && player2.isMoveValid(Direction.UP_LEFT,
-                    player2.getVelocity().scale(delta),levelMap)) {
+            if (input.isKeyDown(Input.KEY_UP) && input.isKeyDown(Input.KEY_LEFT) && player2.isMoveValid(Direction.UP_LEFT,
+                    player2.getVelocity().scale(delta), levelMap)) {
                 player2.moveUpLeft();
             }
             // W and D for Up Right
-            else if(input.isKeyDown(Input.KEY_UP) && input.isKeyDown(Input.KEY_RIGHT) && player2.isMoveValid(Direction.UP_RIGHT,
-                    player2.getVelocity().scale(delta),levelMap)) {
+            else if (input.isKeyDown(Input.KEY_UP) && input.isKeyDown(Input.KEY_RIGHT) && player2.isMoveValid(Direction.UP_RIGHT,
+                    player2.getVelocity().scale(delta), levelMap)) {
                 player2.moveUpRight();
             }
             // S and A for Down Left
-            else if(input.isKeyDown(Input.KEY_DOWN) && input.isKeyDown(Input.KEY_LEFT) && player2.isMoveValid(Direction.DOWN_LEFT,
-                    player2.getVelocity().scale(delta),levelMap)) {
+            else if (input.isKeyDown(Input.KEY_DOWN) && input.isKeyDown(Input.KEY_LEFT) && player2.isMoveValid(Direction.DOWN_LEFT,
+                    player2.getVelocity().scale(delta), levelMap)) {
                 player2.moveDownLeft();
 
             }
             // S and D for Down Right
-            else if(input.isKeyDown(Input.KEY_DOWN) && input.isKeyDown(Input.KEY_RIGHT) && player2.isMoveValid(Direction.DOWN_RIGHT,
-                    player2.getVelocity().scale(delta),levelMap)) {
+            else if (input.isKeyDown(Input.KEY_DOWN) && input.isKeyDown(Input.KEY_RIGHT) && player2.isMoveValid(Direction.DOWN_RIGHT,
+                    player2.getVelocity().scale(delta), levelMap)) {
                 player2.moveDownRight();
             }
             // W for moving up
-            else if(input.isKeyDown(Input.KEY_UP) && player2.isMoveValid(Direction.UP, player2.getVelocity().scale(delta),
+            else if (input.isKeyDown(Input.KEY_UP) && player2.isMoveValid(Direction.UP, player2.getVelocity().scale(delta),
                     levelMap)) {
                 player2.moveUp();
             }
             // A for moving left
-            else if(input.isKeyDown(Input.KEY_LEFT) && player2.isMoveValid(Direction.LEFT, player2.getVelocity().scale(delta),
+            else if (input.isKeyDown(Input.KEY_LEFT) && player2.isMoveValid(Direction.LEFT, player2.getVelocity().scale(delta),
                     levelMap)) {
                 player2.moveLeft();
             }
             // S for moving down
-            else if(input.isKeyDown(Input.KEY_DOWN) && player2.isMoveValid(Direction.DOWN, player2.getVelocity().scale(delta),
+            else if (input.isKeyDown(Input.KEY_DOWN) && player2.isMoveValid(Direction.DOWN, player2.getVelocity().scale(delta),
                     levelMap)) {
                 player2.moveDown();
             }
             // D for moving right
-            else if(input.isKeyDown(Input.KEY_RIGHT) && player2.isMoveValid(Direction.RIGHT, player2.getVelocity().scale(delta),
+            else if (input.isKeyDown(Input.KEY_RIGHT) && player2.isMoveValid(Direction.RIGHT, player2.getVelocity().scale(delta),
                     levelMap)) {
                 player2.moveRight();
             }
@@ -385,11 +413,11 @@ public class Level1 extends BasicGameState {
         player.offsetUpdate(levelMap.currentTileMap);
 
         // Update P2 if applicable.
-        if(twoPlayer) {
+        if (twoPlayer) {
             Coordinate player2ScreenPos = levelMap.convertWorldToScreen(player2.worldPos);
             player2.setX(player2ScreenPos.x);
             player2.setY(player2ScreenPos.y);
-            if(p2dataToken.length > 1)
+            if (p2dataToken.length > 1)
                 player2.mouseRotate(Double.valueOf(p2dataToken[2]));
             player2.update(delta);
             player2.offsetUpdate(levelMap.currentTileMap);
@@ -398,15 +426,15 @@ public class Level1 extends BasicGameState {
         levelMap.updateCamera(player.worldPos);
 
         // Update projectiles
-        for(Projectile p : projectileList) {
+        for (Projectile p : projectileList) {
             p.update(delta);
             Coordinate pScreenPos = levelMap.convertWorldToScreen(p.worldPos);
             p.setX(pScreenPos.x);
             p.setY(pScreenPos.y);
         }
         // Update All enemies
-        for(Enemy enemy : enemyList) {
-            if(twoPlayer)
+        for (Enemy enemy : enemyList) {
+            if (twoPlayer)
                 enemy.makeMove2P(levelMap.currentTileMap, path, player, path2, player2, projectileList, delta);
             else
                 enemy.makeMove(levelMap.currentTileMap, path, player, projectileList, delta);
@@ -419,7 +447,7 @@ public class Level1 extends BasicGameState {
         }
 
         // Update powerups
-        for(Powerup p : powerupList) {
+        for (Powerup p : powerupList) {
             Coordinate screenPos = levelMap.convertWorldToScreen(p.worldPos);
             p.setX(screenPos.x);
             p.setY(screenPos.y);
@@ -427,16 +455,16 @@ public class Level1 extends BasicGameState {
 
 
         // Collision check for projectiles
-        for(Projectile projectile : projectileList) {
+        for (Projectile projectile : projectileList) {
             projectile.collisionCheck(levelMap.currentTileMap, enemyList, player);
-            if(twoPlayer)
+            if (twoPlayer)
                 projectile.collisionCheck(levelMap.currentTileMap, enemyList, player2);
         }
 
         // Collision check for powerups
-        for(Powerup p : powerupList) {
+        for (Powerup p : powerupList) {
             p.playerCollision(player);
-            if(twoPlayer)
+            if (twoPlayer)
                 p.playerCollision(player2);
         }
 
@@ -464,7 +492,7 @@ public class Level1 extends BasicGameState {
         }
 
         // Send data to p2 if were in two player mode
-        if(twoPlayer) {
+        if (twoPlayer) {
             try {
                 dg.client.dataOutputStream.writeUTF(get2PData());
                 dg.client.dataOutputStream.flush();
@@ -474,9 +502,9 @@ public class Level1 extends BasicGameState {
         }
 
         // Remove Projectiles that have collided with objects.
-        projectileList.removeIf( (Projectile projectile) -> projectile.needsRemove());
+        projectileList.removeIf((Projectile projectile) -> projectile.needsRemove());
         // Remove grabbed powerups
-        powerupList.removeIf( (Powerup powerup) -> powerup.getRemoveMe());
+        powerupList.removeIf((Powerup powerup) -> powerup.getRemoveMe());
         // Remove enemies that have died.
         enemyList.removeIf( (Enemy enemy) -> {
             if(enemy.isDead()) {
@@ -488,6 +516,22 @@ public class Level1 extends BasicGameState {
             }
             return enemy.isDead();
         });
+
+        checkIfPlayersCamExitToNextLevel(game);
+    } // update
+
+
+    public void setPlayerType(int id) {
+        player1type = id;
+    }
+
+
+    public void set2Player(boolean status) {
+        twoPlayer = status;
+        if (player1type == 1)
+            player2type = 2;
+        else
+            player2type = 1;
     }
 
     public void setPlayerType(int id) {
@@ -556,4 +600,30 @@ public class Level1 extends BasicGameState {
     }
 
 
+    private TileIndex getKeyPositionWhenLastEnemyStands() {
+        if (enemyList.size() == 1) {
+            // if we have one enemy left, we get the location of the final enemy
+            // to render the key when the enemy dies, in the enemy's location:
+            return enemyList.get(0).getTileIndex();
+        }
+        return null;
+    }
+
+
+    // check if either player is at the door and also has the key to unlock it,
+    // if so, the players move to the next level.
+    private void checkIfPlayersCamExitToNextLevel(StateBasedGame game) {
+        if (levelMap.isAtDoor(player)) {
+            if (player.hasTheKey) {
+                game.enterState(DungeonGame.LEVEL2);
+            }
+        }
+        if (twoPlayer) {
+            if (levelMap.isAtDoor(player)) {
+                if (player.hasTheKey) {
+                    game.enterState(DungeonGame.LEVEL2);
+                }
+            }
+        }
+    }
 }

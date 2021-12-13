@@ -31,6 +31,8 @@ public class MapUtil {
 
 
 
+
+
     Tile[][] currentTileMap;
     Coordinate cameraPos = new Coordinate(0, 0);
     Coordinate maxCameraPos = new Coordinate((LEVELWIDTH * TILESIZE) - (SCREENWIDTH * TILESIZE),
@@ -93,34 +95,45 @@ public class MapUtil {
         return convertWorldToScreen(worldPos);
     }
 
-    // a very handy method for handling collision checks for a tile index:
+    // very handy methods for handling collision checks for a tile index:
     public Boolean hasCollision(TileIndex tileIndex){
         int tileValue = currentTileMap[tileIndex.x][tileIndex.y].getID();
         // return to true if the tile is not blank and not the door tile:
-        return (tileValue > 0 && tileValue != 6);
+        return (tileValue == wallTile || tileValue == wallTileWithTorch);
     }
+
     public static Boolean hasCollision(int tileValue){
         // return to true if the tile is not blank and not the door tile:
         return (tileValue == wallTile || tileValue == wallTileWithTorch);
     }
+
     // allowing for a vector from world to tile:
     public static TileIndex convertWorldToTile(Vector worldPos){
         return new TileIndex((int)Math.floor(worldPos.getX() / TILESIZE), (int)Math.floor(worldPos.getY() / TILESIZE));
     }
+
     // converting from world to tile:
     public static TileIndex convertWorldToTile(Coordinate worldPos){
         return new TileIndex((int)Math.floor(worldPos.x / TILESIZE), (int)Math.floor(worldPos.y / TILESIZE));
     }
+
     // convert screen to tile if needed:
     public TileIndex convertScreenToTile(Coordinate screenPos){
         Coordinate worldPos = convertScreenToWorld(screenPos);
         return convertWorldToTile(worldPos);
     }
+
     // offset of the camera can be in between and partially on tiles:
     public Coordinate getCameraTileOffset() {
         Coordinate cameraTilePos = new Coordinate(cameraPos.x % TILESIZE, cameraPos.y % TILESIZE);
         return cameraTilePos;
     }
+    // check if
+    public Boolean isAtDoor(Player player){
+       TileIndex playerLoc = player.getTileIndex();
+       return (currentTileMap[playerLoc.x][playerLoc.y].getID() == exitDoorGoal);
+    }
+
     // scroll our camera based on independent player movement:
     public void updateCamera(Coordinate deltaMove) {
         cameraPos.x = deltaMove.x - (0.5f * SCREENWIDTH * TILESIZE);
@@ -199,6 +212,8 @@ public class MapUtil {
             }
         }
     }
+
+
 
 
     private String readLevelCSV(String MapData) throws IOException {
