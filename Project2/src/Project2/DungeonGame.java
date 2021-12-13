@@ -112,17 +112,21 @@ public class DungeonGame extends StateBasedGame {
   public static final String POWERUP_SELFREVIVE_RSC = "Project2/Assets/powerups/watermelon.png";
   public static final String POWERUP_INVINCIBILITY_RSC = "Project2/Assets/powerups/shield_02.png";
   public static final String POWERUP_DOUBLESTRENGTH_RSC = "Project2/Assets/powerups/glowing_dust.png";
+  public static final String KEY_RSC = "Project2/Assets/key.png";
 
   // Map - LEVEL 1:
   public static final String MAP_WALL_RSC = "Project2/Assets/level1/wall.png";
   public static final String MAP_FLOOR_RSC = "Project2/Assets/level1/floor.png";
+  public static final String MAP_WALL_WITH_TORCH_RSC = "Project2/Assets/level1/wall_torch.png";
+  public static final String MAP_DOOR_RSC = "Project2/Assets/level1/door.png";
+
   // Map - LEVEL 2:
   public static final String MAP2_WALL_RSC = "Project2/Assets/level2/wall2.png";
   public static final String MAP2_FLOOR_RSC = "Project2/Assets/level2/floor2.png";
   public static final String MAP2_WALL_WITH_TORCH_RSC = "Project2/Assets/level2/wall2_torch.png";
   public static final String MAP2_DOOR_RSC = "Project2/Assets/level2/door2.png";
 
-  public static final String KEY_RSC = "Project2/Assets/key.png";
+
 
   // Parameters
   public final int ScreenWidth;
@@ -228,6 +232,8 @@ public class DungeonGame extends StateBasedGame {
     // Map - level 1
     ResourceManager.loadImage(MAP_FLOOR_RSC);
     ResourceManager.loadImage(MAP_WALL_RSC);
+    ResourceManager.loadImage(MAP_WALL_WITH_TORCH_RSC);
+    ResourceManager.loadImage(MAP_DOOR_RSC);
 
     // Map - level 2
     ResourceManager.loadImage(MAP2_FLOOR_RSC);
