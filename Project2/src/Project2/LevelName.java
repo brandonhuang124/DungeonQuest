@@ -12,6 +12,8 @@ public enum LevelName {
     TWO,
     THREE,
 
+    WIN,
+
     GAMEOVER
 
 }

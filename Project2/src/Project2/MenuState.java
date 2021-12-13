@@ -246,6 +246,7 @@ public class MenuState extends BasicGameState {
           else {
             System.out.println("Start game now");
             ((Level1)game.getState(DungeonGame.LEVEL1)).set2Player(false);
+            MapUtil.levelName = LevelName.ONE;
             game.enterState(DungeonGame.LEVEL1);
           }
         }
@@ -274,6 +275,7 @@ public class MenuState extends BasicGameState {
           else {
             System.out.println("Start Game Now");
             ((Level1)game.getState(DungeonGame.LEVEL1)).set2Player(false);
+            MapUtil.levelName = LevelName.ONE;
             game.enterState(DungeonGame.LEVEL1);
           }
         }
@@ -311,6 +313,7 @@ public class MenuState extends BasicGameState {
 
             // Now we can actually start
             ((Level1)game.getState(DungeonGame.LEVEL1)).set2Player(true);
+            MapUtil.levelName = LevelName.ONE;
             game.enterState(DungeonGame.LEVEL1);
           }
         }
@@ -409,6 +412,7 @@ public class MenuState extends BasicGameState {
       }
       // Check if the server told us were starting.
       if(token != null && token[0].equals("START")) {
+        MapUtil.levelName = LevelName.NONEORTEST;
         game.enterState(DungeonGame.DUMMYSTATE);
       }
     }

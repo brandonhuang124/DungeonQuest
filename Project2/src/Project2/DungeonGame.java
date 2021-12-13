@@ -32,10 +32,12 @@ public class DungeonGame extends StateBasedGame {
   public static final int STARTUPSTATE = 0;
   public static final int TESTSTATE = 1;
   public static final int LEVEL1 = 2;
-  public static final int LEVEL2 = 5;
+  //public static final int LEVEL2 = 5;
   public static final int MENUSTATE = 3;
   public static final int DUMMYSTATE = 4;
   public static final int GAMEOVER = 6;
+  public static final int TRANSITION = 7;
+  public static final int WIN = 8;
   // Important parameters
   public static final int SCALE = 1;
 
@@ -150,11 +152,12 @@ public class DungeonGame extends StateBasedGame {
     // Load states
     addState(new StartState());
     //addState(new TestState());
+    addState(new TransitionState());
     addState(new Level1());
     addState(new MenuState());
     addState(new DummyState());
-    addState(new Level2());
     addState(new GameOver());
+    addState(new WinState());
     /*** RESOURCE LOADING ***/
     // Player
     ResourceManager.loadImage(PLAYER_RANGEDARROW1_RSC);

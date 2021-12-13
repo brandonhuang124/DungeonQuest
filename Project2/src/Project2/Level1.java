@@ -50,7 +50,7 @@ public class Level1 extends BasicGameState {
     @Override
     public void enter(GameContainer container, StateBasedGame game) {
         // set the state id to the level in maputil to determine which map to render:
-        MapUtil.setLevelName(LevelName.ONE);
+
         path = path2 = null;
         if (player1type == 0)
             player1type = 1;
@@ -612,13 +612,13 @@ public class Level1 extends BasicGameState {
     private void checkIfPlayersCamExitToNextLevel(StateBasedGame game) {
         if (levelMap.isAtDoor(player)) {
             if (player.hasTheKey) {
-                game.enterState(DungeonGame.LEVEL2);
+                game.enterState(DungeonGame.TRANSITION);
             }
         }
         if (twoPlayer) {
             if (levelMap.isAtDoor(player)) {
                 if (player.hasTheKey) {
-                    game.enterState(DungeonGame.LEVEL2);
+                    game.enterState(DungeonGame.TRANSITION);
                 }
             }
         }
