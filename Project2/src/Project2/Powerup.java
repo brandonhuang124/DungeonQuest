@@ -96,6 +96,13 @@ public class Powerup extends Entity {
   }
   public static ArrayList<Powerup> buildPowerUpList() {
     ArrayList<Powerup> powerUpList = new ArrayList<Powerup>();
+    if(MapUtil.levelName == LevelName.ONE) {
+      powerUpList.add(new Powerup(16, 14, 1));
+      powerUpList.add(new Powerup(38,  5, 1));
+      powerUpList.add(new Powerup(38, 24, 1));
+      powerUpList.add(new Powerup(15, 31, 1));
+      powerUpList.add(new Powerup(44, 47, 1));
+    }
     if(MapUtil.levelName == LevelName.TWO) {
       powerUpList.add(new Powerup(19, 4, 1));
       powerUpList.add(new Powerup(49, 31, 1));

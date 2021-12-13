@@ -172,8 +172,14 @@ public class Level1 extends BasicGameState {
             else
                 g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC), 152 + (player2.getMaxHealth() * 6) + player2HudOffset, 660);
         }
-        if (enemyList.isEmpty()) {
-            key.render(g);
+        if (enemyList.isEmpty() && !player.hasTheKey) {
+            if(twoPlayer){
+                if(!player2.hasTheKey){
+                    g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), levelMap.convertTileToScreen(key.getLocation()).x,levelMap.convertTileToScreen(key.getLocation()).y );
+                }
+            }else{
+                g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), levelMap.convertTileToScreen(key.getLocation()).x,levelMap.convertTileToScreen(key.getLocation()).y );
+            }
         }
     }
 
@@ -187,21 +193,23 @@ public class Level1 extends BasicGameState {
         if (!enemyList.isEmpty()) {
             // only gets the location if there is one enemy left on the map:
             keyLocation = getKeyPositionWhenLastEnemyStands();
-        } else { // assume we got the location if list is empty with a null check just in case:
-            if (keyLocation != null) {
-                key = new Key(keyLocation.x, keyLocation.y);
-            }
         }
+        if (keyLocation != null) {
+            key = new Key(keyLocation.x, keyLocation.y);
+        }
+
         if (key != null) {
             if (key.playerCollision(player.getTileIndex())) {
                 player.hasTheKey = true;
                 key = null;
+                System.out.println("Level class, A Player has picked up the key!");
             }
             if (twoPlayer) {
                 if (key.playerCollision(player2.getTileIndex())) {
                     // take the key off the map if the player grabs it:
                     // java handles the garbage collection here
                     player2.hasTheKey = true;
+                    System.out.println("Level class, A Player has picked up the key!");
                     key = null;
                 }
             }
