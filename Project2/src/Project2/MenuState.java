@@ -175,6 +175,8 @@ public class MenuState extends BasicGameState {
             System.out.println("Client created: " + DungeonGame.client);
           } catch (Exception e) {
             e.printStackTrace();
+            phase = 1;
+            DungeonGame.client.disconnect();
           }
           try {
             DungeonGame.client.dataOutputStream.writeUTF("Player2;");
@@ -352,7 +354,11 @@ public class MenuState extends BasicGameState {
         // Tell the server we got it
         DungeonGame.client.dataOutputStream.writeUTF("A;");
         DungeonGame.client.dataOutputStream.flush();
-      } catch(IOException e) { e.printStackTrace();}
+      } catch(IOException e) {
+        e.printStackTrace();
+        phase = 1;
+        DungeonGame.client.disconnect();
+      }
 
       // Use mouse position to find what were hovered over.
       if(25 < mousex && mousex < 221 && 645 < mousey && mousey < 713)

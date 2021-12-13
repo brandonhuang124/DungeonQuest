@@ -29,26 +29,36 @@ public class Server {
         try {
             System.out.println("Waiting for connections...");
             while(!hasPlayer1 || !hasPlayer2) {
-                Socket socket = serverSocket.accept();
-                System.out.println("Player #" + 1 + " has connected");
-                ClientHandler clientHandler = new ClientHandler(socket, 1);
-                setPlayers(clientHandler,1);
+                Socket socket, socket2;
+                ClientHandler clientHandler = player1;
+                ClientHandler clientHandler2 = player2;
+                if(!hasPlayer1) {
+                  socket = serverSocket.accept();
+                  System.out.println("Player #" + 1 + " has connected");
+                  clientHandler = new ClientHandler(socket, 1);
+                  setPlayers(clientHandler,1);
 
-                System.out.println("Starting ClientHandler Thread for Player #" + 1);
-                Thread thread = new Thread(clientHandler);
-                thread.start();
+                  System.out.println("Starting ClientHandler Thread for Player #" + 1);
+                  Thread thread = new Thread(clientHandler);
+                  thread.start();
+                }
 
-                Socket socket2 = serverSocket.accept();
-                System.out.println("Player #" + 2 + " has connected");
-                ClientHandler clientHandler2 = new ClientHandler(socket2, 2);
-                setPlayers(clientHandler2,2);
-                clientHandler.partner = clientHandler2;
-                clientHandler2.partner = clientHandler;
+                if(!hasPlayer2) {
+                  socket2 = serverSocket.accept();
+                  System.out.println("Player #" + 2 + " has connected");
+                  clientHandler2 = new ClientHandler(socket2, 2);
+                  setPlayers(clientHandler2,2);
 
-                System.out.println("Starting ClientHandler Thread for Player #" + 2);
-                Thread thread2 = new Thread(clientHandler2);
-                thread2.start();
+                  System.out.println("Starting ClientHandler Thread for Player #" + 2);
+                  Thread thread2 = new Thread(clientHandler2);
+                  thread2.start();
 
+                }
+
+                if(clientHandler != null)
+                  clientHandler.partner = clientHandler2;
+                if(clientHandler2 != null)
+                  clientHandler2.partner = clientHandler;
             }
             System.out.println("Max player connections reached");
         } catch (Exception e) {
