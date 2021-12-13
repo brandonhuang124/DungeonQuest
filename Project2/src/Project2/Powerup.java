@@ -30,6 +30,15 @@ public class Powerup extends Entity {
     if(id == 1) {
       addImage(ResourceManager.getImage(DungeonGame.POWERUP_HEALTHPOTION_RSC));
     }
+    if(id == 2) {
+      addImage(ResourceManager.getImage(DungeonGame.POWERUP_SELFREVIVE_RSC));
+    }
+    if(id == 3) {
+      addImage(ResourceManager.getImage(DungeonGame.POWERUP_INVINCIBILITY_RSC));
+    }
+    if(id == 4) {
+      addImage(ResourceManager.getImage(DungeonGame.POWERUP_DOUBLESTRENGTH_RSC));
+    }
   }
 
   public boolean playerCollision(Player player) {
@@ -38,6 +47,12 @@ public class Powerup extends Entity {
       // Do stuff based on which powerup we are
       if(id == 1)
         healthPotion(player);
+      if(id == 2)
+        selfRevive(player);
+      if(id == 3)
+        invincible(player);
+      if(id == 4)
+        doubleStrength(player);
       removeMe = true;
       return true;
     }
@@ -46,6 +61,18 @@ public class Powerup extends Entity {
 
   private void healthPotion(Player player) {
     player.maxHeal();
+  }
+
+  private void selfRevive(Player player) {
+    player.setSelfRevive(true);
+  }
+
+  private void invincible(Player player) {
+    player.setInvincible(true);
+  }
+
+  private void doubleStrength(Player player) {
+    player.setDoubleStrength(true);
   }
 
   public int getId() { return id;}

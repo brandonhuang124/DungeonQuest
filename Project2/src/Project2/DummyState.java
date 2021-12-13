@@ -36,6 +36,7 @@ public class DummyState extends BasicGameState {
   public void enter(GameContainer container, StateBasedGame game) {
     p1Health = p1MaxHealth = p2Health = p2MaxHealth = 0;
     meleePlayer = rangedPlayer = null;
+    MapUtil.setLevelName(LevelName.ONE);
     enemyList = Enemy.buildEnemyList();
     dummyList = new ArrayList<DummyObject>();
     // parse the CSV map file, throw exception in case of IO error:
@@ -179,7 +180,7 @@ public class DummyState extends BasicGameState {
     /*** CONTROLS SECTION ***/
     data = "";
     // Left click for attacking: Send 1 for yes we attacked, and 0 for no we didn't
-    if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON))
+    if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON))
       data = data.concat("1;");
     else
       data = data.concat("0;");
