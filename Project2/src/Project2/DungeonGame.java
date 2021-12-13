@@ -107,6 +107,7 @@ public class DungeonGame extends StateBasedGame {
   public static final String POWERUP_HEALTHPOTION_RSC = "Project2/Assets/powerups/healthPotion.png";
   public static final String PLAYER_ARROWTEST_RSC = "Project2/Assets/arrow.png";
   public static final String PLAYER_PROJECTILE_RSC = "Project2/Assets/projectile.png";
+  public static final String KEY_RSC = "Project2/Assets/key.png";
 
   // Map - LEVEL 1:
   public static final String MAP_WALL_RSC = "Project2/Assets/level1/wall.png";
@@ -222,6 +223,9 @@ public class DungeonGame extends StateBasedGame {
     ResourceManager.loadImage(MAP2_WALL_RSC);
     ResourceManager.loadImage(MAP2_WALL_WITH_TORCH_RSC);
     ResourceManager.loadImage(MAP2_DOOR_RSC);
+
+    //KEY
+    ResourceManager.loadImage(KEY_RSC);
 
   }
 
