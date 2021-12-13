@@ -103,7 +103,7 @@ public class DungeonGame extends StateBasedGame {
   public static final String MENU_WAIT_RSC = "Project2/Assets/menu/waiting.png";
   public static final String MENU_FOUND_RSC = "Project2/Assets/menu/found.png";
   public static final String MENU_ERROR_RSC = "Project2/Assets/menu/error.png";
-  public static final String MENU_WAITHOST_RSC = "Project2/Assets/menu/error.png";
+  public static final String MENU_WAITHOST_RSC = "Project2/Assets/menu/waitinghost.png";
 
   // Other
   public static final String POWERUP_HEALTHPOTION_RSC = "Project2/Assets/powerups/healthPotion.png";

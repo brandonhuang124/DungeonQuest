@@ -36,6 +36,7 @@ public class DummyState extends BasicGameState {
   public void enter(GameContainer container, StateBasedGame game) {
     p1Health = p1MaxHealth = p2Health = p2MaxHealth = 0;
     meleePlayer = rangedPlayer = null;
+    MapUtil.setLevelName(LevelName.ONE);
     enemyList = Enemy.buildEnemyList();
     dummyList = new ArrayList<DummyObject>();
     // parse the CSV map file, throw exception in case of IO error:
