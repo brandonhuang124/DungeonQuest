@@ -175,6 +175,10 @@ public class MenuState extends BasicGameState {
             System.out.println("Client created: " + DungeonGame.client);
           } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Error Connecting");
+            phase = 1;
+            DungeonGame.client.disconnect();
+            return;
           }
           try {
             DungeonGame.client.dataOutputStream.writeUTF("Player2;");
@@ -215,6 +219,10 @@ public class MenuState extends BasicGameState {
               System.out.println("Client created: " + DungeonGame.client);
             } catch (Exception e) {
               e.printStackTrace();
+              System.out.println("Error Connecting");
+              phase = 1;
+              DungeonGame.client.disconnect();
+              return;
             }
             try {
               DungeonGame.client.dataOutputStream.writeUTF("Player1;");
@@ -240,6 +248,10 @@ public class MenuState extends BasicGameState {
               System.out.println("Client created: " + DungeonGame.client);
             } catch (Exception e) {
               e.printStackTrace();
+              System.out.println("Error Connecting");
+              phase = 1;
+              DungeonGame.client.disconnect();
+              return;
             }
             try {
               DungeonGame.client.dataOutputStream.writeUTF("Player1;");
@@ -304,7 +316,13 @@ public class MenuState extends BasicGameState {
           // Also send the server an acknowledgement
           DungeonGame.client.dataOutputStream.writeUTF("A;");
           DungeonGame.client.dataOutputStream.flush();
-        } catch(IOException e) { e.printStackTrace();}
+        } catch(IOException e) {
+          e.printStackTrace();
+          System.out.println("Error Connecting");
+          phase = 1;
+          DungeonGame.client.disconnect();
+          return;
+        }
 
         // Check mouse positions and click status.
         if(25 < mousex && mousex < 221 && 645 < mousey && mousey < 713)
@@ -352,7 +370,12 @@ public class MenuState extends BasicGameState {
         // Tell the server we got it
         DungeonGame.client.dataOutputStream.writeUTF("A;");
         DungeonGame.client.dataOutputStream.flush();
-      } catch(IOException e) { e.printStackTrace();}
+      } catch(IOException e) {
+        e.printStackTrace();
+        phase = 1;
+        DungeonGame.client.disconnect();
+        return;
+      }
 
       // Use mouse position to find what were hovered over.
       if(25 < mousex && mousex < 221 && 645 < mousey && mousey < 713)

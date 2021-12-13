@@ -7,7 +7,6 @@ import java.net.Socket;
 
 public class Server {
     private ServerSocket serverSocket;
-    private int numPlayers, threadPlayer;
     private volatile ClientHandler player1;
     private volatile ClientHandler player2;
     volatile boolean  hasPlayer1, hasPlayer2;
@@ -16,7 +15,6 @@ public class Server {
         player1 = player2 = null;
         System.out.println("---Server---");
         hasPlayer1 = hasPlayer2 = false;
-        numPlayers = threadPlayer = 0;
         try {
             serverSocket = new ServerSocket(4999);
         } catch (IOException e) {
@@ -29,26 +27,46 @@ public class Server {
         try {
             System.out.println("Waiting for connections...");
             while(!hasPlayer1 || !hasPlayer2) {
-                Socket socket = serverSocket.accept();
-                System.out.println("Player #" + 1 + " has connected");
-                ClientHandler clientHandler = new ClientHandler(socket, 1);
-                setPlayers(clientHandler,1);
+                Socket socket, socket2;
+                ClientHandler clientHandler = player1;
+                ClientHandler clientHandler2 = player2;
+                if(!hasPlayer1) {
+                  socket = serverSocket.accept();
+                  System.out.println("Player #" + 1 + " has connected");
+                  clientHandler = new ClientHandler(socket, 1);
+                  if(player1 == null)
+                    player1 = clientHandler;
+                  else
+                    player2 = clientHandler;
+                  System.out.println("Starting ClientHandler Thread for Player #" + 1);
+                  Thread thread = new Thread(clientHandler);
+                  thread.start();
+                }
 
-                System.out.println("Starting ClientHandler Thread for Player #" + 1);
-                Thread thread = new Thread(clientHandler);
-                thread.start();
+                if(!hasPlayer2) {
+                  socket2 = serverSocket.accept();
+                  System.out.println("Player #" + 2 + " has connected");
+                  clientHandler2 = new ClientHandler(socket2, 2);
+                  if(player2 == null)
+                    player2 = clientHandler;
+                  else
+                    player1 = clientHandler;
+                  System.out.println("Starting ClientHandler Thread for Player #" + 2);
+                  Thread thread2 = new Thread(clientHandler2);
+                  thread2.start();
+                }
 
-                Socket socket2 = serverSocket.accept();
-                System.out.println("Player #" + 2 + " has connected");
-                ClientHandler clientHandler2 = new ClientHandler(socket2, 2);
-                setPlayers(clientHandler2,2);
-                clientHandler.partner = clientHandler2;
-                clientHandler2.partner = clientHandler;
+                // After a pass, we need to set the player's partners
+                if(clientHandler != null)
+                  clientHandler.partner = clientHandler2;
+                if(clientHandler2 != null)
+                  clientHandler2.partner = clientHandler;
 
-                System.out.println("Starting ClientHandler Thread for Player #" + 2);
-                Thread thread2 = new Thread(clientHandler2);
-                thread2.start();
-
+                // Each pass we need to reset players that we "don't have"
+                if(!hasPlayer1)
+                  player1 = null;
+                if(!hasPlayer2)
+                  player2 = null;
             }
             System.out.println("Max player connections reached");
         } catch (Exception e) {
@@ -128,10 +146,6 @@ public class Server {
                       socket.close();
                       return;
                     }
-                    if(playerID == 2){
-                      // Were assigned to the wrong player
-                      Server.this.swapPlayer();
-                    }
                     playerID = 1;
                     hasPlayer1 = true;
                     phase = 2;
@@ -147,10 +161,6 @@ public class Server {
                       dataInputStream.close();
                       socket.close();
                       return;
-                    }
-                    if(playerID == 1){
-                      // Were assigned to the wrong player
-                      Server.this.swapPlayer();
                     }
                     playerID = 2;
                     hasPlayer2 = true;
@@ -233,6 +243,10 @@ public class Server {
             } catch (IOException e) {
                 System.out.println("IOException from run() in ClientHandler");
                 e.printStackTrace();
+                if(playerID == 1)
+                  hasPlayer1 = false;
+                if(playerID == 2)
+                  hasPlayer2 = false;
             }
         }
     }
