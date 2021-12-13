@@ -585,7 +585,7 @@ public class Enemy extends Entity{
     ArrayList<Enemy> enemyList = new ArrayList<Enemy>();
     if(MapUtil.levelName == LevelName.ONE) {
       enemyList.add(new Enemy(9, 19, 1));
-    //  enemyList.add(new Enemy(21, 7, 2));
+      enemyList.add(new Enemy(21, 7, 2));
    //   enemyList.add(new Enemy(50, 5, 2));
     //  enemyList.add(new Enemy(56,26, 1));
     //  enemyList.add(new Enemy(20,35, 1));

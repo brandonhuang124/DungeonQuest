@@ -66,7 +66,6 @@ public class Level1 extends BasicGameState {
                 MapUtil.LEVELWIDTH, MapUtil.LEVELWIDTH);
         projectileList = new ArrayList<Projectile>();
         powerupList = new ArrayList<Powerup>();
-        powerupList.add(new Powerup(5, 3, 1));
         player = new Player(0, 0, player1type);
         if (twoPlayer) {
             player2 = new Player(0, 0, player2type);
@@ -74,6 +73,7 @@ public class Level1 extends BasicGameState {
         }
         player.setWorldPos(new TileIndex(4, 4));
         enemyList = Enemy.buildEnemyList();
+        powerupList = Powerup.buildPowerUpList();
 
         container.setSoundOn(true);
     }
@@ -143,6 +143,9 @@ public class Level1 extends BasicGameState {
         if(player.getDoubleStrength()) {
             g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_DOUBLESTRENGTH_RSC), 192, 700);
         }
+        if((player.hasTheKey) && enemyList.isEmpty()){ // render the key in the hud when picked up:
+            g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), 212, 700);
+        }
 
         // Now if were in two player, render the second players HUD
         if (twoPlayer) {
@@ -167,18 +170,48 @@ public class Level1 extends BasicGameState {
                     g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBAR_RSC), 152 + (i * 6) + player2HudOffset, 660);
             }
             // Render Right cap of health bar
-            if (player2.getCurrentHealth() == player2.getMaxHealth())
+            if (player2.getCurrentHealth() == player2.getMaxHealth()) {
                 g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARR_RSC), 152 + (player2.getMaxHealth() * 6) + player2HudOffset, 660);
-            else
+            } else {
                 g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC), 152 + (player2.getMaxHealth() * 6) + player2HudOffset, 660);
+            }// render the key in player 2's HUD if they picked up the key:
+            if((player2.hasTheKey) && enemyList.isEmpty()){ // render the key in the hud when picked up:
+                g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), 212  + player2HudOffset, 700);
+            }
         }
+
+        // rendering the key being dropped onto the map upon last enemy being killed:
         if (enemyList.isEmpty() && !player.hasTheKey) {
-            if(twoPlayer){
-                if(!player2.hasTheKey){
-                    g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), levelMap.convertTileToScreen(key.getLocation()).x,levelMap.convertTileToScreen(key.getLocation()).y );
+            if(twoPlayer){  // checking that both players do not have the key:
+                if(enemyList.isEmpty() && !player2.hasTheKey){
+                    g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), levelMap.convertTileToScreen(key.getLocation()).x ,
+                                                                                levelMap.convertTileToScreen(key.getLocation()).y );
                 }
             }else{
-                g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), levelMap.convertTileToScreen(key.getLocation()).x,levelMap.convertTileToScreen(key.getLocation()).y );
+                g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), levelMap.convertTileToScreen(key.getLocation()).x ,
+                                                                            levelMap.convertTileToScreen(key.getLocation()).y );
+            }
+        }
+
+        // render a string in the corner of the screen that shows enemy count remaining:
+        // if a player defeats all enemies, instruct to find the key
+        // if a player has picked up the key, instruct to unlock the door
+        // this logic can be refactored to be simpler later
+        if(!enemyList.isEmpty()) {
+            g.drawString("Enemies remaining: " + enemyList.size(), 440, 0);
+        }
+        if(enemyList.isEmpty() && (!player.hasTheKey) && (!twoPlayer)){
+            g.drawString("Find the key!", 440, 0);
+        }
+        if(enemyList.isEmpty() && player.hasTheKey && !twoPlayer){
+            g.drawString("Unlock the door!", 440, 0);
+        }
+        if(twoPlayer){
+            if(enemyList.isEmpty() && (!player.hasTheKey) && (!player2.hasTheKey)){
+                g.drawString("Find the key!", 440, 0);
+            }
+            if(enemyList.isEmpty() && (player2.hasTheKey || player.hasTheKey)){
+                g.drawString("Unlock the door!", 440, 0);
             }
         }
     }
@@ -199,13 +232,13 @@ public class Level1 extends BasicGameState {
         }
 
         if (key != null) {
-            if (key.playerCollision(player.getTileIndex())) {
+            if (key.playerCollision(player.getTileIndex()) && enemyList.isEmpty()) {
                 player.hasTheKey = true;
                 key = null;
                 System.out.println("Level class, A Player has picked up the key!");
             }
             if (twoPlayer) {
-                if (key.playerCollision(player2.getTileIndex())) {
+                if (key.playerCollision(player2.getTileIndex()) && enemyList.isEmpty()) {
                     // take the key off the map if the player grabs it:
                     // java handles the garbage collection here
                     player2.hasTheKey = true;
