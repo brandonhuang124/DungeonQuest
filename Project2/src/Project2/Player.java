@@ -34,7 +34,7 @@ public class Player extends Entity {
   public Weapon weapon;
   public Coordinate worldPos;
   public Coordinate prevMoveVelocity;
-
+  public Boolean hasTheKey;
   /***
    * Constructor, prepares default stats and Images/anmiations
    * @param x
