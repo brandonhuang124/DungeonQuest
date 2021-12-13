@@ -109,6 +109,16 @@ public class MenuState extends BasicGameState {
 
     // Game join
     if(phase == 5) {
+      g.drawImage(ResourceManager.getImage(DungeonGame.MENU_WAITHOST_RSC), 172, 370);
+      g.drawImage(ResourceManager.getImage(DungeonGame.MENU_TITLE_RSC), 63, 25);
+      g.drawImage(ResourceManager.getImage(DungeonGame.MENU_BACK_RSC), 25, 645);
+      if(select == 1)
+        g.drawImage(ResourceManager.getImage(DungeonGame.MENU_SELECTOR_RSC), 231, 647);
+    }
+
+    // Connection error
+    if(phase == 6) {
+      g.drawImage(ResourceManager.getImage(DungeonGame.MENU_ERROR_RSC), 129, 370);
       g.drawImage(ResourceManager.getImage(DungeonGame.MENU_TITLE_RSC), 63, 25);
       g.drawImage(ResourceManager.getImage(DungeonGame.MENU_BACK_RSC), 25, 645);
       if(select == 1)
@@ -220,7 +230,7 @@ public class MenuState extends BasicGameState {
             } catch (Exception e) {
               e.printStackTrace();
               System.out.println("Error Connecting");
-              phase = 1;
+              phase = 6;
               DungeonGame.client.disconnect();
               return;
             }
@@ -249,7 +259,7 @@ public class MenuState extends BasicGameState {
             } catch (Exception e) {
               e.printStackTrace();
               System.out.println("Error Connecting");
-              phase = 1;
+              phase = 6;
               DungeonGame.client.disconnect();
               return;
             }
@@ -319,7 +329,7 @@ public class MenuState extends BasicGameState {
         } catch(IOException e) {
           e.printStackTrace();
           System.out.println("Error Connecting");
-          phase = 1;
+          phase = 6;
           DungeonGame.client.disconnect();
           return;
         }
@@ -376,7 +386,7 @@ public class MenuState extends BasicGameState {
         DungeonGame.client.dataOutputStream.flush();
       } catch(IOException e) {
         e.printStackTrace();
-        phase = 1;
+        phase = 6;
         DungeonGame.client.disconnect();
         return;
       }
@@ -399,6 +409,25 @@ public class MenuState extends BasicGameState {
       // Check if the server told us were starting.
       if(token != null && token[0].equals("START")) {
         game.enterState(DungeonGame.DUMMYSTATE);
+      }
+    }
+
+    // Connection Error phase.
+    else if(phase == 6) {
+      // Use mouse position to find what were hovered over.
+      if(25 < mousex && mousex < 221 && 645 < mousey && mousey < 713)
+        select = 1;
+      else
+        select = 0;
+      // Check if we clicked
+      if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+        if(select == 1) {
+          phase = 1;
+          // If we back out, we need to close connections
+          DungeonGame.client.disconnect();
+          DungeonGame.client = null;
+          return;
+        }
       }
     }
   }

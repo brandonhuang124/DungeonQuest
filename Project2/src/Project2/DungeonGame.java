@@ -101,6 +101,8 @@ public class DungeonGame extends StateBasedGame {
   public static final String MENU_TITLE_RSC = "Project2/Assets/menu/titleCard.png";
   public static final String MENU_WAIT_RSC = "Project2/Assets/menu/waiting.png";
   public static final String MENU_FOUND_RSC = "Project2/Assets/menu/found.png";
+  public static final String MENU_ERROR_RSC = "Project2/Assets/menu/error.png";
+  public static final String MENU_WAITHOST_RSC = "Project2/Assets/menu/error.png";
 
   // Other
   public static final String POWERUP_HEALTHPOTION_RSC = "Project2/Assets/powerups/healthPotion.png";
@@ -202,6 +204,8 @@ public class DungeonGame extends StateBasedGame {
     ResourceManager.loadImage(MENU_JOIN_RSC);
     ResourceManager.loadImage(MENU_WAIT_RSC);
     ResourceManager.loadImage(MENU_FOUND_RSC);
+    ResourceManager.loadImage(MENU_ERROR_RSC);
+    ResourceManager.loadImage(MENU_WAITHOST_RSC);
 
     // Other
     ResourceManager.loadImage(POWERUP_HEALTHPOTION_RSC);
