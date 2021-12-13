@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
+import java.util.Timer;
 
 /***
  * Description:
@@ -29,8 +30,8 @@ public class Level1 extends BasicGameState {
     ArrayList<Powerup> powerupList;
     Vertex[][] path, path2;
     MapUtil levelMap;
+    Timer timer;
     int player1type, player2type;
-    ;
     boolean player1Dead, player2Dead, gameover, twoPlayer;
     Key key;
 
@@ -41,8 +42,9 @@ public class Level1 extends BasicGameState {
 
     @Override
     public void init(GameContainer container, StateBasedGame game) throws SlickException {
-        levelMap = new MapUtil();
         player1type = player2type = 0;
+        levelMap = new MapUtil();
+        timer = new Timer();
     }
 
     @Override
@@ -131,6 +133,16 @@ public class Level1 extends BasicGameState {
             g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARR_RSC), 152 + (player.getMaxHealth() * 6), 660);
         else
             g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC), 152 + (player.getMaxHealth() * 6), 660);
+
+        if(player.getSelfRevive()) {
+            g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_SELFREVIVE_RSC), 152, 700);
+        }
+        if(player.getInvincible()) {
+            g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_INVINCIBILITY_RSC), 172, 700);
+        }
+        if(player.getDoubleStrength()) {
+            g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_DOUBLESTRENGTH_RSC), 192, 700);
+        }
 
         // Now if were in two player, render the second players HUD
         if (twoPlayer) {
@@ -427,6 +439,7 @@ public class Level1 extends BasicGameState {
             else
                 enemy.makeMove(levelMap.currentTileMap, path, player, projectileList, delta);
             enemy.update(delta);
+//            System.out.println("num " + enemy.worldPos.x + " " + enemy.worldPos.y);
             enemy.offsetUpdate(levelMap.currentTileMap);
             Coordinate enemyScreenPos = levelMap.convertWorldToScreen(enemy.worldPos);
             enemy.setX(enemyScreenPos.x);
@@ -456,13 +469,25 @@ public class Level1 extends BasicGameState {
         }
 
         // Check if players have died.
-        if (player.getCurrentHealth() <= 0) {
-            gameover = true;
+        if(player.getCurrentHealth() <= 0) {
+            if(player.getSelfRevive()) {
+                player.maxHeal();
+                player.flipSelfRevive();
+            }
+            else {
+                gameover = true;
+            }
         }
         // Check if p2 died
-        if (twoPlayer) {
-            if (player2.getCurrentHealth() <= 0) {
-                gameover = true;
+        if(twoPlayer) {
+            if(player2.getCurrentHealth() <= 0 ) {
+                if (player2.getSelfRevive()) {
+                    player2.maxHeal();
+                    player2.flipSelfRevive();
+                }
+                else {
+                    gameover = true;
+                }
             }
         }
 
@@ -481,12 +506,12 @@ public class Level1 extends BasicGameState {
         // Remove grabbed powerups
         powerupList.removeIf((Powerup powerup) -> powerup.getRemoveMe());
         // Remove enemies that have died.
-        enemyList.removeIf((Enemy enemy) -> {
-            if (enemy.isDead()) {
+        enemyList.removeIf( (Enemy enemy) -> {
+            if(enemy.isDead()) {
                 // 1 in 9 chance a healing potion will spawn under the dead enemy.
-                if (new Random().nextInt(8) == 0) {
+                if(new Random().nextInt(9) == 0){
                     TileIndex location = enemy.getLocation();
-                    powerupList.add(new Powerup(location.x, location.y, 1));
+                    powerupList.add(new Powerup(location.x, location.y, new Random().nextInt(4)+1));
                 }
             }
             return enemy.isDead();
@@ -509,6 +534,17 @@ public class Level1 extends BasicGameState {
             player2type = 1;
     }
 
+    public void setPlayerType(int id) {
+        player1type = id;
+    }
+
+    public void set2Player(boolean status) {
+        twoPlayer = status;
+        if(player1type == 1)
+            player2type = 2;
+        else
+            player2type = 1;
+    }
 
     public String get2PData() {
         String data = "";
@@ -521,17 +557,17 @@ public class Level1 extends BasicGameState {
         data = data.concat(player2.getPlayerData());
         // Step 2: build all enemy data
         data = data.concat("ENEMYLISTSTART;");
-        for (Enemy e : enemyList)
+        for(Enemy e : enemyList)
             data = data.concat(e.getEnemyData());
         data = data.concat("ENEMYLISTEND;");
         // Step 3: build all projectile data
         data = data.concat("PROJLISTSTART;");
-        for (Projectile p : projectileList)
+        for(Projectile p : projectileList)
             data = data.concat(p.getData());
         data = data.concat("PROJLISTEND;");
         // Step 4: build powerup data
         data = data.concat("POWERUPLISTSTART;");
-        for (Powerup p : powerupList)
+        for(Powerup p : powerupList)
             data = data.concat(p.getData());
         data = data.concat("POWERUPLISTEND;");
 

@@ -102,12 +102,16 @@ public class DungeonGame extends StateBasedGame {
   public static final String MENU_TITLE_RSC = "Project2/Assets/menu/titleCard.png";
   public static final String MENU_WAIT_RSC = "Project2/Assets/menu/waiting.png";
   public static final String MENU_FOUND_RSC = "Project2/Assets/menu/found.png";
+  public static final String MENU_ERROR_RSC = "Project2/Assets/menu/error.png";
+  public static final String MENU_WAITHOST_RSC = "Project2/Assets/menu/waitinghost.png";
 
   // Other
   public static final String POWERUP_HEALTHPOTION_RSC = "Project2/Assets/powerups/healthPotion.png";
   public static final String PLAYER_ARROWTEST_RSC = "Project2/Assets/arrow.png";
   public static final String PLAYER_PROJECTILE_RSC = "Project2/Assets/projectile.png";
-  public static final String KEY_RSC = "Project2/Assets/key.png";
+  public static final String POWERUP_SELFREVIVE_RSC = "Project2/Assets/powerups/watermelon.png";
+  public static final String POWERUP_INVINCIBILITY_RSC = "Project2/Assets/powerups/shield_02.png";
+  public static final String POWERUP_DOUBLESTRENGTH_RSC = "Project2/Assets/powerups/glowing_dust.png";
 
   // Map - LEVEL 1:
   public static final String MAP_WALL_RSC = "Project2/Assets/level1/wall.png";
@@ -208,11 +212,16 @@ public class DungeonGame extends StateBasedGame {
     ResourceManager.loadImage(MENU_JOIN_RSC);
     ResourceManager.loadImage(MENU_WAIT_RSC);
     ResourceManager.loadImage(MENU_FOUND_RSC);
+    ResourceManager.loadImage(MENU_ERROR_RSC);
+    ResourceManager.loadImage(MENU_WAITHOST_RSC);
 
     // Other
     ResourceManager.loadImage(POWERUP_HEALTHPOTION_RSC);
     ResourceManager.loadImage(PLAYER_ARROWTEST_RSC);
     ResourceManager.loadImage(PLAYER_PROJECTILE_RSC);
+    ResourceManager.loadImage(POWERUP_SELFREVIVE_RSC);
+    ResourceManager.loadImage(POWERUP_INVINCIBILITY_RSC);
+    ResourceManager.loadImage(POWERUP_DOUBLESTRENGTH_RSC);
 
     // Map - level 1
     ResourceManager.loadImage(MAP_FLOOR_RSC);

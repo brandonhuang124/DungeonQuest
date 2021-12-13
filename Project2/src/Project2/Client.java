@@ -29,29 +29,17 @@ public class Client {
             printWriter = new PrintWriter(socket.getOutputStream(), true);
             playerID = dataInputStream.readInt();
             System.out.println("Connected to server as Player #" + playerID);
-
-//            clientThread = new ClientThread(socket, dataInputStream, dataOutputStream);
-//            clientThread.start();
         } catch (Exception e) {
             System.out.println("Exception in Client constructor");
             e.printStackTrace();
         }
     }
 
-//    private class ClientThread extends Thread {
-//        private Socket socket;
-//        private DataInputStream dataInputStream;
-//        private DataOutputStream dataOutputStream;
-//
-//        public ClientThread(Socket socket, DataInputStream in, DataOutputStream out) {
-//            this.socket = socket;
-//            this.dataInputStream = in;
-//            this.dataOutputStream = out;
-//        }
-//
-//        @Override
-//        public void run() {
-//
-//        }
-//    }
+    public void disconnect() {
+      try {
+        dataInputStream.close();
+        dataOutputStream.close();
+        socket.close();
+      } catch(IOException e) { e.printStackTrace();}
+    }
 }

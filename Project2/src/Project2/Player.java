@@ -27,9 +27,9 @@ public class Player extends Entity {
 
   private Vector velocity;
   private float speed;
-  private int damage, maxhealth, health, attackCooldownTimer, attackCooldown, playerType;
+  private int damage, maxhealth, health, attackCooldownTimer, attackCooldown, playerType, damageCounter, attackCounter;
   private double weaponAngle;
-  private boolean faceRight, attackReady;
+  private boolean faceRight, attackReady, selfRevive, invincible, doubleStrength;
   private Animation moveLeft, moveRight, idleLeft, idleRight, current;
   public Weapon weapon;
   public Coordinate worldPos;
@@ -56,39 +56,44 @@ public class Player extends Entity {
     playerType = id;
     speed = 0.25f;
     worldPos = new Coordinate(x,y);
-    hasTheKey = false;
+    selfRevive = false;
+    invincible = false;
+    doubleStrength = false;
+    attackCounter = 0;
+    damageCounter = 0;
+
 
 
     // Ranged player assignments
     if(id == 1) {
       moveLeft = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.PLAYER_RANGEDMOVELEFT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.PLAYER_RANGEDMOVELEFT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       moveRight = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.PLAYER_RANGEDMOVERIGHT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.PLAYER_RANGEDMOVERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       idleLeft = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.PLAYER_RANGEDIDLELEFT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.PLAYER_RANGEDIDLELEFT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       idleRight = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.PLAYER_RANGEDIDLERIGHT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.PLAYER_RANGEDIDLERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       attackCooldown = 200;
     }
     // Melee player assignments
     if(id == 2) {
       moveLeft = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.PLAYER_MELEEMOVELEFT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.PLAYER_MELEEMOVELEFT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       moveRight = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.PLAYER_MELEEMOVERIGHT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.PLAYER_MELEEMOVERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       idleLeft = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.PLAYER_MELEEIDLELEFT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.PLAYER_MELEEIDLELEFT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       idleRight = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.PLAYER_MELEEIDLERIGHT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.PLAYER_MELEEIDLERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       attackCooldown = 200;
     }
     attackReady = true;
@@ -307,6 +312,18 @@ public class Player extends Entity {
    *  false: otherwise
    */
   public boolean damage(int damage) {
+    // If boolean is true, return immediately
+    // Duration = 10 attacks, tracked via attackCounter
+    if(getInvincible()) {
+      if(damageCounter < 10) {
+        damageCounter++;
+        return false;
+      }
+      // Flip the invincibility boolean back to false
+      flipInvincible();
+      damageCounter = 0;
+    }
+
     health -= damage;
     if(health <= 0)
       return true;
@@ -321,6 +338,45 @@ public class Player extends Entity {
 
   public int getPlayerType() { return playerType;}
 
+
+  public boolean getSelfRevive() {
+    return selfRevive;
+  }
+
+  public void setSelfRevive(boolean b) {
+    selfRevive = b;
+  }
+
+  public void flipSelfRevive() {
+    selfRevive = !selfRevive;
+  }
+
+  public boolean getInvincible() {
+    return invincible;
+  }
+
+  public void setInvincible(boolean b) {
+    invincible = b;
+  }
+
+  public void flipInvincible() {
+    invincible = !invincible;
+  }
+
+  public boolean getDoubleStrength() {
+    return doubleStrength;
+  }
+
+  public void setDoubleStrength(boolean b) {
+    doubleStrength = b;
+  }
+
+  public void flipDoubleStrength() {
+    doubleStrength = !doubleStrength;
+  }
+
+
+
   /***
    * This function is to be called when the player fire a projectile.
    * @param angle
@@ -330,6 +386,19 @@ public class Player extends Entity {
    */
   public Projectile fire(double angle) {
     // Check if were ready to attack, and only fire if so.
+    if(getDoubleStrength()) {
+      if(attackCounter < 10) {
+        damage = 20;
+        attackCounter++;
+      }
+      else {
+        flipDoubleStrength();
+        damage = 10;
+        attackCounter = 0;
+      }
+    }
+    System.out.println("Damage: " + damage);
+
     if(attackReady) {
       Projectile newProjectile;
       if(playerType == 1)
