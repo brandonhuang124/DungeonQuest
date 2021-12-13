@@ -221,7 +221,7 @@ public class MenuState extends BasicGameState {
         }
         else if(select == 2) {
           System.out.println("Melee Selected");
-          ((Level2)game.getState(DungeonGame.LEVEL2)).setPlayerType(2);
+          ((Level1)game.getState(DungeonGame.LEVEL1)).setPlayerType(2);
           if(!singleplayer) {
             // If were in multiplayer, wee need to open a connection to the server and tell them were player1
             try {
@@ -245,13 +245,13 @@ public class MenuState extends BasicGameState {
 
           else {
             System.out.println("Start game now");
-            ((Level2)game.getState(DungeonGame.LEVEL2)).set2Player(false);
-            game.enterState(DungeonGame.LEVEL2);
+            ((Level1)game.getState(DungeonGame.LEVEL1)).set2Player(false);
+            game.enterState(DungeonGame.LEVEL1);
           }
         }
         else if(select == 3) {
           System.out.println("Ranged Selected");
-          ((Level2)game.getState(DungeonGame.LEVEL2)).setPlayerType(1);
+          ((Level1)game.getState(DungeonGame.LEVEL1)).setPlayerType(1);
           if(!singleplayer) {
             try {
               phase = 3;
@@ -273,8 +273,8 @@ public class MenuState extends BasicGameState {
           }
           else {
             System.out.println("Start Game Now");
-            ((Level2)game.getState(DungeonGame.LEVEL2)).set2Player(false);
-            game.enterState(DungeonGame.LEVEL2);
+            ((Level1)game.getState(DungeonGame.LEVEL1)).set2Player(false);
+            game.enterState(DungeonGame.LEVEL1);
           }
         }
       }
@@ -310,8 +310,8 @@ public class MenuState extends BasicGameState {
             } catch(IOException e) { e.printStackTrace();}
 
             // Now we can actually start
-            ((Level2)game.getState(DungeonGame.LEVEL2)).set2Player(true);
-            game.enterState(DungeonGame.LEVEL2);
+            ((Level1)game.getState(DungeonGame.LEVEL1)).set2Player(true);
+            game.enterState(DungeonGame.LEVEL1);
           }
         }
       }
