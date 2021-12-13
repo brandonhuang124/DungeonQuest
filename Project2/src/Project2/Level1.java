@@ -184,12 +184,12 @@ public class Level1 extends BasicGameState {
         if (enemyList.isEmpty() && !player.hasTheKey) {
             if(twoPlayer){  // checking that both players do not have the key:
                 if(enemyList.isEmpty() && !player2.hasTheKey){
-                    g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), levelMap.convertTileToScreen(key.getLocation()).x ,
-                                                                                levelMap.convertTileToScreen(key.getLocation()).y );
+                    g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), levelMap.convertTileToScreen(key.getLocation()).x,
+                                                                                levelMap.convertTileToScreen(key.getLocation()).y);
                 }
             }else{
-                g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), levelMap.convertTileToScreen(key.getLocation()).x ,
-                                                                            levelMap.convertTileToScreen(key.getLocation()).y );
+                g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), levelMap.convertTileToScreen(key.getLocation()).x,
+                                                                            levelMap.convertTileToScreen(key.getLocation()).y);
             }
         }
 
