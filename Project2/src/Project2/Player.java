@@ -28,8 +28,9 @@ public class Player extends Entity {
   private Vector velocity;
   private float speed;
   private int damage, maxhealth, health, attackCooldownTimer, attackCooldown, playerType, damageCounter, attackCounter;
+  private int baseDamage;
   private double weaponAngle;
-  private boolean faceRight, attackReady, selfRevive, invincible, doubleStrength;
+  private boolean faceRight, attackReady, selfRevive, invincible, doubleStrength, isDead;
   private Animation moveLeft, moveRight, idleLeft, idleRight, current;
   public Weapon weapon;
   public Coordinate worldPos;
@@ -49,8 +50,16 @@ public class Player extends Entity {
   public Player(final float x, final float y, int id) {
     super(x,y);
     weapon = new Weapon(x,y,id);
-    damage = 10;
-    maxhealth = 10;
+    // Assign stats based on type:
+    if(id == 1) {
+      maxhealth = 10;
+      damage = 4;
+    }
+    else if(id == 2) {
+      maxhealth = 15;
+      damage = 5;
+    }
+    baseDamage = damage;
     health = maxhealth;
     velocity = new Vector(0,0);
     playerType = id;
@@ -316,7 +325,7 @@ public class Player extends Entity {
     // If boolean is true, return immediately
     // Duration = 10 attacks, tracked via attackCounter
     if(getInvincible()) {
-      if(damageCounter < 10) {
+      if(damageCounter < 3) {
         damageCounter++;
         return false;
       }
@@ -326,10 +335,16 @@ public class Player extends Entity {
     }
 
     health -= damage;
-    if(health <= 0)
+    if(health <= 0) {
+      worldPos.x = 32;
+      worldPos.y = 32;
+      isDead = true;
       return true;
+    }
     return false;
   }
+
+  public boolean isDead() { return isDead;}
 
   public void maxHeal() {health = maxhealth;}
 
@@ -349,6 +364,7 @@ public class Player extends Entity {
   }
 
   public void flipSelfRevive() {
+    isDead = false;
     selfRevive = !selfRevive;
   }
 
@@ -389,12 +405,12 @@ public class Player extends Entity {
     // Check if were ready to attack, and only fire if so.
     if(getDoubleStrength()) {
       if(attackCounter < 10) {
-        damage = 20;
+        damage = baseDamage * 2;
         attackCounter++;
       }
       else {
         flipDoubleStrength();
-        damage = 10;
+        damage = baseDamage;
         attackCounter = 0;
       }
     }
@@ -421,6 +437,9 @@ public class Player extends Entity {
    */
 
   public void update(final int delta) {
+    // Skip if were dead.
+    if(isDead)
+      return;
     Vector movement = velocity.scale(delta);
     prevMoveVelocity = new Coordinate(movement.getX(), movement.getY());
     worldPos.x += movement.getX();

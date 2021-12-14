@@ -1,5 +1,6 @@
 package Project2;
 
+import jig.ResourceManager;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
@@ -17,7 +18,8 @@ import java.util.Map;
  */
 public class TransitionState extends BasicGameState {
 
-    Boolean playerWon = false;
+    Boolean playerWon;
+    boolean player2;
 
     private int timer;
 
@@ -28,7 +30,8 @@ public class TransitionState extends BasicGameState {
 
     @Override
     public void init(GameContainer container, StateBasedGame game) throws SlickException {
-
+      playerWon = false;
+      player2 = false;
     }
 
     @Override
@@ -44,13 +47,13 @@ public class TransitionState extends BasicGameState {
         if (timer <= 1000 &&  timer > 1) {
             // Checks previous level before updating to the next:
             if (MapUtil.levelName == LevelName.MENU)
-                g.drawString("LEVEL ONE", 300, 400);
+                g.drawImage(ResourceManager.getImage(DungeonGame.MENU_L1_RSC), 250, 350);
             if (MapUtil.levelName == LevelName.ONE)
-                g.drawString("LEVEL TWO", 300, 400);
+              g.drawImage(ResourceManager.getImage(DungeonGame.MENU_L2_RSC), 258, 350);
             if (MapUtil.levelName == LevelName.TWO)
-                g.drawString("LEVEL THREE", 300, 400);
+              g.drawImage(ResourceManager.getImage(DungeonGame.MENU_L3_RSC), 234, 350);
             if (MapUtil.levelName == LevelName.THREE)
-                g.drawString("Drum Roll...", 300, 400);
+              g.drawImage(ResourceManager.getImage(DungeonGame.MENU_DRUM_RSC), 228, 350);
         }
     }
 
@@ -71,11 +74,16 @@ public class TransitionState extends BasicGameState {
             }
 
             if (!playerWon) {
-                game.enterState(DungeonGame.LEVEL1, new FadeOutTransition(), new BlobbyTransition());
+                if (player2)
+                  game.enterState(DungeonGame.DUMMYSTATE, new FadeOutTransition(), new BlobbyTransition());
+                else
+                  game.enterState(DungeonGame.LEVEL1, new FadeOutTransition(), new BlobbyTransition());
             } else {
                 playerWon = false;
                 game.enterState(DungeonGame.WIN, new EmptyTransition(), new HorizontalSplitTransition());
             }
         }
     }
+
+    public void set2P() {player2 = true;}
 }

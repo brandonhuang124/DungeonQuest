@@ -26,4 +26,10 @@ public class Key  extends Entity {
         return location;
     }
 
+    public String getData() {
+      String data = "";
+      data = data.concat(5 + ";");
+      data = data.concat(worldPos.x + ";" + worldPos.y + ";");
+      return data;
+    }
 }

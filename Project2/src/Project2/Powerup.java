@@ -98,6 +98,9 @@ public class Powerup extends Entity {
     ArrayList<Powerup> powerUpList = new ArrayList<Powerup>();
     if(MapUtil.levelName == LevelName.ONE) {
       powerUpList.add(new Powerup(16, 14, 1));
+      //powerUpList.add(new Powerup(16, 15, 2));
+      //powerUpList.add(new Powerup(16, 16, 3));
+      //powerUpList.add(new Powerup(16, 17, 4));
       powerUpList.add(new Powerup(38,  5, 1));
       powerUpList.add(new Powerup(38, 24, 1));
       powerUpList.add(new Powerup(15, 31, 1));
@@ -109,7 +112,7 @@ public class Powerup extends Entity {
       powerUpList.add(new Powerup(18, 40, 1));
       powerUpList.add(new Powerup(12, 40, 1));
       powerUpList.add(new Powerup(54, 42, 1));
-      powerUpList.add(new Powerup(6,  57, 1));
+      powerUpList.add(new Powerup(6,  56, 1));
     }
     if(MapUtil.levelName == LevelName.THREE) {
       powerUpList.add(new Powerup(5, 30, 1));

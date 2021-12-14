@@ -12,13 +12,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import jig.Vector;
+import org.newdawn.slick.state.transition.BlobbyTransition;
+import org.newdawn.slick.state.transition.EmptyTransition;
+import org.newdawn.slick.state.transition.FadeInTransition;
+import org.newdawn.slick.state.transition.FadeOutTransition;
 
 public class DummyState extends BasicGameState {
   MapUtil levelMap;
   Player meleePlayer, rangedPlayer;
   ArrayList<Enemy> enemyList;
   ArrayList<DummyObject> dummyList;
-  boolean firstData;
+  boolean firstData, p1SelfRevive, p1Invincible, p1DoubleStrength, p2SelfRevive, p2Invincible, p2DoubleStrength;
+  boolean levelComplete, gameover, rangedPlayerDead, meleePlayerDead;
   int myId, p1Health, p1MaxHealth, p2Health, p2MaxHealth;
 
   @Override
@@ -29,14 +34,15 @@ public class DummyState extends BasicGameState {
   @Override
   public void init(GameContainer container, StateBasedGame game) throws SlickException {
     levelMap = new MapUtil();
-    MapUtil.setLevelName(LevelName.NONEORTEST);
+    MapUtil.setLevelName(LevelName.ONE);
   }
 
   @Override
   public void enter(GameContainer container, StateBasedGame game) {
+    levelComplete = gameover = rangedPlayerDead = meleePlayerDead = false;
+    p1SelfRevive = p1Invincible = p1DoubleStrength = p2SelfRevive = p2Invincible = p2DoubleStrength = false;
     p1Health = p1MaxHealth = p2Health = p2MaxHealth = 0;
     meleePlayer = rangedPlayer = null;
-    MapUtil.setLevelName(LevelName.ONE);
     enemyList = Enemy.buildEnemyList();
     dummyList = new ArrayList<DummyObject>();
     // parse the CSV map file, throw exception in case of IO error:
@@ -52,17 +58,23 @@ public class DummyState extends BasicGameState {
 
     container.setSoundOn(true);
 
+    // Sanity Check with the other player to ensure we start at the same time
+    try {
+      String string = DungeonGame.client.dataInputStream.readUTF();
+      System.out.println(string);
+    } catch(IOException e) { e.printStackTrace();}
+
   }
 
   @Override
   public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
     levelMap.renderMapByCamera(g);
 
-    if(meleePlayer != null) {
+    if(meleePlayer != null && !meleePlayerDead) {
       meleePlayer.render(g);
       meleePlayer.weapon.render(g);
     }
-    if(rangedPlayer != null) {
+    if(rangedPlayer != null && !rangedPlayerDead) {
       rangedPlayer.render(g);
       rangedPlayer.weapon.render(g);
     }
@@ -102,6 +114,16 @@ public class DummyState extends BasicGameState {
       g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARR_RSC), 152 + (p1MaxHealth * 6), 660);
     else
       g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC), 152 + (p1MaxHealth * 6), 660);
+
+    if(p1SelfRevive) {
+      g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_SELFREVIVE_RSC), 152, 700);
+    }
+    if(p1Invincible) {
+      g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_INVINCIBILITY_RSC), 172, 700);
+    }
+    if(p1DoubleStrength) {
+      g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_DOUBLESTRENGTH_RSC), 192, 700);
+    }
 
     // Render the second players health bar
       // Render Left cap of health bar
@@ -144,8 +166,21 @@ public class DummyState extends BasicGameState {
       e.printStackTrace();
     }
 
+    // If freak accidents happen or poorly timed synchronization reads, skip this loop
+    if(dataToken.length < 4)
+      return;
+
     // Use the data to set important fields in the game
     parseRenderData(dataToken);
+
+    // Check special flags that could have been set
+    if(levelComplete) {
+      ((TransitionState)game.getState(DungeonGame.TRANSITION)).set2P();
+      game.enterState(DungeonGame.TRANSITION, new EmptyTransition(), new BlobbyTransition());
+    }
+    if(gameover) {
+      game.enterState(DungeonGame.GAMEOVER, new FadeOutTransition(), new FadeInTransition());
+    }
 
     // Set screen positions for entities
     Coordinate playerScreenPos = levelMap.convertWorldToScreen(meleePlayer.worldPos);
@@ -171,11 +206,21 @@ public class DummyState extends BasicGameState {
       o.setY(screenPos.y);
     }
 
-    // Set camera pos
-    if(myId == 1)
-      levelMap.updateCamera(rangedPlayer.worldPos);
-    else
-      levelMap.updateCamera(meleePlayer.worldPos);
+    // Set camera pos, we want to follow the other player if were dead
+    if(myId == 1) {
+      if(rangedPlayerDead)
+        levelMap.updateCamera(meleePlayer.worldPos);
+      else
+        levelMap.updateCamera(rangedPlayer.worldPos);
+    }
+
+    else {
+      if(meleePlayerDead)
+        levelMap.updateCamera(rangedPlayer.worldPos);
+      else
+        levelMap.updateCamera(meleePlayer.worldPos);
+    }
+
 
     /*** CONTROLS SECTION ***/
     data = "";
@@ -332,7 +377,37 @@ public class DummyState extends BasicGameState {
     p1MaxHealth = Integer.valueOf(token[index+1]);
     p2Health = Integer.valueOf(token[index+2]);
     p2MaxHealth = Integer.valueOf(token[index+3]);
+    p1SelfRevive = Boolean.parseBoolean(token[index+4]);
+    p1Invincible = Boolean.parseBoolean(token[index+5]);
+    p1DoubleStrength = Boolean.parseBoolean(token[index+6]);
+    p2SelfRevive = Boolean.parseBoolean(token[index+7]);
+    p2Invincible = Boolean.parseBoolean(token[index+8]);
+    p2DoubleStrength = Boolean.parseBoolean(token[index+9]);
     // Handle special instructions
+    index = index + 2;
+    for(; !token[index].equals("INSTRUCTIONSEND"); index++) {
+      // If we get a level complete signal
+      if(token[index].equals("LEVELCOMPLETE")) {
+        levelComplete = true;
+      }
+      // If we get a dead player signal
+      if(token[index].equals("PLAYER1DEAD")) {
+        if(myId == 1)
+          meleePlayerDead = true;
+        else
+          rangedPlayerDead = true;
+      }
+      if(token[index].equals("PLAYER2DEAD")) {
+        if(myId == 1)
+          rangedPlayerDead = true;
+        else
+          meleePlayerDead = true;
+      }
+      // If we get a gameover signal
+      if(token[index].equals("GAMEOVER")) {
+        gameover = true;
+      }
 
+    }
   }
 }

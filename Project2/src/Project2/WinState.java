@@ -1,5 +1,6 @@
 package Project2;
 
+import jig.ResourceManager;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
@@ -12,6 +13,8 @@ import org.newdawn.slick.state.transition.FadeOutTransition;
 import org.newdawn.slick.state.transition.HorizontalSplitTransition;
 
 public class WinState extends BasicGameState {
+    private int select;
+
     @Override
     public int getID() {
         return DungeonGame.WIN;
@@ -24,25 +27,45 @@ public class WinState extends BasicGameState {
     @Override
     public void enter(GameContainer container, StateBasedGame game) {
         MapUtil.levelName = LevelName.WIN;
-
+        select = 0;
+        // If we were playing in 2 player mode we should disconnect at this point.
+        DungeonGame dg = (DungeonGame) game;
+        if(((Level1)game.getState(DungeonGame.LEVEL1)).twoPlayer) {
+            DungeonGame.client.disconnect();
+        }
     }
 
     @Override
     public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
-        g.drawString("You have cleared The Dungeon!", 200, 300);
-        g.drawString("Would you like to start a new game?", 200, 330);
-        g.drawString("[y] Yes | [n] No ", 240, 360);
+        g.drawImage(ResourceManager.getImage(DungeonGame.MENU_WINBG_RSC), 0, 0);
 
+        if(select == 1)
+          g.drawImage(ResourceManager.getImage(DungeonGame.MENU_SELECTOR_RSC), 256, 532);
+        else if(select == 2)
+          g.drawImage(ResourceManager.getImage(DungeonGame.MENU_SELECTOR_RSC), 602, 532);
     }
 
     @Override
     public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
-        Input input = container.getInput();
-        if(input.isKeyDown(Input.KEY_Y)){
-            game.enterState(DungeonGame.STARTUPSTATE, new FadeOutTransition(), new FadeInTransition());
-        }
-        if(input.isKeyDown(Input.KEY_N)){
-            container.exit();
-        }
+      Input input = container.getInput();
+      // Get mouse position
+      float mousex = input.getMouseX();
+      float mousey = input.getMouseY();
+      // Get selection status
+      if(50 < mousex && mousex < 246)
+        if(530 < mousey && mousey < 598)
+          select = 1;
+      if(396 < mousex && mousex < 590)
+        if(530 < mousey && mousey < 598)
+          select = 2;
+        else
+          select = 0;
+
+      if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+        if(select == 1)
+          game.enterState(DungeonGame.STARTUPSTATE, new FadeOutTransition(), new FadeInTransition());
+        else if(select == 2)
+          container.exit();
+      }
     }
 }

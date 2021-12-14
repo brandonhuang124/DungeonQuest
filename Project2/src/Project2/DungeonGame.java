@@ -106,6 +106,13 @@ public class DungeonGame extends StateBasedGame {
   public static final String MENU_FOUND_RSC = "Project2/Assets/menu/found.png";
   public static final String MENU_ERROR_RSC = "Project2/Assets/menu/error.png";
   public static final String MENU_WAITHOST_RSC = "Project2/Assets/menu/waitinghost.png";
+  public static final String MENU_DRUM_RSC = "Project2/Assets/menu/drum.png";
+  public static final String MENU_GAMEOVERBG_RSC = "Project2/Assets/menu/gameoverbg.png";
+  public static final String MENU_HOWTOBG_RSC = "Project2/Assets/menu/howToPlayBG.png";
+  public static final String MENU_L1_RSC = "Project2/Assets/menu/level1.png";
+  public static final String MENU_L2_RSC = "Project2/Assets/menu/level2.png";
+  public static final String MENU_L3_RSC = "Project2/Assets/menu/level3.png";
+  public static final String MENU_WINBG_RSC = "Project2/Assets/menu/winbg.png";
 
   // Other
   public static final String POWERUP_HEALTHPOTION_RSC = "Project2/Assets/powerups/healthPotion.png";
@@ -228,6 +235,13 @@ public class DungeonGame extends StateBasedGame {
     ResourceManager.loadImage(MENU_FOUND_RSC);
     ResourceManager.loadImage(MENU_ERROR_RSC);
     ResourceManager.loadImage(MENU_WAITHOST_RSC);
+    ResourceManager.loadImage(MENU_DRUM_RSC);
+    ResourceManager.loadImage(MENU_GAMEOVERBG_RSC);
+    ResourceManager.loadImage(MENU_HOWTOBG_RSC);
+    ResourceManager.loadImage(MENU_L1_RSC);
+    ResourceManager.loadImage(MENU_L2_RSC);
+    ResourceManager.loadImage(MENU_L3_RSC);
+    ResourceManager.loadImage(MENU_WINBG_RSC);
 
     // Other
     ResourceManager.loadImage(POWERUP_HEALTHPOTION_RSC);

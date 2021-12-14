@@ -6,9 +6,7 @@ import jig.Vector;
 import org.newdawn.slick.*;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
-import org.newdawn.slick.state.transition.BlobbyTransition;
-import org.newdawn.slick.state.transition.EmptyTransition;
-import org.newdawn.slick.state.transition.HorizontalSplitTransition;
+import org.newdawn.slick.state.transition.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,7 +30,8 @@ public class Level1 extends BasicGameState {
     MapUtil levelMap;
     Timer timer;
     int player1type, player2type;
-    boolean player1Dead, player2Dead, gameover, twoPlayer;
+    boolean gameover, levelComplete;
+    public boolean twoPlayer;
     Key key;
 
 
@@ -51,10 +50,11 @@ public class Level1 extends BasicGameState {
     @Override
     public void enter(GameContainer container, StateBasedGame game) {
         // set the state id to the level in maputil to determine which map to render:
+        key = null;
         path = path2 = null;
         if (player1type == 0)
             player1type = 1;
-        player1Dead = player2Dead = gameover = false;
+        gameover = levelComplete = false;
         // parse the CSV map file, throw exception in case of IO error:
         try {
             levelMap.loadLevelMap();
@@ -76,6 +76,14 @@ public class Level1 extends BasicGameState {
         powerupList = Powerup.buildPowerUpList();
 
         container.setSoundOn(true);
+
+        // Sanity check each time we enter this state while in 2player to ensure we start at the same time.
+        if(twoPlayer) {
+          try {
+            DungeonGame.client.dataOutputStream.writeUTF("LevelStart;1;");
+            DungeonGame.client.dataOutputStream.flush();
+          } catch (IOException e) { e.printStackTrace();}
+        }
     }
 
     @Override
@@ -97,11 +105,15 @@ public class Level1 extends BasicGameState {
         for (Powerup p : powerupList) {
             p.render(g);
         }
-        player.render(g);
-        player.weapon.render(g);
+
+        // Render the player
+        if(!player.isDead()) {
+          player.render(g);
+          player.weapon.render(g);
+        }
 
         // If were in two player
-        if (twoPlayer) {
+        if (twoPlayer && !player2.isDead()) {
             player2.render(g);
             player2.weapon.render(g);
         }
@@ -135,13 +147,13 @@ public class Level1 extends BasicGameState {
             g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC), 152 + (player.getMaxHealth() * 6), 660);
 
         if(player.getSelfRevive()) {
-            g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_SELFREVIVE_RSC), 152, 700);
+            g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_SELFREVIVE_RSC).getScaledCopy(0.5f), 152, 700);
         }
         if(player.getInvincible()) {
-            g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_INVINCIBILITY_RSC), 172, 700);
+            g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_INVINCIBILITY_RSC).getScaledCopy(0.5f), 172, 700);
         }
         if(player.getDoubleStrength()) {
-            g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_DOUBLESTRENGTH_RSC), 192, 700);
+            g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_DOUBLESTRENGTH_RSC).getScaledCopy(0.5f), 192, 700);
         }
         if((player.hasTheKey) && enemyList.isEmpty()){ // render the key in the hud when picked up:
             g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), 212, 700);
@@ -231,6 +243,11 @@ public class Level1 extends BasicGameState {
         }
         if(MapUtil.cheatMode){
             if(input.isKeyDown(Input.KEY_Q)){
+                levelComplete = true;
+                try {
+                  dg.client.dataOutputStream.writeUTF(get2PData());
+                  dg.client.dataOutputStream.flush();
+                } catch (IOException e) { e.printStackTrace(); }
                 game.enterState(DungeonGame.TRANSITION, new EmptyTransition(), new BlobbyTransition());
             }
         }
@@ -398,64 +415,6 @@ public class Level1 extends BasicGameState {
             else {
                 player2.stop();
             }
-
-
-            /*** LOCAL CONTROLS ***/
-            // Left click for attacking
-            if (input.isMousePressed(Input.MOUSE_RIGHT_BUTTON)) {
-                // System.out.println("Left Click pressed");
-                Projectile newProjectile = player2.fire(Double.valueOf(p2dataToken[2]));
-                if (newProjectile != null) {
-                    System.out.println("ahh");
-                    projectileList.add(newProjectile);
-                }
-            }
-            // Check diagonals first
-            // W and A for Up Left
-            if (input.isKeyDown(Input.KEY_UP) && input.isKeyDown(Input.KEY_LEFT) && player2.isMoveValid(Direction.UP_LEFT,
-                    player2.getVelocity().scale(delta), levelMap)) {
-                player2.moveUpLeft();
-            }
-            // W and D for Up Right
-            else if (input.isKeyDown(Input.KEY_UP) && input.isKeyDown(Input.KEY_RIGHT) && player2.isMoveValid(Direction.UP_RIGHT,
-                    player2.getVelocity().scale(delta), levelMap)) {
-                player2.moveUpRight();
-            }
-            // S and A for Down Left
-            else if (input.isKeyDown(Input.KEY_DOWN) && input.isKeyDown(Input.KEY_LEFT) && player2.isMoveValid(Direction.DOWN_LEFT,
-                    player2.getVelocity().scale(delta), levelMap)) {
-                player2.moveDownLeft();
-
-            }
-            // S and D for Down Right
-            else if (input.isKeyDown(Input.KEY_DOWN) && input.isKeyDown(Input.KEY_RIGHT) && player2.isMoveValid(Direction.DOWN_RIGHT,
-                    player2.getVelocity().scale(delta), levelMap)) {
-                player2.moveDownRight();
-            }
-            // W for moving up
-            else if (input.isKeyDown(Input.KEY_UP) && player2.isMoveValid(Direction.UP, player2.getVelocity().scale(delta),
-                    levelMap)) {
-                player2.moveUp();
-            }
-            // A for moving left
-            else if (input.isKeyDown(Input.KEY_LEFT) && player2.isMoveValid(Direction.LEFT, player2.getVelocity().scale(delta),
-                    levelMap)) {
-                player2.moveLeft();
-            }
-            // S for moving down
-            else if (input.isKeyDown(Input.KEY_DOWN) && player2.isMoveValid(Direction.DOWN, player2.getVelocity().scale(delta),
-                    levelMap)) {
-                player2.moveDown();
-            }
-            // D for moving right
-            else if (input.isKeyDown(Input.KEY_RIGHT) && player2.isMoveValid(Direction.RIGHT, player2.getVelocity().scale(delta),
-                    levelMap)) {
-                player2.moveRight();
-            }
-            // Other wise were just gonna stop moving.
-            else {
-                //player2.stop();
-            }
         }
 
         // Update the player model
@@ -477,7 +436,12 @@ public class Level1 extends BasicGameState {
             player2.offsetUpdate(levelMap.currentTileMap);
         }
 
-        levelMap.updateCamera(player.worldPos);
+        // Update the camera and follow p2 if were dead and there is a p2
+        if(twoPlayer && player.isDead()) {
+          levelMap.updateCamera(player2.worldPos);
+        }
+        else
+          levelMap.updateCamera(player.worldPos);
 
         // Update projectiles
         for (Projectile p : projectileList) {
@@ -528,9 +492,6 @@ public class Level1 extends BasicGameState {
                 player.maxHeal();
                 player.flipSelfRevive();
             }
-            else {
-                gameover = true;
-            }
         }
         // Check if p2 died
         if(twoPlayer) {
@@ -539,11 +500,18 @@ public class Level1 extends BasicGameState {
                     player2.maxHeal();
                     player2.flipSelfRevive();
                 }
-                else {
-                    gameover = true;
-                }
             }
         }
+
+        // Check if they both died, in that case were in gameover
+      if (twoPlayer && player.isDead() && player2.isDead()) {
+        gameover = true;
+      }
+
+      // Check if were in single player and p1 dies, in that case were in gameover
+      if(!twoPlayer && player.isDead()) {
+        gameover = true;
+      }
 
         // Send data to p2 if were in two player mode
         if (twoPlayer) {
@@ -570,6 +538,18 @@ public class Level1 extends BasicGameState {
             }
             return enemy.isDead();
         });
+
+        // If were in gameover, we need to go to the gameover state.
+        if(gameover) {
+          // Tell p2 if were in 2player
+          if(twoPlayer) {
+            try {
+              dg.client.dataOutputStream.writeUTF(get2PData());
+              dg.client.dataOutputStream.flush();
+            } catch (IOException e) { e.printStackTrace(); }
+          }
+          game.enterState(DungeonGame.GAMEOVER, new FadeOutTransition(), new FadeInTransition());
+        }
 
         checkIfPlayersCamExitToNextLevel(game);
     } // update
@@ -612,24 +592,41 @@ public class Level1 extends BasicGameState {
         data = data.concat("POWERUPLISTSTART;");
         for(Powerup p : powerupList)
             data = data.concat(p.getData());
+        // We're going to add the key here if applicable, since the key will be constructed as a dummy object.
+        if(key != null && enemyList.isEmpty() && !player.hasTheKey && !player2.hasTheKey)
+            data = data.concat(key.getData());
         data = data.concat("POWERUPLISTEND;");
 
         // Step 5: Send HUD information
         data = data.concat("HUDSTART;");
         // Send both players healths and max healths across
         data = data.concat(player.getCurrentHealth() + ";" + player.getMaxHealth() + ";" + player2.getCurrentHealth() + ";"
-                + player2.getMaxHealth() + ";");
-        data = data.concat("HUDEND");
+                + player2.getMaxHealth() + ";" + player.getSelfRevive() + ";" + player.getInvincible() + ";" + player.getDoubleStrength() + ";"
+                + player2.getSelfRevive() + ";" + player2.getInvincible() + ";" + player2.getDoubleStrength() + ";");
+        data = data.concat("HUDEND;");
 
         // Step 6: Send special instructions
         data = data.concat("INSTRUCTIONSSTART;");
         // Send a token if the level was completed
-        // Send a token if a player quits
-        // Send a token if a player dies
+        if(levelComplete) {
+          data = data.concat("LEVELCOMPLETE;");
+        }
         // Send a token if a gameover occurs
+        if(gameover) {
+          data = data.concat("GAMEOVER;");
+        }
+        // Send a token if a player dies
+        else {
+          if(player.isDead()) {
+            data = data.concat("PLAYER1DEAD;");
+          }
+          if(player2.isDead()) {
+            data = data.concat("PLAYER2DEAD;");
+          }
+        }
         // Put other stuff here if necessary
 
-        data = data.concat("INSTRUCTIONSEND");
+        data = data.concat("INSTRUCTIONSEND;");
         return data;
     }
 
@@ -656,6 +653,7 @@ public class Level1 extends BasicGameState {
     // check if either player is at the door and also has the key to unlock it,
     // if so, the players move to the next level.
     private void checkIfPlayersCamExitToNextLevel(StateBasedGame game) {
+        DungeonGame dg = (DungeonGame) game;
         if (levelMap.isAtDoor(player)) {
             if (player.hasTheKey) {
                 game.enterState(DungeonGame.TRANSITION, new EmptyTransition(), new BlobbyTransition());
@@ -664,6 +662,21 @@ public class Level1 extends BasicGameState {
         if (twoPlayer) {
             if (levelMap.isAtDoor(player)) {
                 if (player.hasTheKey) {
+                  levelComplete = true;
+                  try {
+                    dg.client.dataOutputStream.writeUTF(get2PData());
+                    dg.client.dataOutputStream.flush();
+                  } catch (IOException e) { e.printStackTrace(); }
+                    game.enterState(DungeonGame.TRANSITION, new EmptyTransition(), new BlobbyTransition());
+                }
+            }
+            if (levelMap.isAtDoor(player2)) {
+                if (player2.hasTheKey) {
+                    levelComplete = true;
+                    try {
+                      dg.client.dataOutputStream.writeUTF(get2PData());
+                      dg.client.dataOutputStream.flush();
+                    } catch (IOException e) { e.printStackTrace(); }
                     game.enterState(DungeonGame.TRANSITION, new EmptyTransition(), new BlobbyTransition());
                 }
             }
