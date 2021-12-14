@@ -266,14 +266,12 @@ public class Level1 extends BasicGameState {
             if (key.playerCollision(player.getTileIndex()) && enemyList.isEmpty()) {
                 player.hasTheKey = true;
                 key = null;
-                System.out.println("Level class, A Player has picked up the key!");
             }
             if (twoPlayer && key != null) {
                 if (key.playerCollision(player2.getTileIndex()) && enemyList.isEmpty()) {
                     // take the key off the map if the player grabs it:
                     // java handles the garbage collection here
                     player2.hasTheKey = true;
-                    System.out.println("Level class, A Player has picked up the key!");
                     key = null;
                 }
             }
@@ -290,9 +288,7 @@ public class Level1 extends BasicGameState {
             // Read controls for p2
             try {
                 p2data = DungeonGame.client.dataInputStream.readUTF();
-                System.out.println("Reading from Server: " + p2data);
                 p2dataToken = p2data.split(";");
-                System.out.println(p2dataToken[0]);
             } catch (IOException e) {
                 System.out.println("IOException from run() in ClientHandler");
                 e.printStackTrace();
@@ -301,8 +297,7 @@ public class Level1 extends BasicGameState {
 
         /*** CONTROLS SECTION ***/
         // Left click for attacking
-        if (input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
-            // System.out.println("Left Click pressed");
+        if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
             Projectile newProjectile = player.fire(getPlayerMouseAngle(input));
             if (newProjectile != null)
                 projectileList.add(newProjectile);
@@ -356,7 +351,6 @@ public class Level1 extends BasicGameState {
 
         /*** EXTRA CONTROLS SECTION FOR TESTING WITH TWO PLAYERS ***/
         if (twoPlayer && p2dataToken.length > 1) {
-            System.out.println(p2dataToken[1]);
             /*** NETWORK CONTROLS ***/
             // Left click for attacking
             if (p2dataToken[0].equals("1")) {
@@ -457,7 +451,6 @@ public class Level1 extends BasicGameState {
             else
                 enemy.makeMove(levelMap.currentTileMap, path, player, projectileList, delta);
             enemy.update(delta);
-//            System.out.println("num " + enemy.worldPos.x + " " + enemy.worldPos.y);
             enemy.offsetUpdate(levelMap.currentTileMap);
             Coordinate enemyScreenPos = levelMap.convertWorldToScreen(enemy.worldPos);
             enemy.setX(enemyScreenPos.x);

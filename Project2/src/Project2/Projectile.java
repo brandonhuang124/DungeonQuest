@@ -99,7 +99,6 @@ public class Projectile extends Entity {
       TileIndex playerLocation = player.getTileIndex();
       if(playerLocation.x == location.x && playerLocation.y == location.y) {
         player.damage(damage);
-        System.out.println("Player hit by projectile: " + player.getCurrentHealth());
         removeMe = true;
       }
     }

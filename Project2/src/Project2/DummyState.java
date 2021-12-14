@@ -61,7 +61,6 @@ public class DummyState extends BasicGameState {
     // Sanity Check with the other player to ensure we start at the same time
     try {
       String string = DungeonGame.client.dataInputStream.readUTF();
-      System.out.println(string);
     } catch(IOException e) { e.printStackTrace();}
 
   }
@@ -177,8 +176,6 @@ public class DummyState extends BasicGameState {
     try {
       data = DungeonGame.client.dataInputStream.readUTF();
       dataToken = data.split(";");
-      for(int i = 0; i < dataToken.length; i++)
-        System.out.println(dataToken[i]);
     } catch (IOException e) {
       System.out.println("IOException from run() in ClientHandler");
       e.printStackTrace();
