@@ -1,5 +1,6 @@
 package Project2;
 
+import jig.ResourceManager;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
@@ -46,13 +47,13 @@ public class TransitionState extends BasicGameState {
         if (timer <= 1000 &&  timer > 1) {
             // Checks previous level before updating to the next:
             if (MapUtil.levelName == LevelName.MENU)
-                g.drawString("LEVEL ONE", 300, 400);
+                g.drawImage(ResourceManager.getImage(DungeonGame.MENU_L1_RSC), 250, 350);
             if (MapUtil.levelName == LevelName.ONE)
-                g.drawString("LEVEL TWO", 300, 400);
+              g.drawImage(ResourceManager.getImage(DungeonGame.MENU_L2_RSC), 258, 350);
             if (MapUtil.levelName == LevelName.TWO)
-                g.drawString("LEVEL THREE", 300, 400);
+              g.drawImage(ResourceManager.getImage(DungeonGame.MENU_L3_RSC), 234, 350);
             if (MapUtil.levelName == LevelName.THREE)
-                g.drawString("Drum Roll...", 300, 400);
+              g.drawImage(ResourceManager.getImage(DungeonGame.MENU_DRUM_RSC), 228, 350);
         }
     }
 
