@@ -494,7 +494,12 @@ public class Level1 extends BasicGameState {
             player2.offsetUpdate(levelMap.currentTileMap);
         }
 
-        levelMap.updateCamera(player.worldPos);
+        // Update the camera and follow p2 if were dead and there is a p2
+        if(twoPlayer && player.isDead()) {
+          levelMap.updateCamera(player2.worldPos);
+        }
+        else
+          levelMap.updateCamera(player.worldPos);
 
         // Update projectiles
         for (Projectile p : projectileList) {

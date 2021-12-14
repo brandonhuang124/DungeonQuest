@@ -23,7 +23,7 @@ public class DummyState extends BasicGameState {
   ArrayList<Enemy> enemyList;
   ArrayList<DummyObject> dummyList;
   boolean firstData, p1SelfRevive, p1Invincible, p1DoubleStrength, p2SelfRevive, p2Invincible, p2DoubleStrength;
-  boolean levelComplete, gameover, player1Dead, player2Dead;
+  boolean levelComplete, gameover, rangedPlayerDead, meleePlayerDead;
   int myId, p1Health, p1MaxHealth, p2Health, p2MaxHealth;
 
   @Override
@@ -39,7 +39,7 @@ public class DummyState extends BasicGameState {
 
   @Override
   public void enter(GameContainer container, StateBasedGame game) {
-    levelComplete = gameover = player1Dead = player2Dead = false;
+    levelComplete = gameover = rangedPlayerDead = meleePlayerDead = false;
     p1SelfRevive = p1Invincible = p1DoubleStrength = p2SelfRevive = p2Invincible = p2DoubleStrength = false;
     p1Health = p1MaxHealth = p2Health = p2MaxHealth = 0;
     meleePlayer = rangedPlayer = null;
@@ -70,11 +70,11 @@ public class DummyState extends BasicGameState {
   public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
     levelMap.renderMapByCamera(g);
 
-    if(meleePlayer != null && !player1Dead) {
+    if(meleePlayer != null && !meleePlayerDead) {
       meleePlayer.render(g);
       meleePlayer.weapon.render(g);
     }
-    if(rangedPlayer != null && !player2Dead) {
+    if(rangedPlayer != null && !rangedPlayerDead) {
       rangedPlayer.render(g);
       rangedPlayer.weapon.render(g);
     }
@@ -206,11 +206,21 @@ public class DummyState extends BasicGameState {
       o.setY(screenPos.y);
     }
 
-    // Set camera pos
-    if(myId == 1)
-      levelMap.updateCamera(rangedPlayer.worldPos);
-    else
-      levelMap.updateCamera(meleePlayer.worldPos);
+    // Set camera pos, we want to follow the other player if were dead
+    if(myId == 1) {
+      if(rangedPlayerDead)
+        levelMap.updateCamera(meleePlayer.worldPos);
+      else
+        levelMap.updateCamera(rangedPlayer.worldPos);
+    }
+
+    else {
+      if(meleePlayerDead)
+        levelMap.updateCamera(rangedPlayer.worldPos);
+      else
+        levelMap.updateCamera(meleePlayer.worldPos);
+    }
+
 
     /*** CONTROLS SECTION ***/
     data = "";
@@ -382,10 +392,16 @@ public class DummyState extends BasicGameState {
       }
       // If we get a dead player signal
       if(token[index].equals("PLAYER1DEAD")) {
-        player1Dead = true;
+        if(myId == 1)
+          meleePlayerDead = true;
+        else
+          rangedPlayerDead = true;
       }
       if(token[index].equals("PLAYER2DEAD")) {
-        player2Dead = true;
+        if(myId == 1)
+          rangedPlayerDead = true;
+        else
+          meleePlayerDead = true;
       }
       // If we get a gameover signal
       if(token[index].equals("GAMEOVER")) {
