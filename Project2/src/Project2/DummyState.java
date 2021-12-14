@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import jig.Vector;
 import org.newdawn.slick.state.transition.BlobbyTransition;
 import org.newdawn.slick.state.transition.EmptyTransition;
+import org.newdawn.slick.state.transition.FadeInTransition;
+import org.newdawn.slick.state.transition.FadeOutTransition;
 
 public class DummyState extends BasicGameState {
   MapUtil levelMap;
@@ -175,6 +177,9 @@ public class DummyState extends BasicGameState {
     if(levelComplete) {
       ((TransitionState)game.getState(DungeonGame.TRANSITION)).set2P();
       game.enterState(DungeonGame.TRANSITION, new EmptyTransition(), new BlobbyTransition());
+    }
+    if(gameover) {
+      game.enterState(DungeonGame.GAMEOVER, new FadeOutTransition(), new FadeInTransition());
     }
 
     // Set screen positions for entities
