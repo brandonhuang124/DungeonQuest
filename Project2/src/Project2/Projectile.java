@@ -87,9 +87,9 @@ public class Projectile extends Entity {
     if(id == 1 || id == 3) {
       for(Enemy enemy : enemyList) {
         TileIndex enemyLocation = enemy.getLocation();
-        if(enemyLocation.x == location.x && enemyLocation.y == location.y) {
+        if(enemyLocation.x == location.x && enemyLocation.y == location.y && !removeMe) {
           removeMe = true;
-          enemy.damage(10);
+          enemy.damage(damage);
           break;
         }
       }
@@ -98,7 +98,7 @@ public class Projectile extends Entity {
     if(id == 2) {
       TileIndex playerLocation = player.getTileIndex();
       if(playerLocation.x == location.x && playerLocation.y == location.y) {
-        player.damage(2);
+        player.damage(damage);
         System.out.println("Player hit by projectile: " + player.getCurrentHealth());
         removeMe = true;
       }

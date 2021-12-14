@@ -28,6 +28,7 @@ public class Player extends Entity {
   private Vector velocity;
   private float speed;
   private int damage, maxhealth, health, attackCooldownTimer, attackCooldown, playerType, damageCounter, attackCounter;
+  private int baseDamage;
   private double weaponAngle;
   private boolean faceRight, attackReady, selfRevive, invincible, doubleStrength, isDead;
   private Animation moveLeft, moveRight, idleLeft, idleRight, current;
@@ -49,8 +50,16 @@ public class Player extends Entity {
   public Player(final float x, final float y, int id) {
     super(x,y);
     weapon = new Weapon(x,y,id);
-    damage = 10;
-    maxhealth = 10;
+    // Assign stats based on type:
+    if(id == 1) {
+      maxhealth = 10;
+      damage = 4;
+    }
+    else if(id == 2) {
+      maxhealth = 15;
+      damage = 5;
+    }
+    baseDamage = damage;
     health = maxhealth;
     velocity = new Vector(0,0);
     playerType = id;
@@ -396,12 +405,12 @@ public class Player extends Entity {
     // Check if were ready to attack, and only fire if so.
     if(getDoubleStrength()) {
       if(attackCounter < 10) {
-        damage = 20;
+        damage = baseDamage * 2;
         attackCounter++;
       }
       else {
         flipDoubleStrength();
-        damage = 10;
+        damage = baseDamage;
         attackCounter = 0;
       }
     }
