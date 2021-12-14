@@ -113,7 +113,7 @@ public class Level1 extends BasicGameState {
         }
 
         // If were in two player
-        if (twoPlayer) {
+        if (twoPlayer && !player2.isDead()) {
             player2.render(g);
             player2.weapon.render(g);
         }
@@ -147,13 +147,13 @@ public class Level1 extends BasicGameState {
             g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC), 152 + (player.getMaxHealth() * 6), 660);
 
         if(player.getSelfRevive()) {
-            g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_SELFREVIVE_RSC), 152, 700);
+            g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_SELFREVIVE_RSC).getScaledCopy(0.5f), 152, 700);
         }
         if(player.getInvincible()) {
-            g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_INVINCIBILITY_RSC), 172, 700);
+            g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_INVINCIBILITY_RSC).getScaledCopy(0.5f), 172, 700);
         }
         if(player.getDoubleStrength()) {
-            g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_DOUBLESTRENGTH_RSC), 192, 700);
+            g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_DOUBLESTRENGTH_RSC).getScaledCopy(0.5f), 192, 700);
         }
         if((player.hasTheKey) && enemyList.isEmpty()){ // render the key in the hud when picked up:
             g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), 212, 700);
@@ -414,64 +414,6 @@ public class Level1 extends BasicGameState {
             // Other wise were just gonna stop moving.
             else {
                 player2.stop();
-            }
-
-
-            /*** LOCAL CONTROLS ***/
-            // Left click for attacking
-            if (input.isMousePressed(Input.MOUSE_RIGHT_BUTTON)) {
-                // System.out.println("Left Click pressed");
-                Projectile newProjectile = player2.fire(Double.valueOf(p2dataToken[2]));
-                if (newProjectile != null) {
-                    System.out.println("ahh");
-                    projectileList.add(newProjectile);
-                }
-            }
-            // Check diagonals first
-            // W and A for Up Left
-            if (input.isKeyDown(Input.KEY_UP) && input.isKeyDown(Input.KEY_LEFT) && player2.isMoveValid(Direction.UP_LEFT,
-                    player2.getVelocity().scale(delta), levelMap)) {
-                player2.moveUpLeft();
-            }
-            // W and D for Up Right
-            else if (input.isKeyDown(Input.KEY_UP) && input.isKeyDown(Input.KEY_RIGHT) && player2.isMoveValid(Direction.UP_RIGHT,
-                    player2.getVelocity().scale(delta), levelMap)) {
-                player2.moveUpRight();
-            }
-            // S and A for Down Left
-            else if (input.isKeyDown(Input.KEY_DOWN) && input.isKeyDown(Input.KEY_LEFT) && player2.isMoveValid(Direction.DOWN_LEFT,
-                    player2.getVelocity().scale(delta), levelMap)) {
-                player2.moveDownLeft();
-
-            }
-            // S and D for Down Right
-            else if (input.isKeyDown(Input.KEY_DOWN) && input.isKeyDown(Input.KEY_RIGHT) && player2.isMoveValid(Direction.DOWN_RIGHT,
-                    player2.getVelocity().scale(delta), levelMap)) {
-                player2.moveDownRight();
-            }
-            // W for moving up
-            else if (input.isKeyDown(Input.KEY_UP) && player2.isMoveValid(Direction.UP, player2.getVelocity().scale(delta),
-                    levelMap)) {
-                player2.moveUp();
-            }
-            // A for moving left
-            else if (input.isKeyDown(Input.KEY_LEFT) && player2.isMoveValid(Direction.LEFT, player2.getVelocity().scale(delta),
-                    levelMap)) {
-                player2.moveLeft();
-            }
-            // S for moving down
-            else if (input.isKeyDown(Input.KEY_DOWN) && player2.isMoveValid(Direction.DOWN, player2.getVelocity().scale(delta),
-                    levelMap)) {
-                player2.moveDown();
-            }
-            // D for moving right
-            else if (input.isKeyDown(Input.KEY_RIGHT) && player2.isMoveValid(Direction.RIGHT, player2.getVelocity().scale(delta),
-                    levelMap)) {
-                player2.moveRight();
-            }
-            // Other wise were just gonna stop moving.
-            else {
-                //player2.stop();
             }
         }
 

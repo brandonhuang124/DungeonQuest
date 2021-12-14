@@ -316,7 +316,7 @@ public class Player extends Entity {
     // If boolean is true, return immediately
     // Duration = 10 attacks, tracked via attackCounter
     if(getInvincible()) {
-      if(damageCounter < 10) {
+      if(damageCounter < 3) {
         damageCounter++;
         return false;
       }

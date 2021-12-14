@@ -104,6 +104,7 @@ public class MenuState extends BasicGameState {
 
     // How to play
     if(phase == 4) {
+      g.drawImage(ResourceManager.getImage(DungeonGame.MENU_HOWTOBG_RSC), 0, 0);
       g.drawImage(ResourceManager.getImage(DungeonGame.MENU_BACK_RSC), 25, 645);
       if(select == 1)
         g.drawImage(ResourceManager.getImage(DungeonGame.MENU_SELECTOR_RSC), 231, 647);
