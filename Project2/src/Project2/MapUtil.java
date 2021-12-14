@@ -16,6 +16,7 @@ public class MapUtil {
     //Path to the level 60x60 array:
     private final String level1Data = "Project2/src/Project2/Data/LevelOneMap.csv";
     private final String level2Data = "Project2/src/Project2/Data/LevelTwoMap.csv";
+    private final String level3Data = "Project2/src/Project2/Data/LevelThreeMap.csv";
     public static final int TILESIZE = 32;
     public static final int SCREENWIDTH = 20;
     public static final int SCREENHEIGHT = 20;
@@ -28,8 +29,6 @@ public class MapUtil {
     private static final int wallTile = 1;
     private static final int wallTileWithTorch = 2;
     private static final int exitDoorGoal = 6;
-
-
 
 
 
@@ -61,7 +60,7 @@ public class MapUtil {
                 currentMapString = readLevelCSV(level2Data);
                 break;
             case THREE:
-                //TODO level3 map
+                currentMapString = readLevelCSV(level3Data);
                 break;
             case GAMEOVER:
                 System.out.println(TAG + " GameOver state");
@@ -181,6 +180,20 @@ public class MapUtil {
                             renderX, renderY);
                 }
             }
+            case THREE -> { // render based on LEVEL THREE assets:
+                if (renderTile.getID() ==   wallTile) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP3_WALL_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+                }
+                if (renderTile.getID() == wallTileWithTorch) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP3_LAVA_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+                }
+                if (renderTile.getID() == exitDoorGoal) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP3_DOOR_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+                }
+            }
         }
     }
 
@@ -201,6 +214,13 @@ public class MapUtil {
 
                 }
 
+            }
+            case THREE -> { // render based on LEVEL TWO assets:
+                if (renderTile.getID() == floorTile) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP3_FLOOR_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+
+                }
             }
         }
     }

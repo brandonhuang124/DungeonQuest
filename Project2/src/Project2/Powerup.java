@@ -112,9 +112,12 @@ public class Powerup extends Entity {
       powerUpList.add(new Powerup(6,  57, 1));
     }
     if(MapUtil.levelName == LevelName.THREE) {
-      powerUpList.add(new Powerup(10, 15, 1));
-      powerUpList.add(new Powerup(20, 20, 1));
-      powerUpList.add(new Powerup(40, 26, 1));
+      powerUpList.add(new Powerup(5, 30, 1));
+      powerUpList.add(new Powerup(34, 20, 1));
+      powerUpList.add(new Powerup(34, 12, 1));
+      powerUpList.add(new Powerup(38, 32, 1));
+      powerUpList.add(new Powerup( 2, 57, 1));
+      powerUpList.add(new Powerup(25, 57, 1));
     }
     return powerUpList;
   }
