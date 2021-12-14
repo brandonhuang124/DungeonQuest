@@ -109,7 +109,7 @@ public class Server {
                 if(phase == 1) {
                   System.out.println("Phase 1, Get Identity" + playerID);
                   string = dataInputStream.readUTF();
-                  System.out.println("Reading from Client: " + string);
+                  //System.out.println("Reading from Client: " + string);
                   token = string.split(";");
                   if(token[0].equals("Player1")) {
                     // Were the "smart" client.
@@ -173,7 +173,7 @@ public class Server {
                     // If were handling player 1, We need to read for the signal
                     if(playerID == 1) {
                       string = dataInputStream.readUTF();
-                      System.out.println("Reading from Client: " + string);
+                      //System.out.println("Reading from Client: " + string);
                       token = string.split(";");
                       System.out.println(token[0]);
                       if(token[0].equals("START")) {
@@ -206,7 +206,7 @@ public class Server {
                   System.out.println("Entered Phase 4: " + playerID);
                   while(true) {
                     string = dataInputStream.readUTF();
-                    System.out.println("Reading from Client: " + string);
+                    //System.out.println("Reading from Client: " + string);
                     token = string.split(";");
                     if(playerID == 1) {
                       // Were the thread handling player 1

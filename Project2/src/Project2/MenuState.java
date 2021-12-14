@@ -20,7 +20,7 @@ public class MenuState extends BasicGameState {
   private boolean selected, arrowBlink, playerFound, singleplayer;
 
   /********** PUT ADDRESS OF SERVER INTHIS VARIABLE WHEN RUNNING **********/
-  private String serverAddress = "192.168.0.107";
+  private String serverAddress = "192.168.0.108";
 
   @Override
   public int getID() {
