@@ -128,6 +128,11 @@ public class DungeonGame extends StateBasedGame {
   public static final String MAP2_WALL_WITH_TORCH_RSC = "Project2/Assets/level2/wall2_torch.png";
   public static final String MAP2_DOOR_RSC = "Project2/Assets/level2/door2.png";
 
+  // Map - LEVEL 3:
+  public static final String MAP3_WALL_RSC = "Project2/Assets/level3/wall3.png";
+  public static final String MAP3_FLOOR_RSC = "Project2/Assets/level3/floor3.png";
+  public static final String MAP3_LAVA_RSC = "Project2/Assets/level3/lava.png";
+  public static final String MAP3_DOOR_RSC = "Project2/Assets/level3/door3.png";
 
 
   // Parameters
@@ -243,6 +248,12 @@ public class DungeonGame extends StateBasedGame {
     ResourceManager.loadImage(MAP2_WALL_RSC);
     ResourceManager.loadImage(MAP2_WALL_WITH_TORCH_RSC);
     ResourceManager.loadImage(MAP2_DOOR_RSC);
+
+    // Map - level 3
+    ResourceManager.loadImage(MAP3_FLOOR_RSC);
+    ResourceManager.loadImage(MAP3_WALL_RSC);
+    ResourceManager.loadImage(MAP3_LAVA_RSC);
+    ResourceManager.loadImage(MAP3_DOOR_RSC);
 
     //KEY
     ResourceManager.loadImage(KEY_RSC);

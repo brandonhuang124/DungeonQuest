@@ -8,7 +8,11 @@ import org.newdawn.slick.Graphics;
 
 import java.io.*;
 
-
+/**
+ * MapUtil handles rendering the map, checking for which level the game is currently in
+ * where level name and some util methods are static. Attributes to the map,
+ * tile, world and screen conversion are here.
+ */
 
 public class MapUtil {
     private final String TAG = "MapUtil -";
@@ -16,6 +20,7 @@ public class MapUtil {
     //Path to the level 60x60 array:
     private final String level1Data = "Project2/src/Project2/Data/LevelOneMap.csv";
     private final String level2Data = "Project2/src/Project2/Data/LevelTwoMap.csv";
+    private final String level3Data = "Project2/src/Project2/Data/LevelThreeMap.csv";
     public static final int TILESIZE = 32;
     public static final int SCREENWIDTH = 20;
     public static final int SCREENHEIGHT = 20;
@@ -28,8 +33,10 @@ public class MapUtil {
     private static final int wallTile = 1;
     private static final int wallTileWithTorch = 2;
     private static final int exitDoorGoal = 6;
-
-
+    // press M to enter cheat mode while in Playing state:
+    // This will allow skipping of levels by pressing Q
+    // and is reset to false in the starting state
+    public static boolean cheatMode;
 
 
 
@@ -61,7 +68,7 @@ public class MapUtil {
                 currentMapString = readLevelCSV(level2Data);
                 break;
             case THREE:
-                //TODO level3 map
+                currentMapString = readLevelCSV(level3Data);
                 break;
             case GAMEOVER:
                 System.out.println(TAG + " GameOver state");
@@ -72,7 +79,7 @@ public class MapUtil {
         }
     }
 
-    /***
+    /**
      * Screen coordinates: where objects are on camera.
      * World coordinates: where objects are a separate
      *      coordinate system relative to the entire map including off camera.
@@ -181,6 +188,20 @@ public class MapUtil {
                             renderX, renderY);
                 }
             }
+            case THREE -> { // render based on LEVEL THREE assets:
+                if (renderTile.getID() ==   wallTile) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP3_WALL_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+                }
+                if (renderTile.getID() == wallTileWithTorch) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP3_LAVA_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+                }
+                if (renderTile.getID() == exitDoorGoal) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP3_DOOR_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+                }
+            }
         }
     }
 
@@ -201,6 +222,13 @@ public class MapUtil {
 
                 }
 
+            }
+            case THREE -> { // render based on LEVEL TWO assets:
+                if (renderTile.getID() == floorTile) {
+                    g.drawImage(ResourceManager.getImage(DungeonGame.MAP3_FLOOR_RSC).getScaledCopy(DungeonGame.SCALE),
+                            renderX, renderY);
+
+                }
             }
         }
     }

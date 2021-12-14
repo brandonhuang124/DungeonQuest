@@ -5,7 +5,9 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
+import org.newdawn.slick.state.transition.BlobbyTransition;
 import org.newdawn.slick.state.transition.EmptyTransition;
+import org.newdawn.slick.state.transition.FadeOutTransition;
 import org.newdawn.slick.state.transition.HorizontalSplitTransition;
 
 import java.util.Map;
@@ -33,34 +35,47 @@ public class TransitionState extends BasicGameState {
     public void enter(GameContainer container, StateBasedGame game)
     {
         // switching levels:
-        timer = 1000;
-        if(MapUtil.levelName == LevelName.MENU) {
-            MapUtil.levelName = LevelName.ONE;
-        }
-        else if(MapUtil.levelName == LevelName.ONE)
-            MapUtil.setLevelName(LevelName.TWO);
-        else if(MapUtil.levelName == LevelName.TWO){
-            MapUtil.setLevelName(LevelName.THREE);
-        }else if(MapUtil.levelName == LevelName.THREE){
-            playerWon = true;
-        }
+        timer = 1500;
 
     }
 
     @Override
     public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
-
+        if (timer <= 1000 &&  timer > 1) {
+            // Checks previous level before updating to the next:
+            if (MapUtil.levelName == LevelName.MENU)
+                g.drawString("LEVEL ONE", 300, 400);
+            if (MapUtil.levelName == LevelName.ONE)
+                g.drawString("LEVEL TWO", 300, 400);
+            if (MapUtil.levelName == LevelName.TWO)
+                g.drawString("LEVEL THREE", 300, 400);
+            if (MapUtil.levelName == LevelName.THREE)
+                g.drawString("Drum Roll...", 300, 400);
+        }
     }
 
     @Override
-    public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException
-    {
+    public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
         timer -= delta;
-        if (timer <= 0)
-            if(!playerWon) {
-                game.enterState(DungeonGame.LEVEL1, new EmptyTransition(), new HorizontalSplitTransition());
-            }else{
+        if (timer <= 0) {
+            if (MapUtil.levelName == LevelName.MENU) {
+                MapUtil.levelName = LevelName.ONE;
+            } else if (MapUtil.levelName == LevelName.ONE)
+                MapUtil.setLevelName(LevelName.TWO);
+            else if (MapUtil.levelName == LevelName.TWO) {
+                MapUtil.setLevelName(LevelName.THREE);
+            } else if (MapUtil.levelName == LevelName.THREE) {
+                playerWon = true;
+                System.out.println("Player(s) have won the game!");
+
+            }
+
+            if (!playerWon) {
+                game.enterState(DungeonGame.LEVEL1, new FadeOutTransition(), new BlobbyTransition());
+            } else {
+                playerWon = false;
                 game.enterState(DungeonGame.WIN, new EmptyTransition(), new HorizontalSplitTransition());
             }
+        }
     }
 }

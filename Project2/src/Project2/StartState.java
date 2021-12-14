@@ -29,6 +29,7 @@ public class StartState extends BasicGameState {
 
   @Override
   public void enter(GameContainer container, StateBasedGame game) {
+    MapUtil.cheatMode = false;
     DungeonGame rg = (DungeonGame)game;
     container.setSoundOn(true);
   }
