@@ -196,8 +196,8 @@ public class Level1 extends BasicGameState {
         if (enemyList.isEmpty() && !player.hasTheKey) {
             if(twoPlayer){  // checking that both players do not have the key:
                 if(enemyList.isEmpty() && !player2.hasTheKey){
-                    g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), levelMap.convertTileToScreen(key.getLocation()).x,
-                                                                                levelMap.convertTileToScreen(key.getLocation()).y);
+                    g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), levelMap.convertTileToScreen(key.getLocation()).x - 16,
+                                                                                levelMap.convertTileToScreen(key.getLocation()).y - 16);
                 }
             }else{
                 g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), levelMap.convertTileToScreen(key.getLocation()).x,
@@ -268,7 +268,7 @@ public class Level1 extends BasicGameState {
                 key = null;
                 System.out.println("Level class, A Player has picked up the key!");
             }
-            if (twoPlayer) {
+            if (twoPlayer && key != null) {
                 if (key.playerCollision(player2.getTileIndex()) && enemyList.isEmpty()) {
                     // take the key off the map if the player grabs it:
                     // java handles the garbage collection here
@@ -623,6 +623,13 @@ public class Level1 extends BasicGameState {
           if(player2.isDead()) {
             data = data.concat("PLAYER2DEAD;");
           }
+        }
+        // Send a token if a player has a key
+        if(player.hasTheKey) {
+          data = data.concat("P1KEY");
+        }
+        else if (player2.hasTheKey) {
+          data = data.concat("P2KEY");
         }
         // Put other stuff here if necessary
 
