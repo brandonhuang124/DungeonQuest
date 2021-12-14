@@ -29,7 +29,7 @@ public class Player extends Entity {
   private float speed;
   private int damage, maxhealth, health, attackCooldownTimer, attackCooldown, playerType, damageCounter, attackCounter;
   private double weaponAngle;
-  private boolean faceRight, attackReady, selfRevive, invincible, doubleStrength;
+  private boolean faceRight, attackReady, selfRevive, invincible, doubleStrength, isDead;
   private Animation moveLeft, moveRight, idleLeft, idleRight, current;
   public Weapon weapon;
   public Coordinate worldPos;
@@ -326,10 +326,14 @@ public class Player extends Entity {
     }
 
     health -= damage;
-    if(health <= 0)
+    if(health <= 0) {
+      isDead = true;
       return true;
+    }
     return false;
   }
+
+  public boolean isDead() { return isDead;}
 
   public void maxHeal() {health = maxhealth;}
 
@@ -349,6 +353,7 @@ public class Player extends Entity {
   }
 
   public void flipSelfRevive() {
+    isDead = false;
     selfRevive = !selfRevive;
   }
 
@@ -421,6 +426,9 @@ public class Player extends Entity {
    */
 
   public void update(final int delta) {
+    // Skip if were dead.
+    if(isDead)
+      return;
     Vector movement = velocity.scale(delta);
     prevMoveVelocity = new Coordinate(movement.getX(), movement.getY());
     worldPos.x += movement.getX();

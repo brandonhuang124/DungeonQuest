@@ -42,7 +42,6 @@ public class WinState extends BasicGameState {
 
     @Override
     public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
-      DungeonGame dg = (DungeonGame) game;
         Input input = container.getInput();
         if(input.isKeyDown(Input.KEY_Y)){
             game.enterState(DungeonGame.STARTUPSTATE, new FadeOutTransition(), new FadeInTransition());

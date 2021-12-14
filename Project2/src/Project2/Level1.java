@@ -6,9 +6,7 @@ import jig.Vector;
 import org.newdawn.slick.*;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
-import org.newdawn.slick.state.transition.BlobbyTransition;
-import org.newdawn.slick.state.transition.EmptyTransition;
-import org.newdawn.slick.state.transition.HorizontalSplitTransition;
+import org.newdawn.slick.state.transition.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,7 +30,7 @@ public class Level1 extends BasicGameState {
     MapUtil levelMap;
     Timer timer;
     int player1type, player2type;
-    boolean player1Dead, player2Dead, gameover, levelComplete;
+    boolean gameover, levelComplete;
     public boolean twoPlayer;
     Key key;
 
@@ -56,7 +54,7 @@ public class Level1 extends BasicGameState {
         path = path2 = null;
         if (player1type == 0)
             player1type = 1;
-        player1Dead = player2Dead = gameover = levelComplete = false;
+        gameover = levelComplete = false;
         // parse the CSV map file, throw exception in case of IO error:
         try {
             levelMap.loadLevelMap();
@@ -80,10 +78,12 @@ public class Level1 extends BasicGameState {
         container.setSoundOn(true);
 
         // Sanity check each time we enter this state while in 2player to ensure we start at the same time.
-        try {
-          DungeonGame.client.dataOutputStream.writeUTF("LevelStart;1;");
-          DungeonGame.client.dataOutputStream.flush();
-        } catch (IOException e) { e.printStackTrace();}
+        if(twoPlayer) {
+          try {
+            DungeonGame.client.dataOutputStream.writeUTF("LevelStart;1;");
+            DungeonGame.client.dataOutputStream.flush();
+          } catch (IOException e) { e.printStackTrace();}
+        }
     }
 
     @Override
@@ -541,9 +541,6 @@ public class Level1 extends BasicGameState {
                 player.maxHeal();
                 player.flipSelfRevive();
             }
-            else {
-                gameover = true;
-            }
         }
         // Check if p2 died
         if(twoPlayer) {
@@ -552,11 +549,18 @@ public class Level1 extends BasicGameState {
                     player2.maxHeal();
                     player2.flipSelfRevive();
                 }
-                else {
-                    gameover = true;
-                }
             }
         }
+
+        // Check if they both died, in that case were in gameover
+      if (twoPlayer && player.isDead() && player2.isDead()) {
+        gameover = true;
+      }
+
+      // Check if were in single player and p1 dies, in that case were in gameover
+      if(!twoPlayer && player.isDead()) {
+        gameover = true;
+      }
 
         // Send data to p2 if were in two player mode
         if (twoPlayer) {
@@ -583,6 +587,18 @@ public class Level1 extends BasicGameState {
             }
             return enemy.isDead();
         });
+
+        // If were in gameover, we need to go to the gameover state.
+        if(gameover) {
+          // Tell p2 if were in 2player
+          if(twoPlayer) {
+            try {
+              dg.client.dataOutputStream.writeUTF(get2PData());
+              dg.client.dataOutputStream.flush();
+            } catch (IOException e) { e.printStackTrace(); }
+          }
+          game.enterState(DungeonGame.GAMEOVER, new FadeOutTransition(), new FadeInTransition());
+        }
 
         checkIfPlayersCamExitToNextLevel(game);
     } // update
@@ -646,15 +662,15 @@ public class Level1 extends BasicGameState {
         }
         // Send a token if a gameover occurs
         if(gameover) {
-
+          data = data.concat("GAMEOVER");
         }
         // Send a token if a player dies
         else {
-          if(player1Dead) {
-
+          if(player.isDead()) {
+            data = data.concat("PLAYER1DEAD");
           }
-          if(player2Dead) {
-
+          if(player2.isDead()) {
+            data = data.concat("PLAYER2DEAD");
           }
         }
         // Put other stuff here if necessary

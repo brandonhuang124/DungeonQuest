@@ -21,7 +21,7 @@ public class DummyState extends BasicGameState {
   ArrayList<Enemy> enemyList;
   ArrayList<DummyObject> dummyList;
   boolean firstData, p1SelfRevive, p1Invincible, p1DoubleStrength, p2SelfRevive, p2Invincible, p2DoubleStrength;
-  boolean levelComplete;
+  boolean levelComplete, gameover, player1Dead, player2Dead;
   int myId, p1Health, p1MaxHealth, p2Health, p2MaxHealth;
 
   @Override
@@ -37,7 +37,7 @@ public class DummyState extends BasicGameState {
 
   @Override
   public void enter(GameContainer container, StateBasedGame game) {
-    levelComplete = false;
+    levelComplete = gameover = player1Dead = player2Dead = false;
     p1SelfRevive = p1Invincible = p1DoubleStrength = p2SelfRevive = p2Invincible = p2DoubleStrength = false;
     p1Health = p1MaxHealth = p2Health = p2MaxHealth = 0;
     meleePlayer = rangedPlayer = null;
@@ -376,9 +376,16 @@ public class DummyState extends BasicGameState {
         levelComplete = true;
       }
       // If we get a dead player signal
-
+      if(token[index].equals("PLAYER1DEAD")) {
+        levelComplete = true;
+      }
+      if(token[index].equals("PLAYER2DEAD")) {
+        levelComplete = true;
+      }
       // If we get a gameover signal
-
+      if(token[index].equals("GAMEOVER")) {
+        levelComplete = true;
+      }
 
     }
   }
