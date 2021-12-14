@@ -674,7 +674,7 @@ public class Level1 extends BasicGameState {
             }
             if (levelMap.isAtDoor(player2)) {
                 if (player2.hasTheKey) {
-                    game.enterState(DungeonGame.TRANSITION, new EmptyTransition, new BlobbyTransition());
+                    game.enterState(DungeonGame.TRANSITION, new EmptyTransition(), new BlobbyTransition());
                 }
             }
         }
