@@ -70,11 +70,11 @@ public class DummyState extends BasicGameState {
   public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
     levelMap.renderMapByCamera(g);
 
-    if(meleePlayer != null) {
+    if(meleePlayer != null && !player1Dead) {
       meleePlayer.render(g);
       meleePlayer.weapon.render(g);
     }
-    if(rangedPlayer != null) {
+    if(rangedPlayer != null && !player2Dead) {
       rangedPlayer.render(g);
       rangedPlayer.weapon.render(g);
     }
@@ -382,14 +382,14 @@ public class DummyState extends BasicGameState {
       }
       // If we get a dead player signal
       if(token[index].equals("PLAYER1DEAD")) {
-        levelComplete = true;
+        player1Dead = true;
       }
       if(token[index].equals("PLAYER2DEAD")) {
-        levelComplete = true;
+        player2Dead = true;
       }
       // If we get a gameover signal
       if(token[index].equals("GAMEOVER")) {
-        levelComplete = true;
+        gameover = true;
       }
 
     }

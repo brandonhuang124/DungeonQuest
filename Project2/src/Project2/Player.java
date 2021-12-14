@@ -327,6 +327,8 @@ public class Player extends Entity {
 
     health -= damage;
     if(health <= 0) {
+      worldPos.x = 32;
+      worldPos.y = 32;
       isDead = true;
       return true;
     }
