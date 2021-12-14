@@ -614,7 +614,7 @@ public class Level1 extends BasicGameState {
         for(Powerup p : powerupList)
             data = data.concat(p.getData());
         // We're going to add the key here if applicable, since the key will be constructed as a dummy object.
-        if(key != null)
+        if(key != null && enemyList.isEmpty() && !player.hasTheKey && !player2.hasTheKey)
             data = data.concat(key.getData());
         data = data.concat("POWERUPLISTEND;");
 
