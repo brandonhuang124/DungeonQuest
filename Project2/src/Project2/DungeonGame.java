@@ -332,6 +332,7 @@ public class DungeonGame extends StateBasedGame {
     int width = MapUtil.LEVELWIDTH;
     int height = MapUtil.LEVELHEIGHT;
     int leftBound, rightBound, bottomBound, topBound;
+    Tile[][] tilemap = levelMap.currentTileMap;
     Vertex path[][];
     // We need to flood the whole board if the oldPath doesn't exist.
     if(oldPath == null){
@@ -428,15 +429,15 @@ public class DungeonGame extends StateBasedGame {
         }
       }
       // Tile down right
-      if(x > 0 && y > 0) {
-        compare = currentDist + (path[x-1][y-1].getCost() * Math.sqrt(2));
-        if(path[x-1][y-1].getDistance() > compare) {
-          path[x-1][y-1].setDistance(compare);
-          path[x-1][y-1].setDirection(3);
-        }
+      if(x > 0 && y > 0 && tilemap[x-1][y].getID() == 0 && tilemap[x][y-1].getID() == 0) {
+          compare = currentDist + (path[x-1][y-1].getCost() * Math.sqrt(2));
+          if(path[x-1][y-1].getDistance() > compare) {
+            path[x-1][y-1].setDistance(compare);
+            path[x-1][y-1].setDirection(3);
+          }
       }
       // Tile down left
-      if(x < width - 1 && y > 0) {
+      if(x < width - 1 && y > 0 && tilemap[x+1][y].getID() == 0 && tilemap[x][y-1].getID() == 0) {
         compare = currentDist + (path[x+1][y-1].getCost() * Math.sqrt(2));
         if(path[x+1][y-1].getDistance() > compare) {
           path[x+1][y-1].setDistance(compare);
@@ -444,7 +445,7 @@ public class DungeonGame extends StateBasedGame {
         }
       }
       // Tile up right
-      if(x > 0 && y < height - 1) {
+      if(x > 0 && y < height - 1 && tilemap[x-1][y].getID() == 0 && tilemap[x][y+1].getID() == 0) {
         compare = currentDist + (path[x-1][y+1].getCost() * Math.sqrt(2));
         if(path[x-1][y+1].getDistance() > compare) {
           path[x-1][y+1].setDistance(compare);
@@ -452,7 +453,7 @@ public class DungeonGame extends StateBasedGame {
         }
       }
       // Tile up left
-      if(x < width - 1 && y < height - 1) {
+      if(x < width - 1 && y < height - 1 && tilemap[x+1][y].getID() == 0 && tilemap[x][y+1].getID() == 0) {
         compare = currentDist + (path[x+1][y+1].getCost() * Math.sqrt(2));
         if(path[x+1][y+1].getDistance() > compare) {
           path[x+1][y+1].setDistance(compare);

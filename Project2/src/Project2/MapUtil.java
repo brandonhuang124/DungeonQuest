@@ -114,11 +114,6 @@ public class MapUtil {
         return (tileValue == wallTile || tileValue == wallTileWithTorch);
     }
 
-    // allowing for a vector from world to tile:
-    public static TileIndex convertWorldToTile(Vector worldPos){
-        return new TileIndex((int)Math.floor(worldPos.getX() / TILESIZE), (int)Math.floor(worldPos.getY() / TILESIZE));
-    }
-
     // converting from world to tile:
     public static TileIndex convertWorldToTile(Coordinate worldPos){
         return new TileIndex((int)Math.floor(worldPos.x / TILESIZE), (int)Math.floor(worldPos.y / TILESIZE));
