@@ -17,7 +17,8 @@ import java.util.Map;
  */
 public class TransitionState extends BasicGameState {
 
-    Boolean playerWon = false;
+    Boolean playerWon;
+    boolean player2;
 
     private int timer;
 
@@ -28,7 +29,8 @@ public class TransitionState extends BasicGameState {
 
     @Override
     public void init(GameContainer container, StateBasedGame game) throws SlickException {
-
+      playerWon = false;
+      player2 = false;
     }
 
     @Override
@@ -71,11 +73,16 @@ public class TransitionState extends BasicGameState {
             }
 
             if (!playerWon) {
-                game.enterState(DungeonGame.LEVEL1, new FadeOutTransition(), new BlobbyTransition());
+                if (player2)
+                  game.enterState(DungeonGame.DUMMYSTATE, new FadeOutTransition(), new BlobbyTransition());
+                else
+                  game.enterState(DungeonGame.LEVEL1, new FadeOutTransition(), new BlobbyTransition());
             } else {
                 playerWon = false;
                 game.enterState(DungeonGame.WIN, new EmptyTransition(), new HorizontalSplitTransition());
             }
         }
     }
+
+    public void set2P() {player2 = true;}
 }

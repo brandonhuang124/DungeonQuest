@@ -32,7 +32,8 @@ public class Level1 extends BasicGameState {
     MapUtil levelMap;
     Timer timer;
     int player1type, player2type;
-    boolean player1Dead, player2Dead, gameover, twoPlayer;
+    boolean player1Dead, player2Dead, gameover, levelComplete;
+    public boolean twoPlayer;
     Key key;
 
 
@@ -55,7 +56,7 @@ public class Level1 extends BasicGameState {
         path = path2 = null;
         if (player1type == 0)
             player1type = 1;
-        player1Dead = player2Dead = gameover = false;
+        player1Dead = player2Dead = gameover = levelComplete = false;
         // parse the CSV map file, throw exception in case of IO error:
         try {
             levelMap.loadLevelMap();
@@ -77,6 +78,12 @@ public class Level1 extends BasicGameState {
         powerupList = Powerup.buildPowerUpList();
 
         container.setSoundOn(true);
+
+        // Sanity check each time we enter this state while in 2player to ensure we start at the same time.
+        try {
+          DungeonGame.client.dataOutputStream.writeUTF("LevelStart;1;");
+          DungeonGame.client.dataOutputStream.flush();
+        } catch (IOException e) { e.printStackTrace();}
     }
 
     @Override
@@ -629,9 +636,22 @@ public class Level1 extends BasicGameState {
         // Step 6: Send special instructions
         data = data.concat("INSTRUCTIONSSTART;");
         // Send a token if the level was completed
-        // Send a token if a player quits
-        // Send a token if a player dies
+        if(levelComplete) {
+          data = data.concat("LEVELCOMPLETE");
+        }
         // Send a token if a gameover occurs
+        if(gameover) {
+
+        }
+        // Send a token if a player dies
+        else {
+          if(player1Dead) {
+
+          }
+          if(player2Dead) {
+
+          }
+        }
         // Put other stuff here if necessary
 
         data = data.concat("INSTRUCTIONSEND");
@@ -661,6 +681,7 @@ public class Level1 extends BasicGameState {
     // check if either player is at the door and also has the key to unlock it,
     // if so, the players move to the next level.
     private void checkIfPlayersCamExitToNextLevel(StateBasedGame game) {
+        DungeonGame dg = (DungeonGame) game;
         if (levelMap.isAtDoor(player)) {
             if (player.hasTheKey) {
                 game.enterState(DungeonGame.TRANSITION, new EmptyTransition(), new BlobbyTransition());
@@ -669,6 +690,11 @@ public class Level1 extends BasicGameState {
         if (twoPlayer) {
             if (levelMap.isAtDoor(player)) {
                 if (player.hasTheKey) {
+                  levelComplete = true;
+                  try {
+                    dg.client.dataOutputStream.writeUTF(get2PData());
+                    dg.client.dataOutputStream.flush();
+                  } catch (IOException e) { e.printStackTrace(); }
                     game.enterState(DungeonGame.TRANSITION, new EmptyTransition(), new BlobbyTransition());
                 }
             }

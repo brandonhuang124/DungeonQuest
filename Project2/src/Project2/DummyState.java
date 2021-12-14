@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import jig.Vector;
+import org.newdawn.slick.state.transition.BlobbyTransition;
+import org.newdawn.slick.state.transition.EmptyTransition;
 
 public class DummyState extends BasicGameState {
   MapUtil levelMap;
@@ -19,6 +21,7 @@ public class DummyState extends BasicGameState {
   ArrayList<Enemy> enemyList;
   ArrayList<DummyObject> dummyList;
   boolean firstData, p1SelfRevive, p1Invincible, p1DoubleStrength, p2SelfRevive, p2Invincible, p2DoubleStrength;
+  boolean levelComplete;
   int myId, p1Health, p1MaxHealth, p2Health, p2MaxHealth;
 
   @Override
@@ -29,14 +32,15 @@ public class DummyState extends BasicGameState {
   @Override
   public void init(GameContainer container, StateBasedGame game) throws SlickException {
     levelMap = new MapUtil();
-    MapUtil.setLevelName(LevelName.NONEORTEST);
+    MapUtil.setLevelName(LevelName.ONE);
   }
 
   @Override
   public void enter(GameContainer container, StateBasedGame game) {
+    levelComplete = false;
+    p1SelfRevive = p1Invincible = p1DoubleStrength = p2SelfRevive = p2Invincible = p2DoubleStrength = false;
     p1Health = p1MaxHealth = p2Health = p2MaxHealth = 0;
     meleePlayer = rangedPlayer = null;
-    MapUtil.setLevelName(LevelName.ONE);
     enemyList = Enemy.buildEnemyList();
     dummyList = new ArrayList<DummyObject>();
     // parse the CSV map file, throw exception in case of IO error:
@@ -51,6 +55,12 @@ public class DummyState extends BasicGameState {
         MapUtil.LEVELWIDTH,MapUtil.LEVELWIDTH);
 
     container.setSoundOn(true);
+
+    // Sanity Check with the other player to ensure we start at the same time
+    try {
+      String string = DungeonGame.client.dataInputStream.readUTF();
+      System.out.println(string);
+    } catch(IOException e) { e.printStackTrace();}
 
   }
 
@@ -156,6 +166,12 @@ public class DummyState extends BasicGameState {
 
     // Use the data to set important fields in the game
     parseRenderData(dataToken);
+
+    // Check special flags that could have been set
+    if(levelComplete) {
+      ((TransitionState)game.getState(DungeonGame.LEVEL1)).set2P();
+      game.enterState(DungeonGame.TRANSITION, new EmptyTransition(), new BlobbyTransition());
+    }
 
     // Set screen positions for entities
     Coordinate playerScreenPos = levelMap.convertWorldToScreen(meleePlayer.worldPos);
@@ -349,6 +365,17 @@ public class DummyState extends BasicGameState {
     p2Invincible = Boolean.parseBoolean(token[index+8]);
     p2DoubleStrength = Boolean.parseBoolean(token[index+9]);
     // Handle special instructions
+    index = index + 2;
+    for(; !token[index].equals("INSTRUCTIONSEND"); index++) {
+      // If we get a level complete signal
+      if(token[index].equals("LEVELCOMPLETE")) {
+        levelComplete = true;
+      }
+      // If we get a dead player signal
 
+      // If we get a gameover signal
+
+
+    }
   }
 }
