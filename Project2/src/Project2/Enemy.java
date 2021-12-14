@@ -146,7 +146,6 @@ public class Enemy extends Entity{
     if(id == 1) {
       if(playerLocation.x == location.x && playerLocation.y == location.y) {
         player1.damage(damage);
-        System.out.println("Player Hit! " + player1.getCurrentHealth());
         sleep = true;
         sleeptimer = 500;
         stop();
@@ -241,7 +240,6 @@ public class Enemy extends Entity{
     if(id == 1) {
       if(playerLocation.x == location.x && playerLocation.y == location.y) {
         closestPlayer.damage(damage);
-        System.out.println("Player Hit! " + closestPlayer.getCurrentHealth());
         sleep = true;
         sleeptimer = 500;
         stop();

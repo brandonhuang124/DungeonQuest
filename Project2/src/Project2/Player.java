@@ -414,7 +414,6 @@ public class Player extends Entity {
         attackCounter = 0;
       }
     }
-    System.out.println("Damage: " + damage);
 
     if(attackReady) {
       Projectile newProjectile;
