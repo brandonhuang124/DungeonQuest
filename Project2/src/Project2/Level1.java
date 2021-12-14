@@ -626,10 +626,10 @@ public class Level1 extends BasicGameState {
         }
         // Send a token if a player has a key
         if(player.hasTheKey) {
-          data = data.concat("P1KEY");
+          data = data.concat("P1KEY;");
         }
         else if (player2.hasTheKey) {
-          data = data.concat("P2KEY");
+          data = data.concat("P2KEY;");
         }
         // Put other stuff here if necessary
 
