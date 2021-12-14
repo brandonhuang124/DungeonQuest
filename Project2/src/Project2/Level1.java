@@ -618,7 +618,8 @@ public class Level1 extends BasicGameState {
         data = data.concat("HUDSTART;");
         // Send both players healths and max healths across
         data = data.concat(player.getCurrentHealth() + ";" + player.getMaxHealth() + ";" + player2.getCurrentHealth() + ";"
-                + player2.getMaxHealth() + ";");
+                + player2.getMaxHealth() + ";" + player.getSelfRevive() + ";" + player.getInvincible() + ";" + player.getDoubleStrength() + ";"
+                + player2.getSelfRevive() + ";" + player2.getInvincible() + ";" + player2.getDoubleStrength() + ";");
         data = data.concat("HUDEND");
 
         // Step 6: Send special instructions

@@ -18,7 +18,7 @@ public class DummyState extends BasicGameState {
   Player meleePlayer, rangedPlayer;
   ArrayList<Enemy> enemyList;
   ArrayList<DummyObject> dummyList;
-  boolean firstData;
+  boolean firstData, p1SelfRevive, p1Invincible, p1DoubleStrength, p2SelfRevive, p2Invincible, p2DoubleStrength;
   int myId, p1Health, p1MaxHealth, p2Health, p2MaxHealth;
 
   @Override
@@ -102,6 +102,16 @@ public class DummyState extends BasicGameState {
       g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARR_RSC), 152 + (p1MaxHealth * 6), 660);
     else
       g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC), 152 + (p1MaxHealth * 6), 660);
+
+    if(p1SelfRevive) {
+      g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_SELFREVIVE_RSC), 152, 700);
+    }
+    if(p1Invincible) {
+      g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_INVINCIBILITY_RSC), 172, 700);
+    }
+    if(p1DoubleStrength) {
+      g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_DOUBLESTRENGTH_RSC), 192, 700);
+    }
 
     // Render the second players health bar
       // Render Left cap of health bar
@@ -332,6 +342,12 @@ public class DummyState extends BasicGameState {
     p1MaxHealth = Integer.valueOf(token[index+1]);
     p2Health = Integer.valueOf(token[index+2]);
     p2MaxHealth = Integer.valueOf(token[index+3]);
+    p1SelfRevive = Boolean.parseBoolean(token[index+4]);
+    p1Invincible = Boolean.parseBoolean(token[index+5]);
+    p1DoubleStrength = Boolean.parseBoolean(token[index+6]);
+    p2SelfRevive = Boolean.parseBoolean(token[index+7]);
+    p2Invincible = Boolean.parseBoolean(token[index+8]);
+    p2DoubleStrength = Boolean.parseBoolean(token[index+9]);
     // Handle special instructions
 
   }
