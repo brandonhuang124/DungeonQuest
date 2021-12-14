@@ -239,6 +239,11 @@ public class Level1 extends BasicGameState {
         }
         if(MapUtil.cheatMode){
             if(input.isKeyDown(Input.KEY_Q)){
+                levelComplete = true;
+                try {
+                  dg.client.dataOutputStream.writeUTF(get2PData());
+                  dg.client.dataOutputStream.flush();
+                } catch (IOException e) { e.printStackTrace(); }
                 game.enterState(DungeonGame.TRANSITION, new EmptyTransition(), new BlobbyTransition());
             }
         }
@@ -631,13 +636,13 @@ public class Level1 extends BasicGameState {
         data = data.concat(player.getCurrentHealth() + ";" + player.getMaxHealth() + ";" + player2.getCurrentHealth() + ";"
                 + player2.getMaxHealth() + ";" + player.getSelfRevive() + ";" + player.getInvincible() + ";" + player.getDoubleStrength() + ";"
                 + player2.getSelfRevive() + ";" + player2.getInvincible() + ";" + player2.getDoubleStrength() + ";");
-        data = data.concat("HUDEND");
+        data = data.concat("HUDEND;");
 
         // Step 6: Send special instructions
         data = data.concat("INSTRUCTIONSSTART;");
         // Send a token if the level was completed
         if(levelComplete) {
-          data = data.concat("LEVELCOMPLETE");
+          data = data.concat("LEVELCOMPLETE;");
         }
         // Send a token if a gameover occurs
         if(gameover) {
@@ -700,6 +705,11 @@ public class Level1 extends BasicGameState {
             }
             if (levelMap.isAtDoor(player2)) {
                 if (player2.hasTheKey) {
+                    levelComplete = true;
+                    try {
+                      dg.client.dataOutputStream.writeUTF(get2PData());
+                      dg.client.dataOutputStream.flush();
+                    } catch (IOException e) { e.printStackTrace(); }
                     game.enterState(DungeonGame.TRANSITION, new EmptyTransition(), new BlobbyTransition());
                 }
             }

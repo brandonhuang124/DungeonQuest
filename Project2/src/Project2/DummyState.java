@@ -167,6 +167,10 @@ public class DummyState extends BasicGameState {
     // Use the data to set important fields in the game
     parseRenderData(dataToken);
 
+    // If freak accidents happen or poorly timed synchronization reads, skip this loop
+    if(dataToken.length < 4)
+      return;
+
     // Check special flags that could have been set
     if(levelComplete) {
       ((TransitionState)game.getState(DungeonGame.LEVEL1)).set2P();

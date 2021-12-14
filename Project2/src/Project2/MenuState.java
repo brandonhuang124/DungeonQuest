@@ -413,7 +413,7 @@ public class MenuState extends BasicGameState {
       }
       // Check if the server told us were starting.
       if(token != null && token[0].equals("START")) {
-        MapUtil.levelName = LevelName.NONEORTEST;
+        MapUtil.levelName = LevelName.ONE;
         game.enterState(DungeonGame.DUMMYSTATE, new EmptyTransition(), new HorizontalSplitTransition());
       }
     }
