@@ -3,12 +3,12 @@ package Project2;
 import jig.ResourceManager;
 import jig.Vector;
 
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Input;
-import org.newdawn.slick.SlickException;
+import org.newdawn.slick.*;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
+import org.newdawn.slick.state.transition.BlobbyTransition;
+import org.newdawn.slick.state.transition.EmptyTransition;
+import org.newdawn.slick.state.transition.HorizontalSplitTransition;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,6 +35,7 @@ public class Level1 extends BasicGameState {
     boolean player1Dead, player2Dead, gameover, twoPlayer;
     Key key;
 
+
     @Override
     public int getID() {
         return DungeonGame.LEVEL1;
@@ -50,7 +51,6 @@ public class Level1 extends BasicGameState {
     @Override
     public void enter(GameContainer container, StateBasedGame game) {
         // set the state id to the level in maputil to determine which map to render:
-
         path = path2 = null;
         if (player1type == 0)
             player1type = 1;
@@ -197,22 +197,27 @@ public class Level1 extends BasicGameState {
         // if a player defeats all enemies, instruct to find the key
         // if a player has picked up the key, instruct to unlock the door
         // this logic can be refactored to be simpler later
-        if(!enemyList.isEmpty()) {
-            g.drawString("Enemies remaining: " + enemyList.size(), 440, 0);
-        }
-        if(enemyList.isEmpty() && (!player.hasTheKey) && (!twoPlayer)){
-            g.drawString("Find the key!", 440, 0);
-        }
-        if(enemyList.isEmpty() && player.hasTheKey && !twoPlayer){
-            g.drawString("Unlock the door!", 440, 0);
-        }
-        if(twoPlayer){
-            if(enemyList.isEmpty() && (!player.hasTheKey) && (!player2.hasTheKey)){
+        if(!MapUtil.cheatMode) {
+            if (!enemyList.isEmpty()) {
+                g.drawString("Enemies remaining: " + enemyList.size(), 440, 0);
+            }
+            if (enemyList.isEmpty() && (!player.hasTheKey) && (!twoPlayer)) {
                 g.drawString("Find the key!", 440, 0);
             }
-            if(enemyList.isEmpty() && (player2.hasTheKey || player.hasTheKey)){
+            if (enemyList.isEmpty() && player.hasTheKey && !twoPlayer) {
                 g.drawString("Unlock the door!", 440, 0);
             }
+            if (twoPlayer) {
+                if (enemyList.isEmpty() && (!player.hasTheKey) && (!player2.hasTheKey)) {
+                    g.drawString("Find the key!", 440, 0);
+                }
+                if (enemyList.isEmpty() && (player2.hasTheKey || player.hasTheKey)) {
+                    g.drawString("Unlock the door!", 440, 0);
+                }
+            }
+        }
+        if(MapUtil.cheatMode){
+            g.drawString("YOU ARE IN CHEAT MODE, PRESS [Q] TO SKIP", 240, 0);
         }
     }
 
@@ -220,6 +225,15 @@ public class Level1 extends BasicGameState {
     @Override
     public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
         DungeonGame dg = (DungeonGame) game;
+        Input input = container.getInput();
+        if(input.isKeyDown(Input.KEY_M)){
+            MapUtil.cheatMode = true;
+        }
+        if(MapUtil.cheatMode){
+            if(input.isKeyDown(Input.KEY_Q)){
+                game.enterState(DungeonGame.TRANSITION, new EmptyTransition(), new BlobbyTransition());
+            }
+        }
         String p2data;
         String[] p2dataToken = null;
         TileIndex keyLocation = null;
@@ -248,7 +262,6 @@ public class Level1 extends BasicGameState {
             }
         }
 
-        Input input = container.getInput();
         TileIndex playerTile = levelMap.convertWorldToTile(player.worldPos);
         path = DungeonGame.getDijkstras(playerTile.x, playerTile.y, levelMap, path);
 
@@ -645,13 +658,13 @@ public class Level1 extends BasicGameState {
     private void checkIfPlayersCamExitToNextLevel(StateBasedGame game) {
         if (levelMap.isAtDoor(player)) {
             if (player.hasTheKey) {
-                game.enterState(DungeonGame.TRANSITION);
+                game.enterState(DungeonGame.TRANSITION, new EmptyTransition(), new BlobbyTransition());
             }
         }
         if (twoPlayer) {
             if (levelMap.isAtDoor(player)) {
                 if (player.hasTheKey) {
-                    game.enterState(DungeonGame.TRANSITION);
+                    game.enterState(DungeonGame.TRANSITION, new EmptyTransition(), new BlobbyTransition());
                 }
             }
         }

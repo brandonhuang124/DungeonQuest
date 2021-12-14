@@ -8,7 +8,11 @@ import org.newdawn.slick.Graphics;
 
 import java.io.*;
 
-
+/**
+ * MapUtil handles rendering the map, checking for which level the game is currently in
+ * where level name and some util methods are static. Attributes to the map,
+ * tile, world and screen conversion are here.
+ */
 
 public class MapUtil {
     private final String TAG = "MapUtil -";
@@ -29,6 +33,10 @@ public class MapUtil {
     private static final int wallTile = 1;
     private static final int wallTileWithTorch = 2;
     private static final int exitDoorGoal = 6;
+    // press M to enter cheat mode while in Playing state:
+    // This will allow skipping of levels by pressing Q
+    // and is reset to false in the starting state
+    public static boolean cheatMode;
 
 
 
@@ -71,7 +79,7 @@ public class MapUtil {
         }
     }
 
-    /***
+    /**
      * Screen coordinates: where objects are on camera.
      * World coordinates: where objects are a separate
      *      coordinate system relative to the entire map including off camera.

@@ -594,11 +594,11 @@ public class Enemy extends Entity{
     //  enemyList.add(new Enemy(55,52, 1));
     }
     if(MapUtil.levelName == LevelName.TWO) {
-      enemyList.add(new Enemy(10, 10, 2));
+      enemyList.add(new Enemy(10, 10, 1));
    //   enemyList.add(new Enemy(7,  37, 1));
    //   enemyList.add(new Enemy(27, 30, 2));
     //  enemyList.add(new Enemy(37, 22, 1));
-    //  enemyList.add(new Enemy(39, 17, 1));
+    //  enemyList.add(new Enemy(39, 17, 2));
     //  enemyList.add(new Enemy(13, 40, 1));
     //  enemyList.add(new Enemy(54, 47, 1));
     //  enemyList.add(new Enemy(22, 57, 2));
@@ -606,16 +606,16 @@ public class Enemy extends Entity{
     }
     if(MapUtil.levelName == LevelName.THREE) {
       enemyList.add(new Enemy(17, 4, 1));
-      enemyList.add(new Enemy(44, 4, 1));
-      enemyList.add(new Enemy( 3,28, 1));
-      enemyList.add(new Enemy( 7,28, 2));
-      enemyList.add(new Enemy(26,28, 1));
-      enemyList.add(new Enemy(28,38, 1));
-      enemyList.add(new Enemy( 4,44, 2));
-      enemyList.add(new Enemy(16,53, 1));
-      enemyList.add(new Enemy(46,57, 2));
-      enemyList.add(new Enemy(44,26, 2));
-      enemyList.add(new Enemy(52,33, 1));
+   //   enemyList.add(new Enemy(44, 4, 1));
+  //    enemyList.add(new Enemy( 3,28, 1));
+   //   enemyList.add(new Enemy( 7,28, 2));
+   //   enemyList.add(new Enemy(26,28, 1));
+   //   enemyList.add(new Enemy(28,38, 1));
+   //   enemyList.add(new Enemy( 4,44, 2));
+   //   enemyList.add(new Enemy(16,53, 1));
+  //    enemyList.add(new Enemy(46,57, 2));
+   //   enemyList.add(new Enemy(44,26, 2));
+   //   enemyList.add(new Enemy(52,33, 1));
     }
     if(MapUtil.levelName == LevelName.NONEORTEST) {
       enemyList.add(new Enemy(10, 10, 2));
