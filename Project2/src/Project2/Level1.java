@@ -105,8 +105,12 @@ public class Level1 extends BasicGameState {
         for (Powerup p : powerupList) {
             p.render(g);
         }
-        player.render(g);
-        player.weapon.render(g);
+
+        // Render the player
+        if(!player.isDead()) {
+          player.render(g);
+          player.weapon.render(g);
+        }
 
         // If were in two player
         if (twoPlayer) {
@@ -662,20 +666,20 @@ public class Level1 extends BasicGameState {
         }
         // Send a token if a gameover occurs
         if(gameover) {
-          data = data.concat("GAMEOVER");
+          data = data.concat("GAMEOVER;");
         }
         // Send a token if a player dies
         else {
           if(player.isDead()) {
-            data = data.concat("PLAYER1DEAD");
+            data = data.concat("PLAYER1DEAD;");
           }
           if(player2.isDead()) {
-            data = data.concat("PLAYER2DEAD");
+            data = data.concat("PLAYER2DEAD;");
           }
         }
         // Put other stuff here if necessary
 
-        data = data.concat("INSTRUCTIONSEND");
+        data = data.concat("INSTRUCTIONSEND;");
         return data;
     }
 
