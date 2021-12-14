@@ -25,6 +25,11 @@ public class WinState extends BasicGameState {
     public void enter(GameContainer container, StateBasedGame game) {
         MapUtil.levelName = LevelName.WIN;
 
+        // If we were playing in 2 player mode we should disconnect at this point.
+        DungeonGame dg = (DungeonGame) game;
+        if(((Level1)game.getState(DungeonGame.LEVEL1)).twoPlayer) {
+            DungeonGame.client.disconnect();
+        }
     }
 
     @Override
