@@ -20,7 +20,7 @@ public class MenuState extends BasicGameState {
   private boolean selected, arrowBlink, playerFound, singleplayer;
 
   /********** PUT ADDRESS OF SERVER INTHIS VARIABLE WHEN RUNNING **********/
-  private String serverAddress = "192.168.0.107";
+  private String serverAddress = "192.168.0.108";
 
   @Override
   public int getID() {
@@ -166,21 +166,17 @@ public class MenuState extends BasicGameState {
       // Check if we click on something
       if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
         if(select == 1) {
-          System.out.println("1 Selected");
           phase = 2;
           singleplayer = true;
         }
         else if(select == 2) {
-          System.out.println("2 Selected");
           phase = 2;
           singleplayer = false;
         }
         else if(select == 3) {
-          System.out.println("3 Selected");
           phase = 4;
         }
         else if(select == 4) {
-          System.out.println("4 Selected");
           phase = 5;
           // If were joining a game, we need to open a connection and tell the server were P2
           try {
@@ -222,7 +218,6 @@ public class MenuState extends BasicGameState {
           phase = 1;
         }
         else if(select == 2) {
-          System.out.println("Melee Selected");
           ((Level1)game.getState(DungeonGame.LEVEL1)).setPlayerType(2);
           if(!singleplayer) {
             // If were in multiplayer, wee need to open a connection to the server and tell them were player1
@@ -246,14 +241,12 @@ public class MenuState extends BasicGameState {
           }
 
           else {
-            System.out.println("Start game now");
             ((Level1)game.getState(DungeonGame.LEVEL1)).set2Player(false);
             MapUtil.levelName = LevelName.ONE;
             game.enterState(DungeonGame.LEVEL1 , new EmptyTransition(), new  BlobbyTransition());
           }
         }
         else if(select == 3) {
-          System.out.println("Ranged Selected");
           ((Level1)game.getState(DungeonGame.LEVEL1)).setPlayerType(1);
           if(!singleplayer) {
             try {
@@ -275,7 +268,6 @@ public class MenuState extends BasicGameState {
             }
           }
           else {
-            System.out.println("Start Game Now");
             ((Level1)game.getState(DungeonGame.LEVEL1)).set2Player(false);
             MapUtil.levelName = LevelName.ONE;
             game.enterState(DungeonGame.LEVEL1 , new EmptyTransition(), new  BlobbyTransition());
@@ -297,7 +289,6 @@ public class MenuState extends BasicGameState {
 
         if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
           if(select == 1) {
-            System.out.println("Start the game now");
             // Now we gotta tell the server we're gonna start the game.
             try {
               DungeonGame.client.dataOutputStream.writeUTF("START;");
@@ -309,7 +300,6 @@ public class MenuState extends BasicGameState {
             String[] token = null;
             try {
               string = DungeonGame.client.dataInputStream.readUTF();
-              System.out.println("Read from Sever" + string);
               token = string.split(";");
             } catch(IOException e) { e.printStackTrace();}
 
@@ -327,14 +317,12 @@ public class MenuState extends BasicGameState {
         // First read from the server to find if we've found another.
         try {
           string = DungeonGame.client.dataInputStream.readUTF();
-          System.out.println("Read from Sever" + string);
           token = string.split(";");
           // Also send the server an acknowledgement
           DungeonGame.client.dataOutputStream.writeUTF("A;");
           DungeonGame.client.dataOutputStream.flush();
         } catch(IOException e) {
           e.printStackTrace();
-          System.out.println("Error Connecting");
           phase = 6;
           DungeonGame.client.disconnect();
           return;
@@ -385,7 +373,6 @@ public class MenuState extends BasicGameState {
       // Read from the server to find the status of the game search
       try {
         string = DungeonGame.client.dataInputStream.readUTF();
-        System.out.println("Read from Sever" + string);
         token = string.split(";");
         // Tell the server we got it
         DungeonGame.client.dataOutputStream.writeUTF("A;");

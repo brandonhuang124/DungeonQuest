@@ -23,7 +23,7 @@ public class DummyState extends BasicGameState {
   ArrayList<Enemy> enemyList;
   ArrayList<DummyObject> dummyList;
   boolean firstData, p1SelfRevive, p1Invincible, p1DoubleStrength, p2SelfRevive, p2Invincible, p2DoubleStrength;
-  boolean levelComplete, gameover, rangedPlayerDead, meleePlayerDead;
+  boolean levelComplete, gameover, rangedPlayerDead, meleePlayerDead, p1key, p2key;
   int myId, p1Health, p1MaxHealth, p2Health, p2MaxHealth;
 
   @Override
@@ -39,7 +39,7 @@ public class DummyState extends BasicGameState {
 
   @Override
   public void enter(GameContainer container, StateBasedGame game) {
-    levelComplete = gameover = rangedPlayerDead = meleePlayerDead = false;
+    levelComplete = gameover = rangedPlayerDead = meleePlayerDead = p1key = p2key = false;
     p1SelfRevive = p1Invincible = p1DoubleStrength = p2SelfRevive = p2Invincible = p2DoubleStrength = false;
     p1Health = p1MaxHealth = p2Health = p2MaxHealth = 0;
     meleePlayer = rangedPlayer = null;
@@ -61,7 +61,6 @@ public class DummyState extends BasicGameState {
     // Sanity Check with the other player to ensure we start at the same time
     try {
       String string = DungeonGame.client.dataInputStream.readUTF();
-      System.out.println(string);
     } catch(IOException e) { e.printStackTrace();}
 
   }
@@ -111,18 +110,36 @@ public class DummyState extends BasicGameState {
     }
     // Render Right cap of health bar
     if(p1Health == p2MaxHealth)
-      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARR_RSC), 152 + (p1MaxHealth * 6), 660);
+      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_GBARR_RSC).getScaledCopy(0.5f), 152 + (p1MaxHealth * 6), 660);
     else
-      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC), 152 + (p1MaxHealth * 6), 660);
+      g.drawImage(ResourceManager.getImage(DungeonGame.HUD_RBARR_RSC).getScaledCopy(0.5f), 152 + (p1MaxHealth * 6), 660);
 
+    // Powerups for P1
     if(p1SelfRevive) {
-      g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_SELFREVIVE_RSC), 152, 700);
+      g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_SELFREVIVE_RSC).getScaledCopy(0.5f), 152, 700);
     }
     if(p1Invincible) {
-      g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_INVINCIBILITY_RSC), 172, 700);
+      g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_INVINCIBILITY_RSC).getScaledCopy(0.5f), 172, 700);
     }
     if(p1DoubleStrength) {
-      g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_DOUBLESTRENGTH_RSC), 192, 700);
+      g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_DOUBLESTRENGTH_RSC).getScaledCopy(0.5f), 192, 700);
+    }
+    if(p1key) {
+      g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), 212, 700);
+    }
+
+    // Powerups for P2
+    if(p2SelfRevive) {
+      g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_SELFREVIVE_RSC).getScaledCopy(0.5f), 152 + player2HudOffset, 700);
+    }
+    if(p2Invincible) {
+      g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_INVINCIBILITY_RSC).getScaledCopy(0.5f), 172 + player2HudOffset, 700);
+    }
+    if(p2DoubleStrength) {
+      g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_DOUBLESTRENGTH_RSC).getScaledCopy(0.5f), 192 + player2HudOffset, 700);
+    }
+    if(p2key) {
+      g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), 212  + player2HudOffset, 700);
     }
 
     // Render the second players health bar
@@ -159,8 +176,6 @@ public class DummyState extends BasicGameState {
     try {
       data = DungeonGame.client.dataInputStream.readUTF();
       dataToken = data.split(";");
-      for(int i = 0; i < dataToken.length; i++)
-        System.out.println(dataToken[i]);
     } catch (IOException e) {
       System.out.println("IOException from run() in ClientHandler");
       e.printStackTrace();
@@ -407,7 +422,11 @@ public class DummyState extends BasicGameState {
       if(token[index].equals("GAMEOVER")) {
         gameover = true;
       }
-
+      // If we get a key signal
+      if(token[index].equals("P1KEY"))
+        p1key = true;
+      if(token[index].equals("P2KEY"))
+        p2key = true;
     }
   }
 }
