@@ -51,6 +51,7 @@ public class Level1 extends BasicGameState {
     @Override
     public void enter(GameContainer container, StateBasedGame game) {
         // set the state id to the level in maputil to determine which map to render:
+        key = null;
         path = path2 = null;
         if (player1type == 0)
             player1type = 1;
@@ -612,6 +613,9 @@ public class Level1 extends BasicGameState {
         data = data.concat("POWERUPLISTSTART;");
         for(Powerup p : powerupList)
             data = data.concat(p.getData());
+        // We're going to add the key here if applicable, since the key will be constructed as a dummy object.
+        if(key != null)
+            data = data.concat(key.getData());
         data = data.concat("POWERUPLISTEND;");
 
         // Step 5: Send HUD information
