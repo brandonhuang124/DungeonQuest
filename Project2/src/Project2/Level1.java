@@ -190,6 +190,17 @@ public class Level1 extends BasicGameState {
             if((player2.hasTheKey) && enemyList.isEmpty()){ // render the key in the hud when picked up:
                 g.drawImage(ResourceManager.getImage(DungeonGame.KEY_RSC), 212  + player2HudOffset, 700);
             }
+
+            // Render powerups if needed
+            if(player2.getSelfRevive()) {
+              g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_SELFREVIVE_RSC).getScaledCopy(0.5f), 152 + player2HudOffset, 700);
+            }
+            if(player2.getInvincible()) {
+              g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_INVINCIBILITY_RSC).getScaledCopy(0.5f), 172 + player2HudOffset, 700);
+            }
+            if(player2.getDoubleStrength()) {
+              g.drawImage(ResourceManager.getImage(DungeonGame.POWERUP_DOUBLESTRENGTH_RSC).getScaledCopy(0.5f), 192 + player2HudOffset, 700);
+            }
         }
 
         // rendering the key being dropped onto the map upon last enemy being killed:
