@@ -335,7 +335,7 @@ public class Player extends Entity {
     }
 
     health -= damage;
-    if(health <= 0) {
+    if(health <= 0 && !getSelfRevive()) {
       worldPos.x = 32;
       worldPos.y = 32;
       isDead = true;
