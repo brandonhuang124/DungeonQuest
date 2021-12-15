@@ -7,10 +7,12 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
+import org.newdawn.slick.state.transition.*;
 
 import javax.naming.spi.ResolveResult;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.function.DoubleUnaryOperator;
 
 public class MenuState extends BasicGameState {
 
@@ -18,11 +20,11 @@ public class MenuState extends BasicGameState {
   private boolean selected, arrowBlink, playerFound, singleplayer;
 
   /********** PUT ADDRESS OF SERVER INTHIS VARIABLE WHEN RUNNING **********/
-  private String serverAddress = "192.168.0.107";
+  private String serverAddress = "192.168.0.108";
 
   @Override
   public int getID() {
-    return 3;
+    return DungeonGame.MENUSTATE;
   }
 
   @Override
@@ -32,6 +34,7 @@ public class MenuState extends BasicGameState {
 
   @Override
   public void enter(GameContainer container, StateBasedGame game) {
+    MapUtil.setLevelName(LevelName.MENU);
     container.setSoundOn(true);
     selected = playerFound = singleplayer = false;
     arrowBlink = true;
@@ -101,6 +104,7 @@ public class MenuState extends BasicGameState {
 
     // How to play
     if(phase == 4) {
+      g.drawImage(ResourceManager.getImage(DungeonGame.MENU_HOWTOBG_RSC), 0, 0);
       g.drawImage(ResourceManager.getImage(DungeonGame.MENU_BACK_RSC), 25, 645);
       if(select == 1)
         g.drawImage(ResourceManager.getImage(DungeonGame.MENU_SELECTOR_RSC), 231, 647);
@@ -108,6 +112,16 @@ public class MenuState extends BasicGameState {
 
     // Game join
     if(phase == 5) {
+      g.drawImage(ResourceManager.getImage(DungeonGame.MENU_WAITHOST_RSC), 172, 370);
+      g.drawImage(ResourceManager.getImage(DungeonGame.MENU_TITLE_RSC), 63, 25);
+      g.drawImage(ResourceManager.getImage(DungeonGame.MENU_BACK_RSC), 25, 645);
+      if(select == 1)
+        g.drawImage(ResourceManager.getImage(DungeonGame.MENU_SELECTOR_RSC), 231, 647);
+    }
+
+    // Connection error
+    if(phase == 6) {
+      g.drawImage(ResourceManager.getImage(DungeonGame.MENU_ERROR_RSC), 129, 370);
       g.drawImage(ResourceManager.getImage(DungeonGame.MENU_TITLE_RSC), 63, 25);
       g.drawImage(ResourceManager.getImage(DungeonGame.MENU_BACK_RSC), 25, 645);
       if(select == 1)
@@ -152,21 +166,17 @@ public class MenuState extends BasicGameState {
       // Check if we click on something
       if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
         if(select == 1) {
-          System.out.println("1 Selected");
           phase = 2;
           singleplayer = true;
         }
         else if(select == 2) {
-          System.out.println("2 Selected");
           phase = 2;
           singleplayer = false;
         }
         else if(select == 3) {
-          System.out.println("3 Selected");
           phase = 4;
         }
         else if(select == 4) {
-          System.out.println("4 Selected");
           phase = 5;
           // If were joining a game, we need to open a connection and tell the server were P2
           try {
@@ -174,9 +184,13 @@ public class MenuState extends BasicGameState {
             System.out.println("Client created: " + DungeonGame.client);
           } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Error Connecting");
+            phase = 1;
+            DungeonGame.client.disconnect();
+            return;
           }
           try {
-            DungeonGame.client.dataOutputStream.writeUTF("P2CLIENT;");
+            DungeonGame.client.dataOutputStream.writeUTF("Player2;");
             DungeonGame.client.dataOutputStream.flush();
           } catch (IOException e) {
             e.printStackTrace();
@@ -204,7 +218,6 @@ public class MenuState extends BasicGameState {
           phase = 1;
         }
         else if(select == 2) {
-          System.out.println("Melee Selected");
           ((Level1)game.getState(DungeonGame.LEVEL1)).setPlayerType(2);
           if(!singleplayer) {
             // If were in multiplayer, wee need to open a connection to the server and tell them were player1
@@ -214,9 +227,13 @@ public class MenuState extends BasicGameState {
               System.out.println("Client created: " + DungeonGame.client);
             } catch (Exception e) {
               e.printStackTrace();
+              System.out.println("Error Connecting");
+              phase = 6;
+              DungeonGame.client.disconnect();
+              return;
             }
             try {
-              DungeonGame.client.dataOutputStream.writeUTF("P1CLIENT;");
+              DungeonGame.client.dataOutputStream.writeUTF("Player1;");
               DungeonGame.client.dataOutputStream.flush();
             } catch (IOException e) {
               e.printStackTrace();
@@ -224,13 +241,12 @@ public class MenuState extends BasicGameState {
           }
 
           else {
-            System.out.println("Start game now");
             ((Level1)game.getState(DungeonGame.LEVEL1)).set2Player(false);
-            game.enterState(DungeonGame.LEVEL1);
+            MapUtil.levelName = LevelName.ONE;
+            game.enterState(DungeonGame.LEVEL1 , new EmptyTransition(), new  BlobbyTransition());
           }
         }
         else if(select == 3) {
-          System.out.println("Ranged Selected");
           ((Level1)game.getState(DungeonGame.LEVEL1)).setPlayerType(1);
           if(!singleplayer) {
             try {
@@ -239,18 +255,22 @@ public class MenuState extends BasicGameState {
               System.out.println("Client created: " + DungeonGame.client);
             } catch (Exception e) {
               e.printStackTrace();
+              System.out.println("Error Connecting");
+              phase = 6;
+              DungeonGame.client.disconnect();
+              return;
             }
             try {
-              DungeonGame.client.dataOutputStream.writeUTF("P1CLIENT;");
+              DungeonGame.client.dataOutputStream.writeUTF("Player1;");
               DungeonGame.client.dataOutputStream.flush();
             } catch (IOException e) {
               e.printStackTrace();
             }
           }
           else {
-            System.out.println("Start Game Now");
             ((Level1)game.getState(DungeonGame.LEVEL1)).set2Player(false);
-            game.enterState(DungeonGame.LEVEL1);
+            MapUtil.levelName = LevelName.ONE;
+            game.enterState(DungeonGame.LEVEL1 , new EmptyTransition(), new  BlobbyTransition());
           }
         }
       }
@@ -259,8 +279,7 @@ public class MenuState extends BasicGameState {
 
     // Game searching phase
     else if(phase == 3) {
-      if(input.isKeyPressed(Input.KEY_SPACE))
-        playerFound = true;
+      // If we've found a player
       if(playerFound) {
         // We can press the start button here
         if(222 < mousex && mousex < 418 && 440 < mousey && mousey < 508)
@@ -270,14 +289,46 @@ public class MenuState extends BasicGameState {
 
         if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
           if(select == 1) {
-            System.out.println("Start the game now");
+            // Now we gotta tell the server we're gonna start the game.
+            try {
+              DungeonGame.client.dataOutputStream.writeUTF("START;");
+              DungeonGame.client.dataOutputStream.flush();
+            } catch(IOException e) { e.printStackTrace();}
+
+            // Read the acknowledgement for timing reasons
+            String string = null;
+            String[] token = null;
+            try {
+              string = DungeonGame.client.dataInputStream.readUTF();
+              token = string.split(";");
+            } catch(IOException e) { e.printStackTrace();}
+
+            // Now we can actually start
             ((Level1)game.getState(DungeonGame.LEVEL1)).set2Player(true);
-            game.enterState(DungeonGame.LEVEL1);
+            MapUtil.levelName = LevelName.ONE;
+            game.enterState(DungeonGame.LEVEL1, new EmptyTransition(), new  BlobbyTransition());
           }
         }
       }
+      // If were waiting for the player,
       else {
-        // Backing out is still an option.
+        String string = null;
+        String[] token = null;
+        // First read from the server to find if we've found another.
+        try {
+          string = DungeonGame.client.dataInputStream.readUTF();
+          token = string.split(";");
+          // Also send the server an acknowledgement
+          DungeonGame.client.dataOutputStream.writeUTF("A;");
+          DungeonGame.client.dataOutputStream.flush();
+        } catch(IOException e) {
+          e.printStackTrace();
+          phase = 6;
+          DungeonGame.client.disconnect();
+          return;
+        }
+
+        // Check mouse positions and click status.
         if(25 < mousex && mousex < 221 && 645 < mousey && mousey < 713)
           select = 1;
         else
@@ -286,7 +337,16 @@ public class MenuState extends BasicGameState {
         if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
           if(select == 1) {
             phase = 1;
+            // If we back out, we need to close connections
+            DungeonGame.client.disconnect();
+            DungeonGame.client = null;
+            return;
           }
+        }
+
+        // Check if the server told us we found another lpayer
+        if(token[0].equals("FOUND")) {
+          playerFound = true;
         }
       }
     }
@@ -308,16 +368,60 @@ public class MenuState extends BasicGameState {
 
     // Join game Phase
     else if(phase == 5) {
-      // Do stuff here
-      game.enterState(DungeonGame.DUMMYSTATE);
+      String string = null;
+      String[] token = null;
+      // Read from the server to find the status of the game search
+      try {
+        string = DungeonGame.client.dataInputStream.readUTF();
+        token = string.split(";");
+        // Tell the server we got it
+        DungeonGame.client.dataOutputStream.writeUTF("A;");
+        DungeonGame.client.dataOutputStream.flush();
+      } catch(IOException e) {
+        e.printStackTrace();
+        phase = 6;
+        DungeonGame.client.disconnect();
+        return;
+      }
+
+      // Use mouse position to find what were hovered over.
       if(25 < mousex && mousex < 221 && 645 < mousey && mousey < 713)
         select = 1;
       else
         select = 0;
-
+      // Check if we clicked
       if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
         if(select == 1) {
           phase = 1;
+          // If we back out, we need to close connections
+          DungeonGame.client.disconnect();
+          DungeonGame.client = null;
+          return;
+        }
+      }
+      // Check if the server told us were starting.
+      if(token != null && token[0].equals("START")) {
+        MapUtil.levelName = LevelName.ONE;
+        ((Level1)game.getState(DungeonGame.LEVEL1)).set2Player(true);
+        game.enterState(DungeonGame.DUMMYSTATE, new EmptyTransition(), new HorizontalSplitTransition());
+      }
+    }
+
+    // Connection Error phase.
+    else if(phase == 6) {
+      // Use mouse position to find what were hovered over.
+      if(25 < mousex && mousex < 221 && 645 < mousey && mousey < 713)
+        select = 1;
+      else
+        select = 0;
+      // Check if we clicked
+      if(input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+        if(select == 1) {
+          phase = 1;
+          // If we back out, we need to close connections
+          DungeonGame.client.disconnect();
+          DungeonGame.client = null;
+          return;
         }
       }
     }

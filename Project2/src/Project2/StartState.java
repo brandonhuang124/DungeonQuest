@@ -1,5 +1,5 @@
 package Project2;
-
+//TODO removing this state for menu?
 import org.newdawn.slick.*;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
@@ -29,6 +29,7 @@ public class StartState extends BasicGameState {
 
   @Override
   public void enter(GameContainer container, StateBasedGame game) {
+    MapUtil.cheatMode = false;
     DungeonGame rg = (DungeonGame)game;
     container.setSoundOn(true);
   }

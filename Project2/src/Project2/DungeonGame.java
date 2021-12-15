@@ -32,9 +32,12 @@ public class DungeonGame extends StateBasedGame {
   public static final int STARTUPSTATE = 0;
   public static final int TESTSTATE = 1;
   public static final int LEVEL1 = 2;
+  //public static final int LEVEL2 = 5;
   public static final int MENUSTATE = 3;
   public static final int DUMMYSTATE = 4;
-
+  public static final int GAMEOVER = 6;
+  public static final int TRANSITION = 7;
+  public static final int WIN = 8;
   // Important parameters
   public static final int SCALE = 1;
 
@@ -101,15 +104,43 @@ public class DungeonGame extends StateBasedGame {
   public static final String MENU_TITLE_RSC = "Project2/Assets/menu/titleCard.png";
   public static final String MENU_WAIT_RSC = "Project2/Assets/menu/waiting.png";
   public static final String MENU_FOUND_RSC = "Project2/Assets/menu/found.png";
+  public static final String MENU_ERROR_RSC = "Project2/Assets/menu/error.png";
+  public static final String MENU_WAITHOST_RSC = "Project2/Assets/menu/waitinghost.png";
+  public static final String MENU_DRUM_RSC = "Project2/Assets/menu/drum.png";
+  public static final String MENU_GAMEOVERBG_RSC = "Project2/Assets/menu/gameoverbg.png";
+  public static final String MENU_HOWTOBG_RSC = "Project2/Assets/menu/howToPlayBG.png";
+  public static final String MENU_L1_RSC = "Project2/Assets/menu/level1.png";
+  public static final String MENU_L2_RSC = "Project2/Assets/menu/level2.png";
+  public static final String MENU_L3_RSC = "Project2/Assets/menu/level3.png";
+  public static final String MENU_WINBG_RSC = "Project2/Assets/menu/winbg.png";
 
   // Other
   public static final String POWERUP_HEALTHPOTION_RSC = "Project2/Assets/powerups/healthPotion.png";
   public static final String PLAYER_ARROWTEST_RSC = "Project2/Assets/arrow.png";
   public static final String PLAYER_PROJECTILE_RSC = "Project2/Assets/projectile.png";
+  public static final String POWERUP_SELFREVIVE_RSC = "Project2/Assets/powerups/watermelon.png";
+  public static final String POWERUP_INVINCIBILITY_RSC = "Project2/Assets/powerups/shield_02.png";
+  public static final String POWERUP_DOUBLESTRENGTH_RSC = "Project2/Assets/powerups/glowing_dust.png";
+  public static final String KEY_RSC = "Project2/Assets/key.png";
 
-  // Map
-  public static final String MAP_WALL_RSC = "Project2/Assets/wall.png";
-  public static final String MAP_FLOOR_RSC = "Project2/Assets/floor.png";
+  // Map - LEVEL 1:
+  public static final String MAP_WALL_RSC = "Project2/Assets/level1/wall.png";
+  public static final String MAP_FLOOR_RSC = "Project2/Assets/level1/floor.png";
+  public static final String MAP_WALL_WITH_TORCH_RSC = "Project2/Assets/level1/wall_torch.png";
+  public static final String MAP_DOOR_RSC = "Project2/Assets/level1/door.png";
+
+  // Map - LEVEL 2:
+  public static final String MAP2_WALL_RSC = "Project2/Assets/level2/wall2.png";
+  public static final String MAP2_FLOOR_RSC = "Project2/Assets/level2/floor2.png";
+  public static final String MAP2_WALL_WITH_TORCH_RSC = "Project2/Assets/level2/wall2_torch.png";
+  public static final String MAP2_DOOR_RSC = "Project2/Assets/level2/door2.png";
+
+  // Map - LEVEL 3:
+  public static final String MAP3_WALL_RSC = "Project2/Assets/level3/wall3.png";
+  public static final String MAP3_FLOOR_RSC = "Project2/Assets/level3/floor3.png";
+  public static final String MAP3_LAVA_RSC = "Project2/Assets/level3/lava.png";
+  public static final String MAP3_DOOR_RSC = "Project2/Assets/level3/door3.png";
+
 
   // Parameters
   public final int ScreenWidth;
@@ -133,9 +164,12 @@ public class DungeonGame extends StateBasedGame {
     // Load states
     addState(new StartState());
     //addState(new TestState());
+    addState(new TransitionState());
     addState(new Level1());
     addState(new MenuState());
     addState(new DummyState());
+    addState(new GameOver());
+    addState(new WinState());
     /*** RESOURCE LOADING ***/
     // Player
     ResourceManager.loadImage(PLAYER_RANGEDARROW1_RSC);
@@ -199,15 +233,45 @@ public class DungeonGame extends StateBasedGame {
     ResourceManager.loadImage(MENU_JOIN_RSC);
     ResourceManager.loadImage(MENU_WAIT_RSC);
     ResourceManager.loadImage(MENU_FOUND_RSC);
+    ResourceManager.loadImage(MENU_ERROR_RSC);
+    ResourceManager.loadImage(MENU_WAITHOST_RSC);
+    ResourceManager.loadImage(MENU_DRUM_RSC);
+    ResourceManager.loadImage(MENU_GAMEOVERBG_RSC);
+    ResourceManager.loadImage(MENU_HOWTOBG_RSC);
+    ResourceManager.loadImage(MENU_L1_RSC);
+    ResourceManager.loadImage(MENU_L2_RSC);
+    ResourceManager.loadImage(MENU_L3_RSC);
+    ResourceManager.loadImage(MENU_WINBG_RSC);
 
     // Other
     ResourceManager.loadImage(POWERUP_HEALTHPOTION_RSC);
     ResourceManager.loadImage(PLAYER_ARROWTEST_RSC);
     ResourceManager.loadImage(PLAYER_PROJECTILE_RSC);
+    ResourceManager.loadImage(POWERUP_SELFREVIVE_RSC);
+    ResourceManager.loadImage(POWERUP_INVINCIBILITY_RSC);
+    ResourceManager.loadImage(POWERUP_DOUBLESTRENGTH_RSC);
 
-    // Map
+    // Map - level 1
     ResourceManager.loadImage(MAP_FLOOR_RSC);
     ResourceManager.loadImage(MAP_WALL_RSC);
+    ResourceManager.loadImage(MAP_WALL_WITH_TORCH_RSC);
+    ResourceManager.loadImage(MAP_DOOR_RSC);
+
+    // Map - level 2
+    ResourceManager.loadImage(MAP2_FLOOR_RSC);
+    ResourceManager.loadImage(MAP2_WALL_RSC);
+    ResourceManager.loadImage(MAP2_WALL_WITH_TORCH_RSC);
+    ResourceManager.loadImage(MAP2_DOOR_RSC);
+
+    // Map - level 3
+    ResourceManager.loadImage(MAP3_FLOOR_RSC);
+    ResourceManager.loadImage(MAP3_WALL_RSC);
+    ResourceManager.loadImage(MAP3_LAVA_RSC);
+    ResourceManager.loadImage(MAP3_DOOR_RSC);
+
+    //KEY
+    ResourceManager.loadImage(KEY_RSC);
+
   }
 
   public static void main(String[] args) {
@@ -237,8 +301,6 @@ public class DungeonGame extends StateBasedGame {
    */
   public static Tile[][] getTileMap(String map, int width, int height) {
     // Check if an invalid string to build was given.
-    System.out.println(map.length());
-    System.out.println(width + " , " + height);
     if(width * height != map.length()) {
       System.out.println("String length did not match map dimensions");
       return null;
@@ -268,6 +330,7 @@ public class DungeonGame extends StateBasedGame {
     int width = MapUtil.LEVELWIDTH;
     int height = MapUtil.LEVELHEIGHT;
     int leftBound, rightBound, bottomBound, topBound;
+    Tile[][] tilemap = levelMap.currentTileMap;
     Vertex path[][];
     // We need to flood the whole board if the oldPath doesn't exist.
     if(oldPath == null){
@@ -364,15 +427,15 @@ public class DungeonGame extends StateBasedGame {
         }
       }
       // Tile down right
-      if(x > 0 && y > 0) {
-        compare = currentDist + (path[x-1][y-1].getCost() * Math.sqrt(2));
-        if(path[x-1][y-1].getDistance() > compare) {
-          path[x-1][y-1].setDistance(compare);
-          path[x-1][y-1].setDirection(3);
-        }
+      if(x > 0 && y > 0 && tilemap[x-1][y].getID() == 0 && tilemap[x][y-1].getID() == 0) {
+          compare = currentDist + (path[x-1][y-1].getCost() * Math.sqrt(2));
+          if(path[x-1][y-1].getDistance() > compare) {
+            path[x-1][y-1].setDistance(compare);
+            path[x-1][y-1].setDirection(3);
+          }
       }
       // Tile down left
-      if(x < width - 1 && y > 0) {
+      if(x < width - 1 && y > 0 && tilemap[x+1][y].getID() == 0 && tilemap[x][y-1].getID() == 0) {
         compare = currentDist + (path[x+1][y-1].getCost() * Math.sqrt(2));
         if(path[x+1][y-1].getDistance() > compare) {
           path[x+1][y-1].setDistance(compare);
@@ -380,7 +443,7 @@ public class DungeonGame extends StateBasedGame {
         }
       }
       // Tile up right
-      if(x > 0 && y < height - 1) {
+      if(x > 0 && y < height - 1 && tilemap[x-1][y].getID() == 0 && tilemap[x][y+1].getID() == 0) {
         compare = currentDist + (path[x-1][y+1].getCost() * Math.sqrt(2));
         if(path[x-1][y+1].getDistance() > compare) {
           path[x-1][y+1].setDistance(compare);
@@ -388,7 +451,7 @@ public class DungeonGame extends StateBasedGame {
         }
       }
       // Tile up left
-      if(x < width - 1 && y < height - 1) {
+      if(x < width - 1 && y < height - 1 && tilemap[x+1][y].getID() == 0 && tilemap[x][y+1].getID() == 0) {
         compare = currentDist + (path[x+1][y+1].getCost() * Math.sqrt(2));
         if(path[x+1][y+1].getDistance() > compare) {
           path[x+1][y+1].setDistance(compare);
@@ -411,7 +474,6 @@ public class DungeonGame extends StateBasedGame {
     for (int x = leftBound; x < width; x++) {
       for (int y = bottomBound; y < height; y++) {
         if (!seen[x][y]) {
-          // System.out.println("found a node x:" + x + " y:" + y);
           return true;
         }
       }

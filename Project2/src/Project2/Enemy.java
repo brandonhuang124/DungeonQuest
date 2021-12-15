@@ -38,6 +38,12 @@ public class Enemy extends Entity{
   private Animation moveLeft, moveRight, idleLeft, idleRight, current;
   public Coordinate worldPos;
 
+  //assigning id's for tiles with a name to avoid confusion:
+  private final int floorTile = 0;
+  private final int wallTile = 1;
+  private final int wallTileWithTorch = 2;
+  private final int exitDoorGoal = 6;
+
   /***
    * Constructor, prepares default stats and Images/anmiations
    * @param x
@@ -140,7 +146,6 @@ public class Enemy extends Entity{
     if(id == 1) {
       if(playerLocation.x == location.x && playerLocation.y == location.y) {
         player1.damage(damage);
-        System.out.println("Player Hit! " + player1.getCurrentHealth());
         sleep = true;
         sleeptimer = 500;
         stop();
@@ -235,7 +240,6 @@ public class Enemy extends Entity{
     if(id == 1) {
       if(playerLocation.x == location.x && playerLocation.y == location.y) {
         closestPlayer.damage(damage);
-        System.out.println("Player Hit! " + closestPlayer.getCurrentHealth());
         sleep = true;
         sleeptimer = 500;
         stop();
@@ -446,19 +450,19 @@ public class Enemy extends Entity{
     // Check if any adjacent tiles are walls, and if were inside any of them. If so do an offset update.
     TileIndex location = getTileIndex();
     // Tile above
-    if (tilemap[location.x][location.y - 1].getID() == 1 && getTileOffset().getY() >= 0) {
+    if (MapUtil.hasCollision(tilemap[location.x][location.y - 1].getID()) && getTileOffset().getY() >= 0) {
       worldPos.y += getTileOffset().getY();
     }
     // Tile Below
-    if (tilemap[location.x][location.y + 1].getID() == 1 && getTileOffset().getY() <= 0) {
+    if (MapUtil.hasCollision(tilemap[location.x][location.y + 1].getID())  && getTileOffset().getY() <= 0) {
       worldPos.y += getTileOffset().getY();
     }
     // Tile Left
-    if (tilemap[location.x - 1][location.y].getID() == 1 && getTileOffset().getX() >= 0) {
+    if (MapUtil.hasCollision(tilemap[location.x - 1][location.y].getID()) && getTileOffset().getX() >= 0) {
       worldPos.x += getTileOffset().getX();
     }
     // Tile Right
-    if (tilemap[location.x + 1][location.y].getID() == 1 && getTileOffset().getX() <= 0) {
+    if (MapUtil.hasCollision( tilemap[location.x + 1][location.y].getID()) && getTileOffset().getX() <= 0) {
       worldPos.x += getTileOffset().getX();
     }
   }
@@ -488,7 +492,7 @@ public class Enemy extends Entity{
       while(enemyx > playerx) {
         TileIndex currentLocation = MapUtil.convertWorldToTile(new Coordinate(enemyx,enemyy));
         // Check if were in a wall
-        if(tilemap[currentLocation.x][currentLocation.y].getID() == 1) {
+        if(MapUtil.hasCollision(tilemap[currentLocation.x][currentLocation.y].getID())) {
           return false;
         }
         // If no collisions, traverse further down the line.
@@ -501,7 +505,7 @@ public class Enemy extends Entity{
       while(enemyx < playerx) {
         TileIndex currentLocation = MapUtil.convertWorldToTile(new Coordinate(enemyx,enemyy));
         // Check if were in a wall
-        if(tilemap[currentLocation.x][currentLocation.y].getID() == 1) {
+        if(MapUtil.hasCollision(tilemap[currentLocation.x][currentLocation.y].getID())) {
           return false;
         }
         // If no collisions, traverse further down the line.
@@ -565,5 +569,57 @@ public class Enemy extends Entity{
       addAnimation(idleRight);
       current = idleRight;
     }
+  }
+
+  /***
+   * Static method to be called when setting enemies for levels. BUILD HERE WHEN SETTING ENEMIES SO THAT PLAYER 2
+   * CAN ACCESS THIS METHOD AND BUILD AN IDENTICAL ENEMY LIST.
+   *  Id of the level from which we build the list of enemies we can get from MapUtil.
+   * @return
+   *  An ArrayList of enemies to be used in either P1 state or in P2's dummy state. Each one should be using an
+   *  identical list.
+   */
+  public static ArrayList<Enemy> buildEnemyList() {
+    ArrayList<Enemy> enemyList = new ArrayList<Enemy>();
+    if(MapUtil.levelName == LevelName.ONE) {
+      enemyList.add(new Enemy(9, 19, 1));
+      enemyList.add(new Enemy(21, 7, 2));
+      enemyList.add(new Enemy(50, 5, 2));
+      enemyList.add(new Enemy(56,26, 1));
+      enemyList.add(new Enemy(20,35, 1));
+      enemyList.add(new Enemy(25,54, 1));
+      enemyList.add(new Enemy(52,48, 2));
+      enemyList.add(new Enemy(55,52, 1));
+    }
+    if(MapUtil.levelName == LevelName.TWO) {
+      enemyList.add(new Enemy(10, 10, 1));
+      enemyList.add(new Enemy(7,  37, 1));
+      enemyList.add(new Enemy(27, 30, 2));
+      enemyList.add(new Enemy(37, 22, 1));
+      enemyList.add(new Enemy(39, 17, 2));
+      enemyList.add(new Enemy(13, 40, 1));
+      enemyList.add(new Enemy(54, 47, 1));
+      enemyList.add(new Enemy(22, 57, 2));
+      enemyList.add(new Enemy(52, 57, 2));
+    }
+    if(MapUtil.levelName == LevelName.THREE) {
+      enemyList.add(new Enemy(17, 4, 1));
+      enemyList.add(new Enemy(44, 4, 1));
+      enemyList.add(new Enemy( 3,28, 1));
+      enemyList.add(new Enemy( 7,28, 2));
+      enemyList.add(new Enemy(26,28, 1));
+      enemyList.add(new Enemy(28,38, 1));
+      enemyList.add(new Enemy( 4,44, 2));
+      enemyList.add(new Enemy(16,53, 1));
+      enemyList.add(new Enemy(46,57, 2));
+      enemyList.add(new Enemy(44,26, 2));
+      enemyList.add(new Enemy(52,33, 1));
+    }
+    if(MapUtil.levelName == LevelName.NONEORTEST) {
+      enemyList.add(new Enemy(10, 10, 2));
+      enemyList.add(new Enemy(18, 18, 1));
+      enemyList.add(new Enemy(26, 26, 1));
+    }
+    return enemyList;
   }
 }

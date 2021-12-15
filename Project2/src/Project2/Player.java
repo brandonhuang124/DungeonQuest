@@ -27,14 +27,15 @@ public class Player extends Entity {
 
   private Vector velocity;
   private float speed;
-  private int damage, maxhealth, health, attackCooldownTimer, attackCooldown, playerType;
+  private int damage, maxhealth, health, attackCooldownTimer, attackCooldown, playerType, damageCounter, attackCounter;
+  private int baseDamage;
   private double weaponAngle;
-  private boolean faceRight, attackReady;
+  private boolean faceRight, attackReady, selfRevive, invincible, doubleStrength, isDead;
   private Animation moveLeft, moveRight, idleLeft, idleRight, current;
   public Weapon weapon;
   public Coordinate worldPos;
   public Coordinate prevMoveVelocity;
-
+  public Boolean hasTheKey;
   /***
    * Constructor, prepares default stats and Images/anmiations
    * @param x
@@ -49,45 +50,60 @@ public class Player extends Entity {
   public Player(final float x, final float y, int id) {
     super(x,y);
     weapon = new Weapon(x,y,id);
-    damage = 10;
-    maxhealth = 10;
+    // Assign stats based on type:
+    if(id == 1) {
+      maxhealth = 10;
+      damage = 4;
+    }
+    else if(id == 2) {
+      maxhealth = 15;
+      damage = 5;
+    }
+    baseDamage = damage;
     health = maxhealth;
     velocity = new Vector(0,0);
     playerType = id;
     speed = 0.25f;
     worldPos = new Coordinate(x,y);
+    hasTheKey = false;
+    selfRevive = false;
+    invincible = false;
+    doubleStrength = false;
+    attackCounter = 0;
+    damageCounter = 0;
+
 
 
     // Ranged player assignments
     if(id == 1) {
       moveLeft = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.PLAYER_RANGEDMOVELEFT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.PLAYER_RANGEDMOVELEFT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       moveRight = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.PLAYER_RANGEDMOVERIGHT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.PLAYER_RANGEDMOVERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       idleLeft = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.PLAYER_RANGEDIDLELEFT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.PLAYER_RANGEDIDLELEFT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       idleRight = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.PLAYER_RANGEDIDLERIGHT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.PLAYER_RANGEDIDLERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       attackCooldown = 200;
     }
     // Melee player assignments
     if(id == 2) {
       moveLeft = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.PLAYER_MELEEMOVELEFT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.PLAYER_MELEEMOVELEFT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       moveRight = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.PLAYER_MELEEMOVERIGHT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.PLAYER_MELEEMOVERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       idleLeft = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.PLAYER_MELEEIDLELEFT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.PLAYER_MELEEIDLELEFT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       idleRight = new Animation(ResourceManager.getSpriteSheet(
-          DungeonGame.PLAYER_MELEEIDLERIGHT_RSC, 32, 32), 0, 0, 3, 0,
-          true, 100, true);
+              DungeonGame.PLAYER_MELEEIDLERIGHT_RSC, 32, 32), 0, 0, 3, 0,
+              true, 100, true);
       attackCooldown = 200;
     }
     attackReady = true;
@@ -217,7 +233,7 @@ public class Player extends Entity {
     // Down
     if(direction == Direction.DOWN_LEFT || direction == Direction.DOWN || direction == Direction.DOWN_RIGHT) {
       // Check if the tile left is a wall
-      if(tilemap[location.x][location.y+1].getID() == 1) {
+      if(MapUtil.hasCollision(tilemap[location.x][location.y+1].getID())) {
         // If it is, we need to check were not too far into the tile where we will go into the wall.
         Vector offset = getTileOffset();
         adjacencyCheck = true;
@@ -228,7 +244,7 @@ public class Player extends Entity {
     // Left
     // ** Process for checking is similar to above, but directions and tiles checked are changed.
     if (direction == Direction.LEFT || direction == Direction.DOWN_LEFT || direction == Direction.UP_RIGHT) {
-      if(tilemap[location.x-1][location.y].getID() == 1) {
+      if(MapUtil.hasCollision(tilemap[location.x-1][location.y].getID())) {
         Vector offset = getTileOffset();
         adjacencyCheck = true;
         if(offset.getX() >= 0)
@@ -237,7 +253,7 @@ public class Player extends Entity {
     }
     // Right
     if (direction == Direction.RIGHT || direction == Direction.UP_RIGHT || direction == Direction.DOWN_LEFT) {
-      if(tilemap[location.x+1][location.y].getID() == 1) {
+      if(MapUtil.hasCollision(tilemap[location.x+1][location.y].getID())) {
         Vector offset = getTileOffset();
         adjacencyCheck = true;
         if(offset.getX() <= 0)
@@ -246,7 +262,7 @@ public class Player extends Entity {
     }
     // Up
     if (direction == Direction.UP || direction == Direction.UP_LEFT || direction == Direction.UP_RIGHT) {
-      if(tilemap[location.x][location.y-1].getID() == 1) {
+      if(MapUtil.hasCollision(tilemap[location.x][location.y-1].getID())) {
         Vector offset = getTileOffset();
         adjacencyCheck = true;
         if(offset.getY() >= 0)
@@ -260,7 +276,7 @@ public class Player extends Entity {
     if(!adjacencyCheck) {
       // Up Right
       if (direction == Direction.UP_RIGHT) {
-        if (tilemap[location.x + 1][location.y - 1].getID() == 1) {
+        if (MapUtil.hasCollision(tilemap[location.x + 1][location.y - 1].getID())) {
           Vector offset = getTileOffset();
           if (offset.getY() >= 0 || offset.getX() <= 0)
             return false;
@@ -268,7 +284,7 @@ public class Player extends Entity {
       }
       // Up Left
       else if (direction == Direction.UP_LEFT) {
-        if (tilemap[location.x - 1][location.y - 1].getID() == 1) {
+        if (MapUtil.hasCollision(tilemap[location.x - 1][location.y - 1].getID())) {
           Vector offset = getTileOffset();
           if (offset.getY() >= 0 || offset.getX() >= 0)
             return false;
@@ -276,7 +292,7 @@ public class Player extends Entity {
       }
       // Down Right
       else if (direction == Direction.DOWN_RIGHT) {
-        if (tilemap[location.x + 1][location.y + 1].getID() == 1) {
+        if (MapUtil.hasCollision(tilemap[location.x + 1][location.y + 1].getID())) {
           Vector offset = getTileOffset();
           if (offset.getY() <= 0 || offset.getX() <= 0)
             return false;
@@ -284,7 +300,7 @@ public class Player extends Entity {
       }
       // Down Left
       else if (direction == Direction.DOWN_LEFT) {
-        if (tilemap[location.x - 1][location.y + 1].getID() == 1) {
+        if (MapUtil.hasCollision(tilemap[location.x - 1][location.y + 1].getID())) {
           Vector offset = getTileOffset();
           if (offset.getY() <= 0 || offset.getX() >= 0) {
             return false;
@@ -306,11 +322,29 @@ public class Player extends Entity {
    *  false: otherwise
    */
   public boolean damage(int damage) {
+    // If boolean is true, return immediately
+    // Duration = 10 attacks, tracked via attackCounter
+    if(getInvincible()) {
+      if(damageCounter < 3) {
+        damageCounter++;
+        return false;
+      }
+      // Flip the invincibility boolean back to false
+      flipInvincible();
+      damageCounter = 0;
+    }
+
     health -= damage;
-    if(health <= 0)
+    if(health <= 0) {
+      worldPos.x = 32;
+      worldPos.y = 32;
+      isDead = true;
       return true;
+    }
     return false;
   }
+
+  public boolean isDead() { return isDead;}
 
   public void maxHeal() {health = maxhealth;}
 
@@ -319,6 +353,46 @@ public class Player extends Entity {
   public int getMaxHealth() {return maxhealth;}
 
   public int getPlayerType() { return playerType;}
+
+
+  public boolean getSelfRevive() {
+    return selfRevive;
+  }
+
+  public void setSelfRevive(boolean b) {
+    selfRevive = b;
+  }
+
+  public void flipSelfRevive() {
+    isDead = false;
+    selfRevive = !selfRevive;
+  }
+
+  public boolean getInvincible() {
+    return invincible;
+  }
+
+  public void setInvincible(boolean b) {
+    invincible = b;
+  }
+
+  public void flipInvincible() {
+    invincible = !invincible;
+  }
+
+  public boolean getDoubleStrength() {
+    return doubleStrength;
+  }
+
+  public void setDoubleStrength(boolean b) {
+    doubleStrength = b;
+  }
+
+  public void flipDoubleStrength() {
+    doubleStrength = !doubleStrength;
+  }
+
+
 
   /***
    * This function is to be called when the player fire a projectile.
@@ -329,6 +403,18 @@ public class Player extends Entity {
    */
   public Projectile fire(double angle) {
     // Check if were ready to attack, and only fire if so.
+    if(getDoubleStrength()) {
+      if(attackCounter < 10) {
+        damage = baseDamage * 2;
+        attackCounter++;
+      }
+      else {
+        flipDoubleStrength();
+        damage = baseDamage;
+        attackCounter = 0;
+      }
+    }
+
     if(attackReady) {
       Projectile newProjectile;
       if(playerType == 1)
@@ -350,6 +436,9 @@ public class Player extends Entity {
    */
 
   public void update(final int delta) {
+    // Skip if were dead.
+    if(isDead)
+      return;
     Vector movement = velocity.scale(delta);
     prevMoveVelocity = new Coordinate(movement.getX(), movement.getY());
     worldPos.x += movement.getX();
@@ -372,22 +461,22 @@ public class Player extends Entity {
     // Check if any adjacent tiles are walls, and if were inside any of them. If so do an offset update.
     TileIndex location = getTileIndex();
     // Tile above
-    if (tilemap[location.x][location.y - 1].getID() == 1 && getTileOffset().getY() >= 0) {
+    if (MapUtil.hasCollision(tilemap[location.x][location.y - 1].getID()) && getTileOffset().getY() >= 0) {
       worldPos.y += getTileOffset().getY();
       prevMoveVelocity.y += getTileOffset().getY();
     }
     // Tile Below
-    if (tilemap[location.x][location.y + 1].getID() == 1 && getTileOffset().getY() <= 0) {
+    if (MapUtil.hasCollision(tilemap[location.x][location.y + 1].getID()) && getTileOffset().getY() <= 0) {
       worldPos.y += getTileOffset().getY();
       prevMoveVelocity.y += getTileOffset().getY();
     }
     // Tile Left
-    if (tilemap[location.x - 1][location.y].getID() == 1 && getTileOffset().getX() >= 0) {
+    if (MapUtil.hasCollision(tilemap[location.x - 1][location.y].getID()) && getTileOffset().getX() >= 0) {
       worldPos.x += getTileOffset().getX();
       prevMoveVelocity.x += getTileOffset().getX();
     }
     // Tile Right
-    if (tilemap[location.x + 1][location.y].getID() == 1 && getTileOffset().getX() <= 0) {
+    if (MapUtil.hasCollision(tilemap[location.x + 1][location.y].getID()) && getTileOffset().getX() <= 0) {
       worldPos.x += getTileOffset().getX();
       prevMoveVelocity.x += getTileOffset().getX();
     }

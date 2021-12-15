@@ -36,9 +36,16 @@ public class DummyObject extends Entity {
         }
         // If its a power up
         else if(type == 2) {
-            if(id == 1) {
+            if(id == 1)
                 addImage(ResourceManager.getImage(DungeonGame.POWERUP_HEALTHPOTION_RSC));
-            }
+            else if(id == 2)
+              addImage(ResourceManager.getImage(DungeonGame.POWERUP_SELFREVIVE_RSC));
+            else if(id == 3)
+              addImage(ResourceManager.getImage(DungeonGame.POWERUP_INVINCIBILITY_RSC));
+            else if(id == 4)
+              addImage(ResourceManager.getImage(DungeonGame.POWERUP_DOUBLESTRENGTH_RSC));
+            else if(id == 5)
+              addImage(ResourceManager.getImage(DungeonGame.KEY_RSC));
         }
         worldPos = new Coordinate(x,y);
         setRotation(angle);
