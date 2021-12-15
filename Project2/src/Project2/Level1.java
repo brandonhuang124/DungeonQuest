@@ -253,13 +253,20 @@ public class Level1 extends BasicGameState {
             MapUtil.cheatMode = true;
         }
         if(MapUtil.cheatMode){
-            if(input.isKeyDown(Input.KEY_Q)){
+            if(input.isKeyDown(Input.KEY_Q)) {
                 levelComplete = true;
-                try {
-                  dg.client.dataOutputStream.writeUTF(get2PData());
-                  dg.client.dataOutputStream.flush();
-                } catch (IOException e) { e.printStackTrace(); }
-                game.enterState(DungeonGame.TRANSITION, new EmptyTransition(), new BlobbyTransition());
+                if (twoPlayer) {
+                    try {
+                        dg.client.dataOutputStream.writeUTF(get2PData());
+                        dg.client.dataOutputStream.flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    game.enterState(DungeonGame.TRANSITION, new EmptyTransition(), new BlobbyTransition());
+                }
+                else{
+                    game.enterState(DungeonGame.TRANSITION, new EmptyTransition(), new BlobbyTransition());
+                }
             }
         }
         String p2data;
