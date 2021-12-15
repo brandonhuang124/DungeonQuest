@@ -103,23 +103,23 @@ public class Powerup extends Entity {
       powerUpList.add(new Powerup(16, 17, 4));
       powerUpList.add(new Powerup(38,  5, 1));
       powerUpList.add(new Powerup(38, 24, 1));
-      powerUpList.add(new Powerup(15, 31, 1));
+      powerUpList.add(new Powerup(15, 31, 4));
       powerUpList.add(new Powerup(44, 47, 1));
     }
     if(MapUtil.levelName == LevelName.TWO) {
-      powerUpList.add(new Powerup(19, 4, 1));
-      powerUpList.add(new Powerup(49, 31, 1));
+      powerUpList.add(new Powerup(19, 4, 3));
+      powerUpList.add(new Powerup(49, 31, 2));
       powerUpList.add(new Powerup(18, 40, 1));
-      powerUpList.add(new Powerup(12, 40, 1));
+      powerUpList.add(new Powerup(12, 40, 2));
       powerUpList.add(new Powerup(54, 42, 1));
-      powerUpList.add(new Powerup(6,  56, 1));
+      powerUpList.add(new Powerup(6,  56, 4));
     }
     if(MapUtil.levelName == LevelName.THREE) {
-      powerUpList.add(new Powerup(5, 30, 1));
-      powerUpList.add(new Powerup(34, 20, 1));
+      powerUpList.add(new Powerup(5, 30, 2));
+      powerUpList.add(new Powerup(34, 20, 3));
       powerUpList.add(new Powerup(34, 12, 1));
       powerUpList.add(new Powerup(38, 32, 1));
-      powerUpList.add(new Powerup( 2, 57, 1));
+      powerUpList.add(new Powerup( 2, 57, 4));
       powerUpList.add(new Powerup(25, 57, 1));
     }
     return powerUpList;
